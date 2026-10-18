@@ -103,15 +103,25 @@
       btn.style.opacity = '0.7';
     }
     try {
-      const { data, error } = await supabaseClient.auth.signInWithOAuth({
+      const client = (typeof getSupabase === 'function' ? getSupabase() : null) || window.supabaseClient || (window.supabase && typeof window.supabase.createClient === 'function' ? window.supabase.createClient('https://biteosolyhaoxwnzxdxx.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpdGVvc29seWhhb3h3bnp4ZHh4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4OTA3OTcsImV4cCI6MjA5NzQ2Njc5N30.jHjbpWxqqH83dLhGZ4MwYfk1pbnlov5jvP2x9Z0-S2g') : null);
+      if (!client) {
+        throw new Error('Authentication client could not be loaded. Please refresh the page.');
+      }
+      const targetUrl = new URL('index.html', window.location.origin).href;
+      const { data, error } = await client.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: new URL('index.html', window.location.href).href
+          redirectTo: targetUrl
         }
       });
       if (error) throw error;
     } catch(err) {
-      showToast(err.message, 'error');
+      console.error('Google Sign-in Error:', err);
+      if (typeof showToast === 'function') {
+        showToast(err.message || 'Google sign-in failed', 'error');
+      } else {
+        alert(err.message || 'Google sign-in failed');
+      }
       if (btn) {
         btn.disabled = false;
         btn.style.opacity = '1';

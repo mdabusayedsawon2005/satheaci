@@ -3044,7 +3044,7 @@ body.sa-has-back-btn .sa-logo {
   display: none; /* Never visible on mobile/tablet */
 }
 
-@media (min-width: 992px) {
+@media (min-width: 769px) {
   .sa-hero-premium {
     overflow: visible !important;
   }
@@ -3054,16 +3054,16 @@ body.sa-has-back-btn .sa-logo {
   .sa-hero-stage-relative {
     overflow: visible !important;
     position: relative;
-    margin-left: 140px;
-    width: calc(100% - 140px);
+    margin-left: 120px;
+    width: calc(100% - 120px);
   }
   .sa-butler-stage {
-    display: block;
+    display: block !important;
     position: absolute;
-    left: -130px;
+    left: -115px;
     bottom: -5px;
-    width: 240px;
-    height: 420px;
+    width: 220px;
+    height: 390px;
     z-index: 25;
     pointer-events: auto;
     cursor: pointer;
@@ -3082,6 +3082,18 @@ body.sa-has-back-btn .sa-logo {
   .sa-butler-stage:hover img,
   .sa-butler-stage:hover canvas {
     filter: drop-shadow(0 18px 42px rgba(212, 175, 55, 0.55));
+  }
+}
+
+@media (min-width: 992px) {
+  .sa-hero-stage-relative {
+    margin-left: 140px;
+    width: calc(100% - 140px);
+  }
+  .sa-butler-stage {
+    left: -130px;
+    width: 240px;
+    height: 420px;
   }
 }
 

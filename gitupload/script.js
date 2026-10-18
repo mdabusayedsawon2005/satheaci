@@ -9,14 +9,23 @@
 const SUPABASE_URL = 'https://biteosolyhaoxwnzxdxx.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpdGVvc29seWhhb3h3bnp4ZHh4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4OTA3OTcsImV4cCI6MjA5NzQ2Njc5N30.jHjbpWxqqH83dLhGZ4MwYfk1pbnlov5jvP2x9Z0-S2g';
 
-const supabaseClient = window.supabase && typeof window.supabase.createClient === 'function'
-    ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-    : (window.supabaseClient || null);
+function getSupabase() {
+    if (window._saSupabase) return window._saSupabase;
+    if (window.supabase && typeof window.supabase.createClient === 'function') {
+        window._saSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        return window._saSupabase;
+    }
+    if (window.supabaseClient && typeof window.supabaseClient.from === 'function') {
+        window._saSupabase = window.supabaseClient;
+        return window._saSupabase;
+    }
+    return null;
+}
 
-// Expose client instance globally
-window.supabaseClient = supabaseClient;
+const supabaseClient = getSupabase();
+window.supabaseClient = supabaseClient || window.supabaseClient;
 if (supabaseClient) {
-    window.supabase = supabaseClient;
+    window._saSupabase = supabaseClient;
 }
 
 // ── COMPREHENSIVE BANGLADESH GEOGRAPHY (All 8 Divisions, 64 Districts) ──
@@ -1841,7 +1850,7 @@ window.addEventListener('resize', () => {
         _saLastIsMobile = isMobileNow;
         renderHeroBanners();
     }
-    if (window.innerWidth >= 992) {
+    if (window.innerWidth >= 769) {
         if (typeof window.saStartContinuousButler === 'function') {
             window.saStartContinuousButler();
         }
@@ -2037,7 +2046,7 @@ function initHeroSlider() {
 // ══════════════════════════════════════════════════════════
 function initRoyalButlerMascot() {
     if (window._saButlerInitialized) {
-        if (window.innerWidth >= 992 && typeof window.saStartContinuousButler === 'function') {
+        if (window.innerWidth >= 769 && typeof window.saStartContinuousButler === 'function') {
             window.saStartContinuousButler();
         }
         return;
@@ -2048,8 +2057,21 @@ function initRoyalButlerMascot() {
     const canvas = document.getElementById('saButlerCanvas');
     if (!stage || !butlerImg || !canvas) return;
 
-    if (window.innerWidth < 992) {
-        return;
+    function updateButlerLayout() {
+        const isDesktop = window.innerWidth >= 769;
+        if (!isDesktop) {
+            if (isRunning) {
+                window.saStopContinuousButler();
+            }
+            return;
+        }
+
+        // Make sure stage is visible and properly sized
+        stage.style.display = 'block';
+
+        if (!isRunning) {
+            window.saStartContinuousButler();
+        }
     }
 
     window._saButlerInitialized = true;
@@ -2069,10 +2091,24 @@ function initRoyalButlerMascot() {
 
     // Single ultra-optimized 707KB transparent spritesheet with auto-fallback
     const spritesheet = new Image();
+    let spritesheetLoaded = false;
+
+    spritesheet.onload = function() {
+        spritesheetLoaded = true;
+        if (window.innerWidth >= 769) {
+            butlerImg.style.display = 'none';
+            canvas.style.display = 'block';
+        }
+    };
+
     spritesheet.onerror = function() {
         if (!this._r) {
             this._r = true;
             this.src = 'butler_spritesheet.webp';
+        } else {
+            // If spritesheet fails, keep static fallback image visible!
+            butlerImg.style.display = 'block';
+            canvas.style.display = 'none';
         }
     };
     spritesheet.src = 'images/butler_spritesheet.webp';
@@ -2082,7 +2118,11 @@ function initRoyalButlerMascot() {
 
         if (!isPaused && (now - lastTime >= frameInterval)) {
             lastTime = now;
-            if (spritesheet.complete && spritesheet.naturalWidth > 0) {
+            if (spritesheetLoaded || (spritesheet.complete && spritesheet.naturalWidth > 0)) {
+                if (canvas.style.display !== 'block') {
+                    butlerImg.style.display = 'none';
+                    canvas.style.display = 'block';
+                }
                 const col = currentFrame % COLS;
                 const row = Math.floor(currentFrame / COLS);
                 const sx = col * FRAME_W;
@@ -2113,12 +2153,16 @@ function initRoyalButlerMascot() {
     }
 
     window.saStartContinuousButler = function() {
-        if (window.innerWidth < 992) return;
+        if (window.innerWidth < 769) return;
         isPaused = false;
         if (!isRunning) {
             isRunning = true;
-            butlerImg.style.display = 'none';
-            canvas.style.display = 'block';
+            if (spritesheetLoaded || (spritesheet.complete && spritesheet.naturalWidth > 0)) {
+                butlerImg.style.display = 'none';
+                canvas.style.display = 'block';
+            } else {
+                butlerImg.style.display = 'block';
+            }
             lastTime = performance.now();
             if (window._saButlerAnimId) {
                 cancelAnimationFrame(window._saButlerAnimId);
@@ -2142,7 +2186,7 @@ function initRoyalButlerMascot() {
     };
 
     window.saTriggerButlerSlide = function() {
-        if (window.innerWidth < 992) {
+        if (window.innerWidth < 769) {
             if (typeof window._saButlerPushSlide === 'function') window._saButlerPushSlide();
             return;
         }
@@ -2152,7 +2196,10 @@ function initRoyalButlerMascot() {
     };
 
     // Auto-start continuous butler loop on desktop!
-    window.saStartContinuousButler();
+    updateButlerLayout();
+    window.addEventListener('resize', () => {
+        updateButlerLayout();
+    });
 
     stage.onclick = (e) => {
         e.stopPropagation();
