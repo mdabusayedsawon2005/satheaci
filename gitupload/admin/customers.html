@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sathe Achi | Customers Management</title>
+  <link rel="icon" href="../logo.png" type="image/png">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="admin-style.css?v=3">
+  <style>
+    .filters-bar { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+    .search-input { flex: 1; min-width: 200px; padding: 12px 16px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--bg-color); color: var(--text-dark); outline: none; }
+    
+    .avatar-cell { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px; }
+
+    /* MODAL STYLES */
+    .sa-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 1000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: var(--trans); }
+    .sa-modal.show { opacity: 1; pointer-events: auto; }
+    .sa-modal-content { background: var(--surface); width: 100%; max-width: 600px; padding: 30px; border-radius: var(--radius-lg); transform: translateY(20px); transition: var(--trans); box-shadow: var(--shadow-lg); border: 1px solid var(--glass-border); max-height: 90vh; overflow-y: auto; }
+    .sa-modal.show .sa-modal-content { transform: translateY(0); }
+    .sa-modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; position: sticky; top: -30px; background: var(--surface); padding-top: 30px; z-index: 10; border-bottom: 1px solid var(--border); padding-bottom: 20px; }
+    .sa-modal-close { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-muted); }
+
+    .cust-profile { display: flex; align-items: center; gap: 20px; margin-bottom: 30px; }
+    .cust-avatar-large { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 700; }
+    .cust-info h2 { font-size: 24px; font-weight: 800; margin-bottom: 5px; }
+    .cust-info p { color: var(--text-muted); font-size: 14px; margin-bottom: 2px; }
+
+    .cust-stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px; }
+    .cust-stat { background: var(--bg-color); padding: 15px; border-radius: var(--radius-md); border: 1px solid var(--border); }
+    .cust-stat-label { font-size: 12px; text-transform: uppercase; color: var(--text-muted); font-weight: 700; margin-bottom: 5px; }
+    .cust-stat-value { font-size: 20px; font-weight: 800; color: var(--primary); }
+
+    .btn-view { color: var(--info); background: none; border: none; padding: 8px; border-radius: 4px; cursor: pointer; }
+    .btn-view:hover { background: rgba(0,122,255,0.1); }
+  </style>
+</head>
+<body>
+
+<div class="admin-layout">
+  <div class="sa-sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- SIDEBAR -->
+  <aside class="sa-sidebar" id="adminSidebar">
+    <div class="sa-sidebar-header">
+      <a href="index.html" class="sa-sidebar-logo"><i class="fa-solid fa-bag-shopping"></i> SatheAchi</a>
+      <button class="sa-sidebar-close" id="sidebarCloseBtn"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <nav class="sa-sidebar-nav">
+      <div class="sa-nav-section-label">Main</div>
+      <a href="index.html" class="sa-nav-item"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+      <a href="orders.html" class="sa-nav-item"><i class="fa-solid fa-cart-shopping"></i> Orders</a>
+      <a href="products.html" class="sa-nav-item"><i class="fa-solid fa-box"></i> Products</a>
+      <a href="categories.html" class="sa-nav-item"><i class="fa-solid fa-tags"></i> Categories</a>
+      <a href="customers.html" class="sa-nav-item active"><i class="fa-solid fa-users"></i> Customers</a>
+      <div class="sa-nav-section-label">Marketing</div>
+      <a href="banners.html" class="sa-nav-item"><i class="fa-regular fa-image"></i> Banners</a>
+      <a href="coupons.html" class="sa-nav-item"><i class="fa-solid fa-ticket"></i> Coupons</a>
+      <a href="notifications.html" class="sa-nav-item"><i class="fa-regular fa-bell"></i> Notifications</a>
+      <a href="reviews.html" class="sa-nav-item"><i class="fa-regular fa-star"></i> Reviews</a>
+      <div class="sa-nav-section-label">System</div>
+      <a href="admins.html" class="sa-nav-item"><i class="fa-solid fa-user-shield"></i> Admins</a>
+      <a href="profile.html" class="sa-nav-item"><i class="fa-solid fa-user-gear"></i> Profile</a>
+      <a href="settings.html" class="sa-nav-item"><i class="fa-solid fa-gear"></i> Settings</a>
+      <div style="height: 20px;"></div>
+      <a href="#" class="sa-nav-item" onclick="event.preventDefault(); adminLogout();" style="margin-top: auto; border-top: 1px solid var(--border);"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+    </nav>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="sa-main">
+    <header class="sa-topbar">
+      <div class="sa-tb-left">
+        <button class="sa-menu-btn" id="mobileMenuBtn"><i class="fa-solid fa-bars"></i></button>
+        <h1 class="sa-tb-title">Customers</h1>
+      </div>
+      <div class="sa-tb-right">
+        <button class="sa-icon-btn" id="adminThemeBtn"><i class="fa-regular fa-moon"></i></button>
+        <div class="sa-admin-profile">
+          <div class="sa-admin-avatar"><i class="fa-solid fa-user-tie"></i></div>
+          <div class="sa-admin-info"><span class="sa-admin-name" id="topbarAdminName">Admin</span><span class="sa-admin-role">Super Admin</span></div>
+        </div>
+      </div>
+    </header>
+
+    <div class="sa-page-content">
+      <div class="sa-table-card">
+        <div class="sa-card-header" style="margin-bottom: 0;">
+          <h3 class="sa-card-title">Customer List</h3>
+        </div>
+        
+        <div class="filters-bar" style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+          <input type="text" id="searchCust" class="search-input" placeholder="Search by name or phone..." oninput="filterTable()">
+          <button class="sa-btn sa-btn-primary" onclick="openSendNotifModal('', '')"><i class="fa-solid fa-paper-plane"></i> Send Notification</button>
+        </div>
+        
+        <div class="sa-table-resp-wrap">
+          <table class="sa-table">
+            <thead>
+              <tr>
+                <th>Profile</th>
+                <th>Name</th>
+                <th>Phone</th>
+                <th>Total Orders</th>
+                <th>Joined Date</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="custTableBody">
+              <tr><td colspan="6"><div class="sa-skeleton" style="height:40px;"></div></td></tr>
+              <tr><td colspan="6"><div class="sa-skeleton" style="height:40px;"></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="sa-mobile-cards" id="custMobileCards">
+          <div style="text-align:center;padding:20px;color:var(--text-muted);">Loading customers...</div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- CUSTOMER DETAILS MODAL -->
+<div class="sa-modal" id="custModal">
+  <div class="sa-modal-content">
+    <div class="sa-modal-header">
+      <h3 class="sa-modal-title">Customer Details</h3>
+      <button class="sa-modal-close" onclick="closeCustModal()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    
+    <div class="cust-profile">
+      <div class="cust-avatar-large" id="custModalAvatar">U</div>
+      <div class="cust-info">
+        <h2 id="custModalName">Loading...</h2>
+        <p><i class="fa-solid fa-phone"></i> <span id="custModalPhone">---</span></p>
+        <p><i class="fa-solid fa-calendar-day"></i> Joined: <span id="custModalJoined">---</span></p>
+      </div>
+    </div>
+
+    <div class="cust-stats-grid">
+      <div class="cust-stat">
+        <div class="cust-stat-label">Total Orders</div>
+        <div class="cust-stat-value" id="custModalOrdersCount">0</div>
+      </div>
+      <div class="cust-stat">
+        <div class="cust-stat-label">Total Spent</div>
+        <div class="cust-stat-value" id="custModalSpent">৳0</div>
+      </div>
+    </div>
+
+    <h4 style="margin-bottom: 15px; color: var(--text-muted); font-size: 14px; text-transform: uppercase;">Recent Orders</h4>
+    <div style="border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden;">
+      <table class="sa-table" style="margin: 0;">
+        <tbody id="custModalOrdersTable">
+          <!-- Populated dynamically -->
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<!-- SEND NOTIFICATION MODAL -->
+<div class="sa-modal" id="notifModal">
+  <div class="sa-modal-content" style="max-width:500px; color:var(--text-dark);">
+    <div class="sa-modal-header">
+      <h3 class="sa-modal-title">Send Notification</h3>
+      <button class="sa-modal-close" onclick="closeNotifModal()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <form id="sendNotifForm">
+      <!-- User Selection Mode -->
+      <div class="form-group" style="margin-bottom:15px;">
+        <label style="display:block; font-size:12px; font-weight:700; margin-bottom:8px; color:var(--text-muted);">Send To</label>
+        <div style="display:flex; gap:20px; margin-top:5px;">
+          <label style="display:inline-flex; align-items:center; gap:8px; cursor:pointer; font-weight:normal;">
+            <input type="radio" name="notifSendTo" id="notifSendToSelected" value="selected" checked onchange="toggleSendToFields()"> Selected User
+          </label>
+          <label style="display:inline-flex; align-items:center; gap:8px; cursor:pointer; font-weight:normal;">
+            <input type="radio" name="notifSendTo" id="notifSendToAll" value="all" onchange="toggleSendToFields()"> All Users
+          </label>
+        </div>
+      </div>
+
+      <!-- Recipient selection: single customer (from table row button click) -->
+      <div class="form-group" id="notifSingleCustContainer" style="margin-bottom:15px;">
+        <label style="display:block; font-size:12px; font-weight:700; margin-bottom:8px; color:var(--text-muted);">Recipient</label>
+        <input type="hidden" id="notifCustId">
+        <input type="text" id="notifCustName" class="form-input" disabled style="opacity:0.7; cursor:not-allowed;">
+      </div>
+
+      <!-- Recipient selection: dropdown (when sending notification globally) -->
+      <div class="form-group" id="notifSelectCustContainer" style="margin-bottom:15px; display:none;">
+        <label style="display:block; font-size:12px; font-weight:700; margin-bottom:8px; color:var(--text-muted);">Select Recipient</label>
+        <select id="notifSelectCust" class="form-input" style="height:auto; padding:10px;"></select>
+      </div>
+
+      <div class="form-group" style="margin-bottom:15px;">
+        <label style="display:block; font-size:12px; font-weight:700; margin-bottom:8px; color:var(--text-muted);">Notification Title</label>
+        <input type="text" id="notifTitle" class="form-input" required placeholder="e.g. Special Offer just for you!">
+      </div>
+      <div class="form-group" style="margin-bottom:15px;">
+        <label style="display:block; font-size:12px; font-weight:700; margin-bottom:8px; color:var(--text-muted);">Notification Message</label>
+        <textarea id="notifMessage" class="form-input" required rows="4" placeholder="Type notification details here..."></textarea>
+      </div>
+      <div class="form-group" style="margin-bottom:20px;">
+        <label style="display:block; font-size:12px; font-weight:700; margin-bottom:8px; color:var(--text-muted);">Notification Type</label>
+        <select id="notifType" class="form-input" style="height:auto; padding:10px;">
+          <option value="info">Info</option>
+          <option value="success">Success</option>
+          <option value="warning">Warning</option>
+          <option value="error">Error</option>
+          <option value="promotion">Promotion</option>
+          <option value="order_update">Order Update</option>
+        </select>
+      </div>
+      <button type="submit" class="sa-btn sa-btn-primary" style="width:100%;">Send Notification</button>
+    </form>
+  </div>
+</div>
+
+<script src="admin-app.js"></script>
+<script>
+  let customers = [];
+
+  document.getElementById('mobileMenuBtn').addEventListener('click', () => {
+    document.getElementById('adminSidebar').classList.add('show');
+    document.getElementById('sidebarOverlay').classList.add('show');
+  });
+  document.getElementById('sidebarOverlay').addEventListener('click', () => {
+    document.getElementById('adminSidebar').classList.remove('show');
+    document.getElementById('sidebarOverlay').classList.remove('show');
+  });
+
+  document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(loadCustomers, 500);
+  });
+
+  async function loadCustomers() {
+    try {
+      // 1. Fetch profiles
+      const { data: profilesData } = await window.db.from('profiles')
+        .select(`*, orders(id, total, created_at, order_number, order_status)`)
+        .order('created_at', { ascending: false });
+
+      // 2. Fetch all orders to capture any guest/direct order customers
+      const { data: allOrders } = await window.db.from('orders')
+        .select('id, user_id, order_number, total, order_status, shipping_name, shipping_phone, shipping_address, shipping_district, created_at')
+        .order('created_at', { ascending: false });
+
+      const customerMap = new Map();
+
+      // Add registered profiles
+      (profilesData || []).forEach(p => {
+        const key = p.phone || p.id;
+        customerMap.set(key, {
+          id: p.id,
+          full_name: p.full_name || 'Registered Customer',
+          phone: p.phone || '',
+          avatar_url: p.avatar_url || null,
+          created_at: p.created_at,
+          orders: p.orders || []
+        });
+      });
+
+      // Merge order customers
+      (allOrders || []).forEach(o => {
+        const key = o.shipping_phone || o.user_id || o.shipping_name;
+        if (!key) return;
+        if (customerMap.has(key)) {
+          const existing = customerMap.get(key);
+          if (!existing.orders.some(x => x.id === o.id)) {
+            existing.orders.push(o);
+          }
+        } else {
+          customerMap.set(key, {
+            id: o.user_id || ('order-cust-' + o.id),
+            full_name: o.shipping_name || 'Customer',
+            phone: o.shipping_phone || '',
+            avatar_url: null,
+            created_at: o.created_at,
+            orders: [o]
+          });
+        }
+      });
+
+      customers = Array.from(customerMap.values());
+      filterTable();
+    } catch (err) {
+      console.error(err);
+      showToast('Error loading customers', 'error');
+    }
+  }
+
+  function filterTable() {
+    const search = document.getElementById('searchCust').value.toLowerCase();
+    
+    const filtered = customers.filter(c => {
+      const nameMatch = c.full_name && c.full_name.toLowerCase().includes(search);
+      const phoneMatch = c.phone && c.phone.includes(search);
+      return nameMatch || phoneMatch;
+    });
+
+    renderTable(filtered);
+    renderMobileCards(filtered);
+  }
+
+  function renderTable(data) {
+    const tbody = document.getElementById('custTableBody');
+    if (data.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:40px;">No customers found.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = data.map(c => {
+      const initial = c.full_name ? c.full_name.charAt(0).toUpperCase() : 'U';
+      const orderCount = c.orders ? c.orders.length : 0;
+      
+      return `
+      <tr>
+        <td>
+          ${c.avatar_url 
+            ? `<img src="${c.avatar_url}" class="avatar-cell">` 
+            : `<div class="avatar-cell">${initial}</div>`}
+        </td>
+        <td style="font-weight:700;">${c.full_name || 'No Name'}</td>
+        <td style="color:var(--text-muted);">${c.phone || '-'}</td>
+        <td style="font-weight:700;">${orderCount}</td>
+        <td>${new Date(c.created_at).toLocaleDateString()}</td>
+        <td style="display:flex; gap:6px;">
+          <button class="btn-view" onclick="viewCustomer('${c.id}')" title="View Profile"><i class="fa-solid fa-eye"></i> Profile</button>
+          <button class="btn-view" onclick="openSendNotifModal('${c.id}', '${(c.full_name || 'No Name').replace(/'/g, "\\'")}')" title="Send Notification" style="color:var(--primary);"><i class="fa-solid fa-paper-plane"></i> Notify</button>
+        </td>
+      </tr>
+    `}).join('');
+  }
+
+  function renderMobileCards(data) {
+    const container = document.getElementById('custMobileCards');
+    if (!container) return;
+    if (data.length === 0) {
+      container.innerHTML = `<div style="text-align:center; padding:40px 20px; color:var(--text-muted);"><i class="fa-solid fa-users-slash" style="font-size:36px; margin-bottom:10px; display:block;"></i>No customers found.</div>`;
+      return;
+    }
+
+    container.innerHTML = data.map(c => {
+      const initial = c.full_name ? c.full_name.charAt(0).toUpperCase() : 'U';
+      const orderCount = c.orders ? c.orders.length : 0;
+      const validOrders = (c.orders || []).filter(o => o.order_status !== 'cancelled');
+      const totalSpent = validOrders.reduce((sum, o) => sum + Number(o.total || 0), 0);
+
+      return `
+        <div class="sa-mob-card">
+          <div class="sa-mob-card-header">
+            <div style="display:flex; align-items:center; gap:10px;">
+              ${c.avatar_url ? `<img src="${c.avatar_url}" class="avatar-cell" style="width:36px; height:36px;">` : `<div class="avatar-cell" style="width:36px; height:36px; font-size:14px;">${initial}</div>`}
+              <div>
+                <div class="sa-mob-card-title">${c.full_name || 'Customer'}</div>
+                <div style="font-size:12px; color:var(--text-muted);">${c.phone || 'No phone'}</div>
+              </div>
+            </div>
+            <span class="sa-status-badge status-delivered">${orderCount} order${orderCount === 1 ? '' : 's'}</span>
+          </div>
+          <div class="sa-mob-card-body">
+            <div class="sa-mob-field">
+              <span class="sa-mob-field-label">Total Spent</span>
+              <span class="sa-mob-field-val" style="color:var(--primary); font-weight:800;">৳${totalSpent.toLocaleString()}</span>
+            </div>
+            <div class="sa-mob-field">
+              <span class="sa-mob-field-label">Joined / First Order</span>
+              <span class="sa-mob-field-val">${new Date(c.created_at).toLocaleDateString()}</span>
+            </div>
+          </div>
+          <div class="sa-mob-card-actions">
+            <button class="sa-btn sa-btn-secondary sa-btn-sm" onclick="viewCustomer('${c.id}')"><i class="fa-solid fa-eye"></i> View Profile</button>
+            <button class="sa-btn sa-btn-primary sa-btn-sm" onclick="openSendNotifModal('${c.id}', '${(c.full_name || 'No Name').replace(/'/g, "\\'")}')"><i class="fa-solid fa-paper-plane"></i> Notify</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function viewCustomer(id) {
+    const c = customers.find(x => x.id === id);
+    if (!c) return;
+
+    // Set Info
+    const initial = c.full_name ? c.full_name.charAt(0).toUpperCase() : 'U';
+    if(c.avatar_url) {
+      document.getElementById('custModalAvatar').innerHTML = `<img src="${c.avatar_url}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+    } else {
+      document.getElementById('custModalAvatar').innerHTML = initial;
+    }
+    
+    document.getElementById('custModalName').textContent = c.full_name || 'No Name';
+    document.getElementById('custModalPhone').textContent = c.phone || 'No Phone provided';
+    document.getElementById('custModalJoined').textContent = new Date(c.created_at).toLocaleDateString();
+    
+    // Set Stats
+    const orders = c.orders || [];
+    document.getElementById('custModalOrdersCount').textContent = orders.length;
+    
+    // Calculate total spent (only successful/delivered orders usually, but we'll sum non-cancelled)
+    const validOrders = orders.filter(o => o.order_status !== 'cancelled');
+    const totalSpent = validOrders.reduce((sum, o) => sum + Number(o.total), 0);
+    document.getElementById('custModalSpent').textContent = '৳' + totalSpent.toLocaleString();
+
+    // Set Orders Table
+    const tbody = document.getElementById('custModalOrdersTable');
+    if (orders.length > 0) {
+      // Sort orders descending by date, take top 5
+      const recent = [...orders].sort((a,b) => new Date(b.created_at) - new Date(a.created_at)).slice(0, 5);
+      tbody.innerHTML = recent.map(o => `
+        <tr>
+          <td style="font-weight:700;">${o.order_number}</td>
+          <td>${new Date(o.created_at).toLocaleDateString()}</td>
+          <td style="color:var(--primary); font-weight:700;">৳${Number(o.total).toLocaleString()}</td>
+          <td><span class="sa-status-badge status-${o.order_status}" style="font-size:10px; padding:4px 8px;">${o.order_status}</span></td>
+        </tr>
+      `).join('');
+    } else {
+      tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:20px; color:var(--text-muted);">No orders history.</td></tr>`;
+    }
+
+    document.getElementById('custModal').classList.add('show');
+  }
+
+  function closeCustModal() {
+    document.getElementById('custModal').classList.remove('show');
+  }
+
+  // Notif Modal Actions
+  window.toggleSendToFields = function() {
+    const sendToAll = document.getElementById('notifSendToAll').checked;
+    const singleCustId = document.getElementById('notifCustId').value;
+    
+    const singleContainer = document.getElementById('notifSingleCustContainer');
+    const selectContainer = document.getElementById('notifSelectCustContainer');
+    
+    if (sendToAll) {
+      singleContainer.style.display = 'none';
+      selectContainer.style.display = 'none';
+    } else {
+      if (singleCustId) {
+        singleContainer.style.display = 'block';
+        selectContainer.style.display = 'none';
+      } else {
+        singleContainer.style.display = 'none';
+        selectContainer.style.display = 'block';
+        // Populate select list
+        const select = document.getElementById('notifSelectCust');
+        select.innerHTML = customers.map(c => `<option value="${c.id}">${c.full_name || 'No Name'} (${c.phone || 'No Phone'})</option>`).join('');
+      }
+    }
+  };
+
+  window.openSendNotifModal = function(custId, custName) {
+    document.getElementById('notifCustId').value = custId || '';
+    document.getElementById('notifCustName').value = custName || '';
+    document.getElementById('notifTitle').value = '';
+    document.getElementById('notifMessage').value = '';
+    document.getElementById('notifType').value = 'info';
+    
+    if (custId) {
+      document.getElementById('notifSendToSelected').checked = true;
+      document.getElementById('notifSendToAll').checked = false;
+    } else {
+      document.getElementById('notifSendToAll').checked = true;
+      document.getElementById('notifSendToSelected').checked = false;
+    }
+    
+    toggleSendToFields();
+    document.getElementById('notifModal').classList.add('show');
+  };
+
+  window.closeNotifModal = function() {
+    document.getElementById('notifModal').classList.remove('show');
+  };
+
+  document.getElementById('sendNotifForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const title = document.getElementById('notifTitle').value.trim();
+    const message = document.getElementById('notifMessage').value.trim();
+    const type = document.getElementById('notifType').value;
+    const sendToAll = document.getElementById('notifSendToAll').checked;
+    
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending...';
+
+    try {
+      let targetUserIds = [];
+      if (sendToAll) {
+        if (customers && customers.length > 0) {
+          targetUserIds = customers.map(c => c.id);
+        } else {
+          const { data, error: fetchErr } = await window.db.from('profiles').select('id');
+          if (fetchErr) throw fetchErr;
+          targetUserIds = data.map(c => c.id);
+        }
+        if (targetUserIds.length === 0) {
+          throw new Error('No customers found to notify.');
+        }
+      } else {
+        const singleCustId = document.getElementById('notifCustId').value;
+        const targetUserId = singleCustId || document.getElementById('notifSelectCust').value;
+        if (!targetUserId) {
+          throw new Error('Please select a customer.');
+        }
+        targetUserIds = [targetUserId];
+      }
+      
+      const notificationsToInsert = targetUserIds.map(userId => ({
+        user_id: userId,
+        title,
+        message,
+        type,
+        is_read: false
+      }));
+
+      const { error } = await window.db.from('notifications').insert(notificationsToInsert);
+      if (error) throw error;
+      
+      showToast(sendToAll ? 'Broadcast notification sent successfully!' : 'Notification sent successfully!', 'success');
+      closeNotifModal();
+    } catch (err) {
+      console.error(err);
+      showToast(err.message || 'Failed to send notification', 'error');
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = originalText;
+    }
+  });
+</script>
+</body>
+</html>

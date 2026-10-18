@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script>
+    (function(){try{if(localStorage.getItem('sathe_achi_theme')==='dark'){document.documentElement.setAttribute('data-theme','dark');}else{document.documentElement.removeAttribute('data-theme');}}catch(e){}})();
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Account | Sathe Achi</title>
+  <link rel="icon" href="logo.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="sa-style.css?v=31">
+  <style>
+    body { background: var(--bg-color); display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+    .sa-auth-card { background: var(--white); border-radius: var(--radius-lg); padding: 40px; width: 100%; max-width: 420px; box-shadow: var(--shadow-md); border: 1px solid var(--border); }
+    .sa-auth-logo { text-align: center; margin-bottom: 30px; }
+    .sa-auth-logo a { display: inline-flex; align-items: center; gap: 8px; font-size: 28px; font-weight: 800; color: var(--text-dark); }
+    .sa-auth-logo i { background: var(--primary); color: #fff; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-sm); font-size: 20px; }
+    .sa-auth-logo span { color: var(--primary); }
+    .sa-auth-logo p { color: var(--text-muted); font-size: 14px; margin-top: 10px; }
+    
+    .sa-auth-form { display: flex; flex-direction: column; gap: 15px; }
+    .sa-input-wrap { position: relative; }
+    .sa-input-wrap label { display: block; font-size: 13px; font-weight: 600; color: var(--text-dark); margin-bottom: 8px; }
+    .sa-input-wrap input { width: 100%; padding: 12px 15px 12px 40px; border: 1px solid var(--border); border-radius: var(--radius-md); font-size: 14px; outline: none; transition: var(--trans); }
+    .sa-input-wrap input:focus { border-color: var(--primary); }
+    .sa-input-wrap i.sa-icon-l { position: absolute; left: 15px; bottom: 14px; color: var(--text-muted); font-size: 14px; }
+    
+    .sa-auth-opt { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; cursor: pointer; color: var(--text-muted); }
+    .sa-auth-opt input { accent-color: var(--primary); width: 15px; height: 15px; }
+    
+    .sa-auth-btn { width: 100%; padding: 14px; font-size: 16px; margin-top: 10px; }
+    .sa-auth-divider { display: flex; align-items: center; margin: 20px 0; color: var(--text-muted); font-size: 13px; font-weight: 600; }
+    .sa-auth-divider::before, .sa-auth-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+    .sa-auth-divider span { padding: 0 14px; }
+    .sa-btn-google { width: 100%; padding: 12px 16px; border: 1.5px solid var(--border); border-radius: var(--radius-md); background: var(--white); color: var(--text-dark); font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 12px; cursor: pointer; transition: all 0.25s ease; box-shadow: 0 2px 6px rgba(0,0,0,0.04); }
+    .sa-btn-google:hover { background: #f8fafc; border-color: #cbd5e1; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    .sa-btn-google svg { width: 20px; height: 20px; flex-shrink: 0; }
+    .sa-auth-footer { text-align: center; margin-top: 25px; font-size: 14px; color: var(--text-muted); font-weight: 500; }
+    .sa-auth-footer a { color: var(--primary); font-weight: 700; }
+  </style>
+</head>
+<body class="sa-has-back-btn">
+
+<button class="sa-back-btn" onclick="navigateBack()" aria-label="Go back">
+  <i class="fa-solid fa-chevron-left"></i>
+</button>
+
+<div class="sa-toasts" id="toastContainer"></div>
+
+<div class="sa-auth-card">
+  <div class="sa-auth-logo">
+    <a href="index.html"><i class="fa-solid fa-bag-shopping"></i> Sathe<span>Achi</span></a>
+    <p>Create your account in seconds</p>
+  </div>
+  <form id="signupForm" class="sa-auth-form">
+    <div class="sa-input-wrap">
+      <label>Full Name</label>
+      <input type="text" id="fullName" required placeholder="John Doe" autocomplete="name">
+      <i class="fa-regular fa-user sa-icon-l"></i>
+    </div>
+    <div class="sa-input-wrap">
+      <label>Phone Number</label>
+      <input type="tel" id="phone" required placeholder="01712345678" autocomplete="tel">
+      <i class="fa-solid fa-phone sa-icon-l"></i>
+    </div>
+    <div class="sa-input-wrap">
+      <label>Email Address</label>
+      <input type="email" id="email" required placeholder="example@gmail.com" autocomplete="email">
+      <i class="fa-regular fa-envelope sa-icon-l"></i>
+    </div>
+    <div class="sa-input-wrap">
+      <label>Password</label>
+      <input type="password" id="password" required placeholder="••••••••" autocomplete="new-password">
+      <i class="fa-solid fa-lock sa-icon-l"></i>
+    </div>
+    <div class="sa-input-wrap">
+      <label>Confirm Password</label>
+      <input type="password" id="confirmPassword" required placeholder="••••••••" autocomplete="new-password">
+      <i class="fa-solid fa-lock sa-icon-l"></i>
+    </div>
+    <label class="sa-auth-opt"><input type="checkbox" required> I accept the Terms & Conditions</label>
+    <button type="submit" class="sa-btn-primary sa-auth-btn">Create Account</button>
+  </form>
+
+  <div class="sa-auth-divider">
+    <span>OR</span>
+  </div>
+
+  <button type="button" class="sa-btn-google" id="btnGoogleSignup" onclick="signUpWithGoogle()">
+    <svg viewBox="0 0 24 24">
+      <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+      <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+      <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+      <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+    </svg>
+    <span>Sign up with Google</span>
+  </button>
+
+  <div class="sa-auth-footer">Already have an account? <a href="login.html">Log In</a></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="script.js?v=31"></script>
+<script>
+  async function signUpWithGoogle() {
+    const btn = document.getElementById('btnGoogleSignup');
+    if (btn) {
+      btn.disabled = true;
+      btn.style.opacity = '0.7';
+    }
+    try {
+      const { data, error } = await supabaseClient.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: new URL('index.html', window.location.href).href
+        }
+      });
+      if (error) throw error;
+    } catch(err) {
+      showToast(err.message, 'error');
+      if (btn) {
+        btn.disabled = false;
+        btn.style.opacity = '1';
+      }
+    }
+  }
+  document.getElementById('signupForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = e.target.querySelector('button');
+    const oldText = btn.innerHTML;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Creating...';
+    btn.disabled = true;
+
+    const fullName = document.getElementById('fullName').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+
+    // 1. Validation checks
+    if (!fullName) {
+      showToast('Full Name is required.', 'error');
+      btn.innerHTML = oldText;
+      btn.disabled = false;
+      return;
+    }
+
+    if (!phone) {
+      showToast('Phone Number is required.', 'error');
+      btn.innerHTML = oldText;
+      btn.disabled = false;
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      showToast('Please enter a valid email address.', 'error');
+      btn.innerHTML = oldText;
+      btn.disabled = false;
+      return;
+    }
+
+    // 2. Password minimum length check (6 characters, no strong rules required)
+    if (password.length < 6) {
+      showToast('Password must be at least 6 characters long.', 'error');
+      btn.innerHTML = oldText;
+      btn.disabled = false;
+      return;
+    }
+
+    // 3. Confirm Password match check
+    if (password !== confirmPassword) {
+      showToast('Passwords do not match.', 'error');
+      btn.innerHTML = oldText;
+      btn.disabled = false;
+      return;
+    }
+
+    try {
+      if (!supabaseClient) throw new Error('Supabase client is not loaded. Please try again.');
+
+      const { data, error } = await supabaseClient.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: fullName,
+            phone: phone
+          }
+        }
+      });
+      if (error) throw error;
+
+      // Force session load or sign in user automatically using credentials
+      let session = data.session;
+      if (!session) {
+        const loginRes = await supabaseClient.auth.signInWithPassword({ email, password });
+        if (loginRes.error) throw loginRes.error;
+        session = loginRes.data.session;
+      }
+
+      if (session) {
+        await supabaseClient.auth.setSession(session);
+        if (session.user) {
+          const profile = {
+            id: session.user.id,
+            name: fullName,
+            email: email,
+            phone: phone,
+            avatar: fullName ? fullName.charAt(0).toUpperCase() : 'U'
+          };
+          localStorage.setItem('sathe_achi_user_profile', JSON.stringify(profile));
+        }
+      }
+
+      showToast('Account created and logged in successfully!', 'success');
+      setTimeout(() => { window.location.href = 'index.html'; }, 1000);
+    } catch (err) {
+      showToast(err.message, 'error');
+      btn.innerHTML = oldText;
+      btn.disabled = false;
+    }
+  });
+</script>
+<script src="sa-motion.js?v=4"></script>
+</body>
+</html>
+

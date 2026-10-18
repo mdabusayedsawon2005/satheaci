@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 417 76" width="417" height="76">
+  <defs>
+    <!-- Hollow 4-point star -->
+    <path id="star-hollow" d="M0,-13 Q0,0 13,0 Q0,0 0,13 Q0,0 -13,0 Q0,0 0,-13 Z" />
+    <!-- Mini sparkle -->
+    <path id="sparkle-mini" d="M0,-7 Q0,0 7,0 Q0,0 0,7 Q0,0 -7,0 Q0,0 0,-7 Z" />
+    <!-- Delicate sparkle -->
+    <path id="sparkle-delicate" d="M0,-5 Q0,0 5,0 Q0,0 0,5 Q0,0 -5,0 Q0,0 0,-5 Z" />
+  </defs>
+
+  <!-- ═══ LEFT CELESTIAL EMBLEM (Compass North Star + Ring + Moon + Dots) ═══ -->
+  <g transform="translate(36, 38)">
+    <!-- Delicate Gold Orbital Ring -->
+    <circle cx="0" cy="0" r="18.5" fill="none" stroke="#f3ca6c" stroke-width="1.3" opacity="0.88" />
+    
+    <!-- Rotated Gold accent star (45 deg) -->
+    <path d="M0,-23 Q0,0 21,0 Q0,0 0,23 Q0,0 -21,0 Q0,0 0,-23 Z" fill="#f3ca6c" opacity="0.75" transform="rotate(45) scale(0.65)" />
+    
+    <!-- Elongated North Star (Compass Star) -->
+    <path d="M0,-28 Q0,0 20,0 Q0,0 0,28 Q0,0 -20,0 Q0,0 0,-28 Z" fill="#f8fafc" />
+    
+    <!-- Inner bright center core -->
+    <circle cx="0" cy="0" r="2.2" fill="#ffe08a" />
+    
+    <!-- Gold Crescent Moon at bottom-left -->
+    <path d="M-13,16 A5,5 0 1,0 -7,22 A6,6 0 0,1 -13,16 Z" fill="#f3ca6c" />
+    <!-- Celestial gold dot at top-left -->
+    <circle cx="14" cy="-16" r="2.3" fill="#f3ca6c" />
+    <!-- Celestial gold dot at bottom-center (under S) -->
+    <circle cx="31" cy="22" r="2.2" fill="#f3ca6c" />
+  </g>
+
+  <!-- ═══ SATHE ACHI TYPOGRAPHY (PURE VECTOR PATHS) ═══ -->
+  <g class="brand-typography">
+    <g transform="translate(72.0, 51.0) scale(0.03600, -0.03600)">
+      <path d="M94 284Q54 220 54 153Q54 80 107 20Q136 -14 180.5 -33.0Q225 -52 278.0 -52.0Q331 -52 373 -32Q457 9 457 102Q457 137 433.5 176.0Q410 215 363 246L193 360Q94 422 94 520Q94 530 95 540Q101 617 156.5 665.5Q212 714 305 714Q362 714 443 704H505L492 557H483Q482 609 443.0 640.5Q404 672 340 672Q262 672 227 625Q210 601 210.0 573.0Q210 545 227.0 525.5Q244 506 281 483L468 361Q525 324 557 274Q595 215 595 153Q595 113 578.5 68.5Q562 24 524.5 -14.0Q487 -52 428.0 -76.0Q369 -100 297.5 -100.0Q226 -100 168 -75Q61 -30 32 82Q26 106 26 132Q26 216 85 291Z" fill="#f8fafc" />
+    </g>    <g transform="translate(95.6, 51.0) scale(0.03600, -0.03600)">
+      <path d="M966 -183Q857 -238 745 -201Q626 -163 540 -39Q494 27 461 114L429 199H193L140 73Q135 60 135.0 52.0Q135 44 138.5 34.5Q142 25 153.5 17.5Q165 10 179 10H187V0H-27V10H-18Q5 10 27.5 23.5Q50 37 65 64L288 573Q249 661 205 694Q168 722 134.5 722.0Q101 722 72 712L70 722Q142 759 208 759Q290 759 355 695Q419 632 468 513L613 155Q695 -48 781 -124Q816 -155 853.0 -167.0Q890 -179 915.5 -179.0Q941 -179 965 -173ZM210 242H414L344 427Q339 441 330.0 465.5Q321 490 318 500Z" fill="#f8fafc" />
+    </g>    <g transform="translate(122.2, 51.0) scale(0.03600, -0.03600)">
+      <path d="M-25 467Q-74 514 -74 568Q-74 610 -47 641Q4 701 96 701H567Q611 702 644.0 708.5Q677 715 686 719V545H676V557Q676 602 649.0 630.0Q622 658 576 659H441V72Q443 36 474 18Q488 10 505 10H518V0H214V10H227Q253 10 271.5 28.0Q290 46 291 71V659H96Q55 659 24 644Q-39 614 -39 550Q-39 512 -15 472Z" fill="#f8fafc" />
+    </g>    <g transform="translate(148.5, 51.0) scale(0.03600, -0.03600)">
+      <path d="M523 10Q549 10 568.0 28.0Q587 46 588 72V327H273V70Q273 -50 212 -121Q164 -177 74 -177Q45 -177 11 -170L9 -160Q83 -129 104 -68Q123 -16 123 70V628Q122 654 103.5 672.0Q85 690 59 690H46V700H350V690H337Q301 690 283 660Q274 646 273 628V370H588V610Q588 727 661 796Q719 853 807 853Q827 853 849 850L851 840Q778 814 756 748Q738 694 737 610V73Q738 37 769 19Q784 10 802 10H814V0H511V10Z" fill="#f8fafc" />
+    </g>    <g transform="translate(180.7, 51.0) scale(0.03600, -0.03600)">
+      <path d="M55 10Q81 10 99.5 28.5Q118 47 119 73V630Q116 665 86 682Q71 690 55 690H42V700H323Q367 700 400.0 707.0Q433 714 443 718V543H432V555Q433 600 406.5 627.5Q380 655 335 657H269V366H428Q465 367 489.0 391.5Q513 416 513 452V461H522V230H513V238Q513 275 489.0 299.0Q465 323 429 324H269V43H464Q537 43 586.5 85.0Q636 127 660 204H670L623 0H42V10Z" fill="#f8fafc" />
+    </g>    <g transform="translate(238.1, 51.0) scale(0.03600, -0.03600)">
+      <path d="M966 -183Q857 -238 745 -201Q626 -163 540 -39Q494 27 461 114L429 199H193L140 73Q135 60 135.0 52.0Q135 44 138.5 34.5Q142 25 153.5 17.5Q165 10 179 10H187V0H-27V10H-18Q5 10 27.5 23.5Q50 37 65 64L288 573Q249 661 205 694Q168 722 134.5 722.0Q101 722 72 712L70 722Q142 759 208 759Q290 759 355 695Q419 632 468 513L613 155Q695 -48 781 -124Q816 -155 853.0 -167.0Q890 -179 915.5 -179.0Q941 -179 965 -173ZM210 242H414L344 427Q339 441 330.0 465.5Q321 490 318 500Z" fill="#f8fafc" />
+    </g>    <g transform="translate(264.6, 51.0) scale(0.03600, -0.03600)">
+      <path d="M808 391Q811 361 811.0 315.5Q811 270 793.0 204.5Q775 139 728 89Q632 -14 464 -14Q260 -14 142.0 86.5Q24 187 24.0 349.5Q24 512 143.5 613.0Q263 714 459 714Q534 714 602.0 699.0Q670 684 715 660L717 488H709Q692 552 652 595Q580 672 458.0 672.0Q336 672 261.5 585.0Q187 498 187.0 354.5Q187 211 264.5 121.0Q342 31 478 28Q625 28 712.0 122.0Q799 216 799 377Q799 384 799 391Z" fill="#f8fafc" />
+    </g>    <g transform="translate(295.6, 51.0) scale(0.03600, -0.03600)">
+      <path d="M523 10Q549 10 568.0 28.0Q587 46 588 72V327H273V70Q273 -50 212 -121Q164 -177 74 -177Q45 -177 11 -170L9 -160Q83 -129 104 -68Q123 -16 123 70V628Q122 654 103.5 672.0Q85 690 59 690H46V700H350V690H337Q301 690 283 660Q274 646 273 628V370H588V610Q588 727 661 796Q719 853 807 853Q827 853 849 850L851 840Q778 814 756 748Q738 694 737 610V73Q738 37 769 19Q784 10 802 10H814V0H511V10Z" fill="#f8fafc" />
+    </g>    <g transform="translate(327.8, 51.0) scale(0.03600, -0.03600)">
+      <path d="M404 10H417V0H113V10H126Q152 10 170.5 28.5Q189 47 190 73V659L95 655Q1 651 1 585Q1 558 19.5 539.5Q38 521 71 521Q74 521 77 521V515Q57 508 43 508Q-2 508 -26 540Q-43 562 -43 590Q-43 634 -8.5 662.5Q26 691 98 696Q111 697 182 700Q344 706 417 720L419 710Q376 703 358.5 681.0Q341 659 340 616V73Q341 47 359.5 28.5Q378 10 404 10Z" fill="#f8fafc" />
+    </g>
+  </g>
+
+  <!-- ═══ CENTER CELESTIAL ACCENTS (between SATHE and ACHI) ═══ -->
+  <!-- Top Hollow Gold Star -->
+  <g transform="translate(222.1, 16)">
+    <use href="#star-hollow" fill="none" stroke="#f3ca6c" stroke-width="1.4" />
+    <circle cx="0" cy="0" r="1.2" fill="#f3ca6c" />
+  </g>
+  <!-- Bottom Solid Sparkle -->
+  <g transform="translate(222.1, 58)">
+    <use href="#sparkle-mini" fill="#f8fafc" />
+  </g>
+
+  <!-- ═══ UPPER ACCENTS OVER 'ACHI' ═══ -->
+  <!-- Navy Dot over H/I -->
+  <circle cx="311.4" cy="15" r="2.6" fill="#f8fafc" />
+  <!-- Gold Sparkle over I -->
+  <g transform="translate(340.4, 15)">
+    <use href="#sparkle-mini" fill="#f3ca6c" transform="scale(1.15)" />
+  </g>
+
+  <!-- ═══ RIGHT CELESTIAL EMBLEM ═══ -->
+  <g transform="translate(379.4, 38)">
+    <!-- Gold drop-shadow star offset -->
+    <g transform="translate(3.5, 3.5)">
+      <path d="M0,-19 Q0,0 18,0 Q0,0 0,19 Q0,0 -18,0 Q0,0 0,-19 Z" fill="#f3ca6c" />
+    </g>
+    <!-- Navy star on top -->
+    <path d="M0,-19 Q0,0 18,0 Q0,0 0,19 Q0,0 -18,0 Q0,0 0,-19 Z" fill="#f8fafc" />
+    <!-- Bright center glint -->
+    <circle cx="0" cy="0" r="1.8" fill="#ffe08a" />
+    
+    <!-- Top Gold Sparkle above right star -->
+    <g transform="translate(-8, -22)">
+      <use href="#sparkle-mini" fill="#f3ca6c" transform="scale(0.9)" />
+    </g>
+    <!-- Bottom Gold Sparkle directly below right star -->
+    <g transform="translate(0, 24)">
+      <use href="#sparkle-mini" fill="#f3ca6c" transform="scale(0.95)" />
+    </g>
+  </g>
+</svg>

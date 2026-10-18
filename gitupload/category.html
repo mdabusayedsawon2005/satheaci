@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <script>
+    (function(){try{if(localStorage.getItem('sathe_achi_theme')==='dark'){document.documentElement.setAttribute('data-theme','dark');}else{document.documentElement.removeAttribute('data-theme');}}catch(e){}})();
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Products | সাথে আছি</title>
+  <link rel="icon" href="logo.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="sa-style.css?v=31">
+  
+  <style>
+    /* ══════════════════════════════════════════
+       PRODUCT LISTING PAGE (PLP) STYLES
+    ══════════════════════════════════════════ */
+    body {
+      background: #f8fafc;
+      font-family: 'Plus Jakarta Sans', 'Hind Siliguri', sans-serif;
+      color: #1e293b;
+    }
+
+    [data-theme="dark"] body {
+      background: #080d1a;
+      color: #e2e8f0;
+    }
+
+    /* ─── PAGE BANNER (SLIM & CHIKON LUXURY) ─── */
+    .plp-banner { 
+      background: linear-gradient(135deg, #060b17 0%, #0c1a32 50%, #15243f 100%); 
+      padding: 12px 0 14px; 
+      color: #fff; 
+      position: relative; 
+      overflow: hidden; 
+      border-bottom: 1px solid rgba(212, 175, 55, 0.22);
+    }
+    .plp-banner::after { 
+      content: ''; 
+      position: absolute; 
+      right: 3%; 
+      top: -50%; 
+      width: 35%; 
+      height: 200%; 
+      background: radial-gradient(circle, rgba(212, 175, 55, 0.12) 0%, transparent 65%); 
+      pointer-events: none; 
+    }
+
+    .plp-banner-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .plp-title-block {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .plp-breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11.5px;
+      font-weight: 500;
+      color: #94a3b8;
+      margin: 0;
+      position: relative;
+      z-index: 2;
+    }
+    .plp-breadcrumb a {
+      color: #cbd5e1;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .plp-breadcrumb a:hover {
+      color: var(--sa-gold, #d4af37);
+    }
+    .plp-breadcrumb span {
+      color: rgba(212, 175, 55, 0.6);
+      font-size: 10px;
+    }
+
+    .plp-title { 
+      font-size: 20px; 
+      font-weight: 800; 
+      margin: 0; 
+      letter-spacing: 0.2px;
+      color: #ffffff;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .plp-title-badge {
+      font-size: 11px;
+      font-weight: 700;
+      background: rgba(212, 175, 55, 0.2);
+      border: 1px solid rgba(212, 175, 55, 0.4);
+      color: #f3e5ab;
+      padding: 2px 8px;
+      border-radius: 99px;
+      letter-spacing: 0.3px;
+    }
+    .plp-subtitle { 
+      display: none; 
+    }
+
+    /* Quick Filter Chips (Slim, Inline) */
+    .plp-quick-chips {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 2px 0;
+      scrollbar-width: none;
+      position: relative;
+      z-index: 2;
+    }
+    .plp-quick-chips::-webkit-scrollbar { display: none; }
+    .plp-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 12px;
+      border-radius: 99px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #e2e8f0;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+    .plp-chip:hover, .plp-chip.active {
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.28), rgba(212, 175, 55, 0.12));
+      border-color: rgba(212, 175, 55, 0.6);
+      color: #fff;
+      transform: translateY(-1px);
+    }
+
+    @media (max-width: 991px) { 
+      .plp-banner { padding: 12px 0 10px; } 
+      .plp-banner-row { flex-direction: column; align-items: flex-start; gap: 8px; }
+      .plp-title { font-size: 18px; } 
+      .plp-quick-chips { width: 100%; -webkit-overflow-scrolling: touch; }
+    }
+
+    /* ─── MAIN LAYOUT (STABLE 2-COLUMN GRID) ─── */
+    .plp-layout { 
+      display: grid; 
+      grid-template-columns: 270px 1fr; 
+      gap: 28px; 
+      margin: 28px 0 80px; 
+      align-items: start; 
+    }
+    @media (max-width: 992px) { 
+      .plp-layout { grid-template-columns: 1fr; gap: 16px; margin: 18px 0 60px; } 
+    }
+
+    /* ─── FILTER SIDEBAR (DESKTOP STICKY) ─── */
+    .filter-sidebar { 
+      background: #ffffff; 
+      border-radius: 20px; 
+      padding: 24px; 
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04); 
+      border: 1px solid rgba(0, 0, 0, 0.06); 
+      position: sticky;
+      top: 84px;
+      max-height: calc(100vh - 100px);
+      overflow-y: auto;
+    }
+    [data-theme="dark"] .filter-sidebar {
+      background: #0f172a;
+      border-color: rgba(255, 255, 255, 0.08);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .filter-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    }
+    [data-theme="dark"] .filter-header {
+      border-bottom-color: rgba(255, 255, 255, 0.08);
+    }
+
+    .filter-header h3 {
+      font-size: 17px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-dark, #0f172a);
+      margin: 0;
+    }
+    [data-theme="dark"] .filter-header h3 { color: #fff; }
+
+    .filter-reset-link {
+      font-size: 13px;
+      font-weight: 600;
+      color: #ef4444;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      text-decoration: underline;
+    }
+
+    .filter-group { 
+      margin-bottom: 22px; 
+      padding-bottom: 20px; 
+      border-bottom: 1px solid rgba(0, 0, 0, 0.06); 
+    }
+    [data-theme="dark"] .filter-group {
+      border-bottom-color: rgba(255, 255, 255, 0.06);
+    }
+    .filter-group:last-child { 
+      margin-bottom: 0; 
+      padding-bottom: 0; 
+      border-bottom: none; 
+    }
+    .filter-title { 
+      font-size: 14.5px; 
+      font-weight: 700; 
+      color: var(--text-dark, #0f172a); 
+      margin-bottom: 14px; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+    }
+    [data-theme="dark"] .filter-title { color: #f1f5f9; }
+
+    /* Price Range Inputs */
+    .price-inputs { 
+      display: flex; 
+      align-items: center; 
+      gap: 8px; 
+      margin-bottom: 12px;
+    }
+    .price-input-wrap {
+      position: relative;
+      flex: 1;
+    }
+    .price-input-wrap span {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 13px;
+      font-weight: 700;
+      color: #94a3b8;
+    }
+    .price-input-wrap input { 
+      width: 100%; 
+      padding: 9px 8px 9px 24px; 
+      border: 1.5px solid rgba(0, 0, 0, 0.08); 
+      border-radius: 10px; 
+      font-size: 13px; 
+      font-weight: 600;
+      outline: none; 
+      background: #f8fafc;
+      color: #0f172a;
+      transition: all 0.2s; 
+    }
+    [data-theme="dark"] .price-input-wrap input {
+      background: #1e293b;
+      border-color: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+    .price-input-wrap input:focus { 
+      border-color: var(--sa-gold, #d4af37); 
+      background: #fff;
+    }
+
+    .price-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .price-chip {
+      padding: 5px 10px;
+      font-size: 11.5px;
+      font-weight: 600;
+      border-radius: 6px;
+      background: rgba(0, 0, 0, 0.04);
+      color: #475569;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.2s;
+    }
+    [data-theme="dark"] .price-chip {
+      background: rgba(255, 255, 255, 0.05);
+      color: #94a3b8;
+    }
+    .price-chip:hover {
+      border-color: rgba(212, 175, 55, 0.4);
+      color: var(--sa-gold, #d4af37);
+    }
+
+    /* Checkboxes */
+    .filter-check { 
+      display: flex; 
+      align-items: center; 
+      gap: 10px; 
+      margin-bottom: 10px; 
+      cursor: pointer; 
+      font-size: 13.5px;
+      font-weight: 500;
+      color: #475569;
+      transition: color 0.15s;
+    }
+    [data-theme="dark"] .filter-check { color: #94a3b8; }
+    .filter-check:hover { color: var(--sa-gold, #d4af37); }
+    .filter-check input { 
+      width: 17px; 
+      height: 17px; 
+      accent-color: #d4af37; 
+      cursor: pointer; 
+      border-radius: 4px;
+    }
+
+    .btn-apply-filters { 
+      width: 100%; 
+      padding: 13px 18px; 
+      background: linear-gradient(135deg, #0c1a30 0%, #172a4d 100%); 
+      color: #cca24a; 
+      border: 1px solid rgba(212, 175, 55, 0.45); 
+      border-radius: 12px; 
+      font-weight: 700; 
+      font-size: 14px;
+      cursor: pointer; 
+      margin-top: 14px; 
+      transition: all 0.25s ease; 
+      box-shadow: 0 4px 14px rgba(12, 26, 48, 0.2);
+    }
+    .btn-apply-filters:hover { 
+      background: linear-gradient(135deg, #cca24a 0%, #b8860b 100%); 
+      color: #0c1a30;
+      border-color: #cca24a;
+      box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+      transform: translateY(-1px);
+    }
+
+    /* ─── MOBILE FILTER DRAWER (SLIDE-UP BOTTOM SHEET) ─── */
+    .filter-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      z-index: 1050;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .filter-overlay.active {
+      display: block;
+      opacity: 1;
+    }
+
+    @media (max-width: 992px) {
+      .filter-sidebar {
+        display: none;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        top: auto;
+        max-height: 85vh;
+        z-index: 1100;
+        border-radius: 24px 24px 0 0;
+        overflow-y: auto;
+        padding: 24px 20px 80px;
+        box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.3);
+        transform: translateY(100%);
+        transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+      }
+      .filter-sidebar.active {
+        display: block;
+        transform: translateY(0);
+      }
+      .filter-drag-handle {
+        width: 44px;
+        height: 4px;
+        background: #cbd5e1;
+        border-radius: 99px;
+        margin: -10px auto 16px;
+      }
+      .filter-close {
+        display: flex !important;
+        position: absolute;
+        top: 18px;
+        right: 18px;
+        background: rgba(0, 0, 0, 0.05);
+        border: none;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: #475569;
+      }
+      [data-theme="dark"] .filter-close {
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+      }
+      .filter-mobile-actions {
+        display: flex;
+        gap: 12px;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 12px 20px 24px;
+        background: #fff;
+        border-top: 1px solid rgba(0, 0, 0, 0.08);
+        z-index: 10;
+      }
+      [data-theme="dark"] .filter-mobile-actions {
+        background: #0f172a;
+        border-top-color: rgba(255, 255, 255, 0.08);
+      }
+    }
+
+    /* ─── PRODUCTS CONTENT AREA ─── */
+    .plp-toolbar { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      margin-bottom: 22px; 
+      background: #ffffff; 
+      padding: 14px 20px; 
+      border-radius: 16px; 
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03); 
+      border: 1px solid rgba(0, 0, 0, 0.05); 
+    }
+    [data-theme="dark"] .plp-toolbar {
+      background: #0f172a;
+      border-color: rgba(255, 255, 255, 0.06);
+    }
+    .plp-count { 
+      font-size: 14px; 
+      font-weight: 600; 
+      color: #64748b; 
+    }
+    [data-theme="dark"] .plp-count { color: #94a3b8; }
+    .plp-count span { 
+      color: var(--text-dark, #0f172a); 
+      font-weight: 800; 
+    }
+    [data-theme="dark"] .plp-count span { color: #f8fafc; }
+    
+    .plp-sort { 
+      display: flex; 
+      align-items: center; 
+      gap: 10px; 
+    }
+    .plp-sort label { 
+      font-size: 13px; 
+      font-weight: 600; 
+      color: #64748b; 
+    }
+    [data-theme="dark"] .plp-sort label { color: #94a3b8; }
+    .plp-sort select { 
+      padding: 8px 14px; 
+      border: 1.5px solid rgba(212, 175, 55, 0.35); 
+      border-radius: 10px; 
+      font-size: 13px; 
+      font-weight: 700; 
+      color: #0f172a; 
+      outline: none; 
+      cursor: pointer; 
+      background: #f8fafc; 
+      transition: all 0.2s;
+    }
+    [data-theme="dark"] .plp-sort select {
+      background: #1e293b;
+      border-color: rgba(212, 175, 55, 0.3);
+      color: #f8fafc;
+    }
+    
+    .btn-mobile-filter { 
+      display: none; 
+      padding: 9px 16px; 
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.15), rgba(212, 175, 55, 0.05)); 
+      border: 1px solid rgba(212, 175, 55, 0.4); 
+      border-radius: 10px; 
+      font-size: 13px; 
+      font-weight: 700; 
+      color: var(--sa-gold, #d4af37); 
+      cursor: pointer; 
+      align-items: center; 
+      gap: 8px; 
+    }
+    @media (max-width: 992px) { 
+      .btn-mobile-filter { display: inline-flex; } 
+      .plp-toolbar { flex-wrap: wrap; gap: 12px; } 
+      .plp-sort { width: 100%; justify-content: space-between; } 
+      .plp-count { width: auto; } 
+    }
+
+    /* Product Grid */
+    .plp-grid { 
+      display: grid; 
+      grid-template-columns: repeat(3, 1fr); 
+      gap: 20px; 
+    }
+    @media (min-width: 1320px) {
+      .plp-grid { grid-template-columns: repeat(4, 1fr); }
+    }
+    @media (max-width: 1200px) and (min-width: 993px) { 
+      .plp-grid { grid-template-columns: repeat(3, 1fr); gap: 16px; } 
+    }
+    @media (max-width: 992px) and (min-width: 601px) { 
+      .plp-grid { grid-template-columns: repeat(3, 1fr); gap: 16px; } 
+    }
+    @media (max-width: 600px) { 
+      .plp-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; } 
+    }
+
+    /* ─── LOADING SKELETON ─── */
+    .skeleton { 
+      animation: pulse 1.5s infinite ease-in-out; 
+      background-color: #e2e8f0; 
+      border-radius: 8px; 
+    }
+    [data-theme="dark"] .skeleton {
+      background-color: #1e293b;
+    }
+    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+    .skel-card { 
+      background: #fff; 
+      border-radius: 18px; 
+      padding: 14px; 
+      border: 1px solid rgba(0, 0, 0, 0.05); 
+    }
+    [data-theme="dark"] .skel-card {
+      background: #151d2c;
+      border-color: rgba(255, 255, 255, 0.05);
+    }
+    .skel-img { width: 100%; height: 215px; border-radius: 12px; margin-bottom: 12px; }
+    .skel-line { height: 12px; margin-bottom: 8px; border-radius: 4px; }
+    .skel-line.short { width: 60%; }
+    .skel-box { height: 38px; border-radius: 10px; margin-top: 14px; }
+
+    /* ─── EMPTY STATE (LUXURY) ─── */
+    .empty-state { 
+      text-align: center; 
+      padding: 60px 24px; 
+      background: #fff; 
+      border-radius: 20px; 
+      border: 1px solid rgba(0, 0, 0, 0.05); 
+      grid-column: 1 / -1; 
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+    }
+    [data-theme="dark"] .empty-state {
+      background: #0f172a;
+      border-color: rgba(255, 255, 255, 0.06);
+    }
+    .empty-state-icon { 
+      width: 70px;
+      height: 70px;
+      margin: 0 auto 18px;
+      border-radius: 50%;
+      background: rgba(212, 175, 55, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px; 
+      color: var(--sa-gold, #d4af37); 
+    }
+    .empty-state h3 { 
+      font-size: 20px; 
+      font-weight: 800; 
+      color: var(--text-dark, #0f172a); 
+      margin-bottom: 8px; 
+    }
+    [data-theme="dark"] .empty-state h3 { color: #f8fafc; }
+    .empty-state p { 
+      font-size: 14px; 
+      color: #64748b; 
+      margin-bottom: 24px; 
+      max-width: 420px; 
+      margin-left: auto; 
+      margin-right: auto; 
+      line-height: 1.5;
+    }
+    [data-theme="dark"] .empty-state p { color: #94a3b8; }
+
+    /* ─── PLP PAGINATION ─── */
+    .plp-pagination { 
+      display: flex; 
+      justify-content: center; 
+      align-items: center; 
+      gap: 8px; 
+      margin-top: 40px; 
+    }
+    .page-btn { 
+      min-width: 42px; 
+      height: 42px; 
+      border-radius: 12px; 
+      border: 1.5px solid rgba(0, 0, 0, 0.08); 
+      background: #fff; 
+      color: var(--text-dark, #0f172a); 
+      font-size: 14px; 
+      font-weight: 700; 
+      cursor: pointer; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      transition: all 0.2s; 
+    }
+    [data-theme="dark"] .page-btn {
+      background: #151d2c;
+      border-color: rgba(255, 255, 255, 0.08);
+      color: #f8fafc;
+    }
+    .page-btn:hover:not(:disabled) { 
+      border-color: var(--sa-gold, #d4af37); 
+      color: var(--sa-gold, #d4af37); 
+    }
+    .page-btn.active { 
+      background: linear-gradient(135deg, #d4af37, #b89025); 
+      color: #000; 
+      border-color: #d4af37; 
+      box-shadow: 0 4px 15px rgba(212, 175, 55, 0.35);
+    }
+    .page-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+<div class="sa-toasts" id="toastContainer"></div>
+
+<!-- HEADER (Stationary & Sticky) -->
+<header class="sa-header" id="saHeader">
+  <div class="sa-wrap sa-header-inner">
+    <a href="index.html" class="sa-logo" aria-label="সাথে আছি Home">
+      <img src="logo.png" alt="SatheAchi.com" class="sa-logo-img sa-logo-mobile" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+      <img src="sathe_achi_brand_logo.svg" alt="Sathe Achi" class="sa-logo-desktop">
+      <div class="sa-logo-icon" style="display:none;"><i class="fa-solid fa-handshake-simple"></i></div>
+    </a>
+    <div class="sa-search-wrap">
+      <form class="sa-search-box" action="category.html" method="GET" id="saSearchBox">
+        <i class="fa-solid fa-magnifying-glass sa-search-icon"></i>
+        <input type="text" name="search" id="saSearch" placeholder="Search products, brands..." autocomplete="off">
+        <button type="button" class="sa-search-clear" id="saSearchClear" aria-label="Clear search"><i class="fa-solid fa-xmark"></i></button>
+        <button type="submit" class="sa-search-btn" id="saSearchBtn" aria-label="Search"><i class="fa-solid fa-arrow-right"></i></button>
+      </form>
+      <div class="sa-search-suggestions" id="saSearchSuggestions"></div>
+    </div>
+    <div class="sa-hdr-actions">
+      <a href="index.html" class="sa-icon-btn sa-pc-home-btn" title="Home" aria-label="Home">
+        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+      </a>
+      <button class="sa-icon-btn theme-toggle" id="saTheme" title="Dark Mode" aria-label="Toggle theme">
+        <svg class="theme-icon-moon" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        <svg class="theme-icon-sun" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+      </button>
+      <a href="wishlist.html" class="sa-icon-btn" title="Wishlist" aria-label="Wishlist">
+        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+      </a>
+      <a href="cart.html" class="sa-icon-btn sa-cart-btn" title="Cart" aria-label="Cart">
+        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+        <span class="sa-badge cart-count">0</span>
+      </a>
+      <div style="position:relative;">
+        <button class="sa-icon-btn" id="saProfileBtn" title="Profile" aria-label="Profile menu">
+          <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        </button>
+        <div class="sa-profile-dropdown" id="saProfileDropdown">
+          <div class="sa-dropdown-logged-in" style="display:none;">
+            <div class="sa-dropdown-header"><div class="sa-dropdown-user-info"><span class="sa-user-name">Loading...</span><span class="sa-user-email"></span></div></div>
+            <div class="sa-dropdown-divider"></div>
+            <a href="account.html" class="sa-dropdown-item"><i class="fa-regular fa-user"></i> My Account</a>
+            <a href="orders.html" class="sa-dropdown-item"><i class="fa-solid fa-box"></i> My Orders</a>
+            <a href="wishlist.html" class="sa-dropdown-item"><i class="fa-regular fa-heart"></i> Wishlist</a>
+            <div class="sa-dropdown-divider"></div>
+            <a href="#" class="sa-dropdown-item" id="saHeaderLogout" style="color:#ef4444;"><i class="fa-solid fa-right-from-bracket" style="color:#ef4444;"></i> Logout</a>
+          </div>
+          <div class="sa-dropdown-guest">
+            <div class="sa-dropdown-header"><div class="sa-dropdown-user-info"><span class="sa-user-name">Welcome!</span><span class="sa-user-email">Sign in to your account</span></div></div>
+            <a href="login.html" class="sa-dropdown-login-btn">Sign In</a>
+            <a href="signup.html" class="sa-dropdown-item" style="justify-content:center; font-size:12px; color:var(--text-muted);">Create Account</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ═══ 2. LUXURY CELESTIAL CATEGORY NAV ═══ -->
+<nav class="sa-category-nav">
+  <div class="sa-wrap sa-category-nav-inner">
+    <a href="index.html" class="sa-cnav-item">Home</a>
+    <span class="sa-cnav-div"></span>
+    <a href="category.html?slug=Fashion" class="sa-cnav-item">Fashion</a>
+    <span class="sa-cnav-div"></span>
+    <a href="category.html?slug=Electronics" class="sa-cnav-item">Electronics</a>
+    <span class="sa-cnav-div"></span>
+    <a href="category.html?slug=Mobiles" class="sa-cnav-item">Mobiles</a>
+    <span class="sa-cnav-div"></span>
+    <a href="category.html?slug=Watches" class="sa-cnav-item">Watches</a>
+  </div>
+</nav>
+
+<!-- PAGE BANNER & BREADCRUMB (Slim & Sleek) -->
+<div class="plp-banner" id="plpBanner">
+  <div class="sa-wrap plp-banner-row">
+    <div class="plp-title-block">
+      <div class="plp-breadcrumb">
+        <a href="index.html">হোম</a>
+        <span>/</span>
+        <a href="categories.html">ক্যাটাগরি</a>
+        <span>/</span>
+        <span id="breadcrumbCurrent">পণ্যসমূহ</span>
+      </div>
+      <h1 class="plp-title" id="pageTitle">
+        পণ্যসমূহ
+        <span class="plp-title-badge" id="categoryBadge">সকল পণ্য</span>
+      </h1>
+    </div>
+
+    <!-- Quick Filter Chips -->
+    <div class="plp-quick-chips">
+      <button class="plp-chip active" onclick="quickFilter('all', this)">সকল পণ্য</button>
+      <button class="plp-chip" onclick="quickFilter('flash', this)"><i class="fa-solid fa-bolt" style="color:#f59e0b;"></i> ফ্ল্যাশ সেল</button>
+      <button class="plp-chip" onclick="quickFilter('rating', this)"><i class="fa-solid fa-star" style="color:#fbbf24;"></i> ৪+ রেটিং</button>
+      <button class="plp-chip" onclick="quickFilter('under1000', this)">৳ ১০০০ এর নিচে</button>
+      <button class="plp-chip" onclick="quickFilter('under5000', this)">৳ ১০০০ - ৫০০০</button>
+      <button class="plp-chip" onclick="quickFilter('instock', this)"><i class="fa-solid fa-check" style="color:#10b981;"></i> ইন-স্টক</button>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN CATALOG SECTION -->
+<section class="sa-section" style="padding-top:0;">
+  <div class="sa-wrap">
+    
+    <!-- MOBILE FILTER OVERLAY -->
+    <div class="filter-overlay" id="filterOverlay" onclick="toggleMobileFilter()"></div>
+
+    <div class="plp-layout">
+      
+      <!-- FILTER SIDEBAR -->
+      <aside class="filter-sidebar" id="filterSidebar">
+        <div class="filter-drag-handle"></div>
+        <button class="filter-close" onclick="toggleMobileFilter()" style="display:none;" aria-label="Close Filter"><i class="fa-solid fa-xmark"></i></button>
+        
+        <div class="filter-header">
+          <h3><i class="fa-solid fa-sliders" style="color:var(--sa-gold, #d4af37);"></i> ফিল্টারসমূহ</h3>
+          <button class="filter-reset-link" onclick="resetFilters()">রিসেট</button>
+        </div>
+        
+        <!-- Price Range -->
+        <div class="filter-group">
+          <div class="filter-title">দামের রেঞ্জ (৳)</div>
+          <div class="price-inputs">
+            <div class="price-input-wrap">
+              <span>৳</span>
+              <input type="number" id="minPrice" placeholder="শুরু" min="0">
+            </div>
+            <span style="color:#94a3b8; font-weight:700;">-</span>
+            <div class="price-input-wrap">
+              <span>৳</span>
+              <input type="number" id="maxPrice" placeholder="সর্বোচ্চ" min="0">
+            </div>
+          </div>
+          <div class="price-chips">
+            <span class="price-chip" onclick="setPriceBracket(0, 1000)">&lt; ৳১,০০০</span>
+            <span class="price-chip" onclick="setPriceBracket(1000, 5000)">৳১,০০০ - ৫,০০০</span>
+            <span class="price-chip" onclick="setPriceBracket(5000, 20000)">৳৫,০০০ - ২০,০০০</span>
+            <span class="price-chip" onclick="setPriceBracket(20000, 100000)">৳২০,০০০+</span>
+          </div>
+        </div>
+
+        <!-- Brands Filter -->
+        <div class="filter-group">
+          <div class="filter-title">ব্র্যান্ডসমূহ</div>
+          <div id="brandsList">
+            <p style="font-size:13px; color:#94a3b8;">লোড হচ্ছে...</p>
+          </div>
+        </div>
+
+        <!-- Availability Filter -->
+        <div class="filter-group">
+          <div class="filter-title">উপলব্ধতা</div>
+          <label class="filter-check">
+            <input type="checkbox" id="inStockOnly" value="inStock" onchange="applyFilters(true)">
+            <span>শুধুমাত্র ইন-স্টক পণ্য</span>
+          </label>
+          <label class="filter-check">
+            <input type="checkbox" id="flashSaleOnly" value="flashSale" onchange="applyFilters(true)">
+            <span>ফ্ল্যাশ সেল ডিসকাউন্ট</span>
+          </label>
+        </div>
+
+        <!-- Rating Filter -->
+        <div class="filter-group">
+          <div class="filter-title">রেটিং</div>
+          <label class="filter-check">
+            <input type="checkbox" id="rating4Plus" value="4" onchange="applyFilters(true)">
+            <span><i class="fa-solid fa-star" style="color:#fbbf24;"></i> ৪.০ বা তার বেশি</span>
+          </label>
+        </div>
+
+        <button class="btn-apply-filters" onclick="applyFilters(true)">ফিল্টার প্রয়োগ করুন</button>
+
+        <div class="filter-mobile-actions" style="display:none;">
+          <button class="page-btn" style="flex:1;" onclick="resetFilters()">রিসেট</button>
+          <button class="btn-apply-filters" style="flex:2; margin-top:0;" onclick="applyFilters(true)">ফলাফল দেখুন</button>
+        </div>
+      </aside>
+
+      <!-- PRODUCTS AREA -->
+      <main class="plp-content">
+        
+        <!-- Toolbar -->
+        <div class="plp-toolbar">
+          <div class="plp-count">
+            মোট পণ্য: <span id="resultCount">0</span> টি
+          </div>
+          
+          <button class="btn-mobile-filter" onclick="toggleMobileFilter()">
+            <i class="fa-solid fa-sliders"></i> ফিল্টার
+          </button>
+          
+          <div class="plp-sort">
+            <label for="sortSelect">সাজান:</label>
+            <select id="sortSelect" onchange="applyFilters(true)">
+              <option value="relevance">প্রাসঙ্গিকতা (Featured)</option>
+              <option value="price_asc">দাম: কম থেকে বেশি</option>
+              <option value="price_desc">দাম: বেশি থেকে কম</option>
+              <option value="rating">সেরা রেটিং</option>
+              <option value="newest">নতুন পণ্য</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Product Grid -->
+        <div class="plp-grid" id="productGrid">
+          <!-- Populated by JS -->
+        </div>
+
+        <!-- Pagination -->
+        <div class="plp-pagination" id="paginationWrap">
+          <!-- Populated by JS -->
+        </div>
+
+      </main>
+
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="sa-footer">
+  <div class="sa-wrap">
+    <div class="sa-footer-bottom" style="text-align:center; padding:24px 0 14px; display:flex; flex-direction:column; align-items:center; gap:12px;">
+      <p>© 2026 SatheAchi.com. All rights reserved. | Developed by <a href="developer.html" style="color:var(--sa-gold, #d4af37); font-weight:700; text-decoration:none;">EX YOUSUF HUZAIFA</a></p>
+      <div class="sa-footer-social" id="saFooterSocial" style="justify-content:center;"></div>
+    </div>
+  </div>
+</footer>
+
+<!-- MOBILE BOTTOM NAV -->
+<div class="sa-bottom-nav">
+  <a href="index.html" class="sa-bn-item">
+    <div class="sa-bn-icon-wrap">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+    </div>
+    <span class="sa-bn-label">Home</span>
+  </a>
+  <a href="categories.html" class="sa-bn-item active">
+    <div class="sa-bn-icon-wrap">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"></rect><rect x="14" y="3" width="7" height="7" rx="2"></rect><rect x="14" y="14" width="7" height="7" rx="2"></rect><rect x="3" y="14" width="7" height="7" rx="2"></rect></svg>
+    </div>
+    <span class="sa-bn-label">Categories</span>
+  </a>
+  <a href="cart.html" class="sa-bn-item">
+    <div class="sa-bn-icon-wrap">
+      <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+      <span class="sa-cart-count sa-bn-badge" style="display:none;">0</span>
+    </div>
+    <span class="sa-bn-label">Cart</span>
+  </a>
+  <a href="wishlist.html" class="sa-bn-item">
+    <div class="sa-bn-icon-wrap">
+      <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+    </div>
+    <span class="sa-bn-label">Wishlist</span>
+  </a>
+  <a href="account.html" class="sa-bn-item">
+    <div class="sa-bn-icon-wrap">
+      <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+    </div>
+    <span class="sa-bn-label">Account</span>
+  </a>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="script.js?v=31"></script>
+<script src="sa-motion.js?v=5"></script>
+
+<script>
+/**
+ * ════════════════════════════════════════════════════════════════
+ *  PLP MASTER CONTROLLER - REAL DB + SMART LOCAL CACHE FALLBACK
+ * ════════════════════════════════════════════════════════════════
+ */
+
+const initialUrlParams = new URLSearchParams(window.location.search);
+let queryParams = {
+  slug: initialUrlParams.get('slug') || '',
+  search: initialUrlParams.get('search') || '',
+  flash_sale: initialUrlParams.get('flash_sale') || '',
+  sort: initialUrlParams.get('sort') || ''
+};
+
+const ITEMS_PER_PAGE = 12;
+let currentPage = 1;
+
+function initPLP() {
+  const params = new URLSearchParams(window.location.search);
+  queryParams.slug       = params.get('slug') || '';
+  queryParams.search     = params.get('search') || '';
+  queryParams.flash_sale = params.get('flash_sale') || '';
+  queryParams.sort       = params.get('sort') || '';
+
+  if (queryParams.flash_sale === 'true') {
+    const fsCheck = document.getElementById('flashSaleOnly');
+    if (fsCheck) fsCheck.checked = true;
+  }
+
+  if (queryParams.sort) {
+    const sortSelect = document.getElementById('sortSelect');
+    if (sortSelect) sortSelect.value = queryParams.sort;
+  }
+
+  setupPageHeader();
+  renderBrandFilters();
+  if (typeof syncActiveCategoryNav === 'function') syncActiveCategoryNav();
+  applyFilters(true);
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initPLP);
+} else {
+  initPLP();
+}
+
+document.addEventListener('storeDataLoaded', () => {
+  renderBrandFilters();
+  applyFilters(false);
+});
+
+// Setup Banner & Breadcrumbs
+function setupPageHeader() {
+  const titleEl = document.getElementById('pageTitle');
+  const subEl   = document.getElementById('pageSubtitle');
+  const bcEl    = document.getElementById('breadcrumbCurrent');
+  const badgeEl = document.getElementById('categoryBadge');
+
+  if (queryParams.flash_sale === 'true') {
+    titleEl.innerHTML = `ফ্ল্যাশ সেল <span class="plp-title-badge">সীমিত সময়</span>`;
+    subEl.textContent = 'সেরা অফারে দারুণ সব ডিসকাউন্ট পণ্য';
+    bcEl.textContent  = 'Flash Sale';
+  } else if (queryParams.search) {
+    const q = decodeURIComponent(queryParams.search);
+    titleEl.innerHTML = `"${escapeHtml(q)}" <span class="plp-title-badge">সার্চ ফলাফল</span>`;
+    subEl.textContent = `"${q}" এর জন্য পাওয়া পণ্যসমূহ`;
+    bcEl.textContent  = q;
+  } else if (queryParams.slug) {
+    const s = decodeURIComponent(queryParams.slug);
+    titleEl.innerHTML = `${escapeHtml(s)} <span class="plp-title-badge">ক্যাটাগরি</span>`;
+    subEl.textContent = `${s} ক্যাটাগরির সেরা পণ্যসমূহ`;
+    bcEl.textContent  = s;
+  } else {
+    titleEl.innerHTML = `সকল পণ্য <span class="plp-title-badge">ক্যাটালগ</span>`;
+    subEl.textContent = 'আমাদের সম্পূর্ণ কালেকশন ব্রাউজ করুন';
+    bcEl.textContent  = 'All Products';
+  }
+}
+
+// Smart Category-Aware Brand Filters
+async function renderBrandFilters() {
+  let brands = [];
+  const catalog = (typeof PRODUCTS !== 'undefined' && PRODUCTS && PRODUCTS.length > 0) ? PRODUCTS : (window.PRODUCTS || []);
+  const container = document.getElementById('brandsList');
+  if (!container) return;
+  
+  if (catalog.length === 0) {
+    container.innerHTML = '<p style="font-size:12.5px; color:#94a3b8;"><i class="fa-solid fa-spinner fa-spin"></i> লোড হচ্ছে...</p>';
+    return;
+  }
+
+  let pool = catalog;
+  if (queryParams.slug) {
+    const targetSlug = decodeURIComponent(queryParams.slug).toLowerCase().trim();
+    pool = pool.filter(p => 
+      (p.category && p.category.toLowerCase().includes(targetSlug)) ||
+      (p.category_name && p.category_name.toLowerCase().includes(targetSlug))
+    );
+    if (pool.length === 0) pool = catalog;
+  }
+  brands = [...new Set(pool.map(p => p.brand))].filter(Boolean).sort();
+
+  if (brands.length === 0) {
+    container.innerHTML = '<p style="font-size:12.5px; color:#94a3b8;">কোনো ব্র্যান্ড ফিল্টার নেই</p>';
+    return;
+  }
+
+  container.innerHTML = brands.slice(0, 8).map(b => `
+    <label class="filter-check">
+      <input type="checkbox" class="brand-filter" value="${escapeHtml(b)}" onchange="applyFilters(true)">
+      <span>${escapeHtml(b)}</span>
+    </label>
+  `).join('');
+}
+
+// Skeletons
+function renderSkeletons() {
+  const grid = document.getElementById('productGrid');
+  if (!grid) return;
+  let html = '';
+  for(let i=0; i<6; i++) {
+    html += `
+      <div class="skel-card">
+        <div class="skeleton skel-img"></div>
+        <div class="skeleton skel-line"></div>
+        <div class="skeleton skel-line short"></div>
+        <div class="skeleton skel-box"></div>
+      </div>
+    `;
+  }
+  grid.innerHTML = html;
+}
+
+// Quick Price Helper
+function setPriceBracket(min, max) {
+  document.getElementById('minPrice').value = min;
+  document.getElementById('maxPrice').value = max;
+  applyFilters(true);
+}
+
+// Quick Pills Filter
+function quickFilter(type, btn) {
+  document.querySelectorAll('.plp-chip').forEach(c => c.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+
+  const fs = document.getElementById('flashSaleOnly');
+  const r4 = document.getElementById('rating4Plus');
+  const is = document.getElementById('inStockOnly');
+  const minP = document.getElementById('minPrice');
+  const maxP = document.getElementById('maxPrice');
+
+  if (fs) fs.checked = false;
+  if (r4) r4.checked = false;
+  if (is) is.checked = false;
+  if (minP) minP.value = '';
+  if (maxP) maxP.value = '';
+
+  if (type === 'flash' && fs) fs.checked = true;
+  if (type === 'rating' && r4) r4.checked = true;
+  if (type === 'instock' && is) is.checked = true;
+  if (type === 'under1000') {
+    if (minP) minP.value = '0';
+    if (maxP) maxP.value = '1000';
+  }
+  if (type === 'under5000') {
+    if (minP) minP.value = '1000';
+    if (maxP) maxP.value = '5000';
+  }
+
+  applyFilters(true);
+}
+
+// Reset Filters
+function resetFilters() {
+  document.getElementById('minPrice').value = '';
+  document.getElementById('maxPrice').value = '';
+  if (document.getElementById('inStockOnly')) document.getElementById('inStockOnly').checked = false;
+  if (document.getElementById('flashSaleOnly')) document.getElementById('flashSaleOnly').checked = false;
+  if (document.getElementById('rating4Plus')) document.getElementById('rating4Plus').checked = false;
+  document.querySelectorAll('.brand-filter').forEach(cb => cb.checked = false);
+  document.querySelectorAll('.plp-chip').forEach((c, idx) => c.classList.toggle('active', idx === 0));
+  applyFilters(true);
+}
+
+// Toggle Mobile Filter Drawer
+function toggleMobileFilter() {
+  const sb = document.getElementById('filterSidebar');
+  const ov = document.getElementById('filterOverlay');
+  if (sb && ov) {
+    const isOpen = sb.classList.contains('active');
+    sb.classList.toggle('active', !isOpen);
+    ov.classList.toggle('active', !isOpen);
+    document.body.style.overflow = !isOpen ? 'hidden' : '';
+  }
+}
+
+// Core Apply & Query Logic
+async function applyFilters(resetPage = false) {
+  if (resetPage) currentPage = 1;
+
+  // 1. Instant Cache Render
+  const catalog = (typeof PRODUCTS !== 'undefined' && PRODUCTS && PRODUCTS.length > 0) ? PRODUCTS : (window.PRODUCTS || []);
+  
+  if (catalog.length === 0) {
+    renderSkeletons();
+    const countEl = document.getElementById('resultCount');
+    if (countEl) countEl.textContent = '...';
+    return;
+  }
+  let pool = catalog;
+
+  if (queryParams.slug) {
+    const targetSlug = decodeURIComponent(queryParams.slug).toLowerCase().trim();
+    pool = pool.filter(p => 
+      (p.category && p.category.toLowerCase().includes(targetSlug)) ||
+      (p.category_name && p.category_name.toLowerCase().includes(targetSlug)) ||
+      (p.brand && p.brand.toLowerCase() === targetSlug)
+    );
+  }
+
+  if (queryParams.search) {
+    const q = decodeURIComponent(queryParams.search).toLowerCase().trim();
+    pool = pool.filter(p => 
+      (p.title && p.title.toLowerCase().includes(q)) ||
+      (p.description && p.description.toLowerCase().includes(q)) ||
+      (p.category && p.category.toLowerCase().includes(q)) ||
+      (p.brand && p.brand.toLowerCase().includes(q))
+    );
+  }
+
+  // Price filter
+  const minP = parseFloat(document.getElementById('minPrice').value) || 0;
+  const maxP = parseFloat(document.getElementById('maxPrice').value) || Infinity;
+  if (minP > 0 || maxP < Infinity) {
+    pool = pool.filter(p => {
+      const price = parseFloat(p.discountPrice || p.originalPrice || 0);
+      return price >= minP && price <= maxP;
+    });
+  }
+
+  // Brand filter
+  const selectedBrands = Array.from(document.querySelectorAll('.brand-filter:checked')).map(cb => cb.value);
+  if (selectedBrands.length > 0) {
+    pool = pool.filter(p => selectedBrands.includes(p.brand));
+  }
+
+  // Stock & Flash Sale
+  if (document.getElementById('inStockOnly')?.checked) {
+    pool = pool.filter(p => (p.stock || 1) > 0);
+  }
+  if (document.getElementById('flashSaleOnly')?.checked) {
+    pool = pool.filter(p => p.isFlashSale);
+  }
+  if (document.getElementById('rating4Plus')?.checked) {
+    pool = pool.filter(p => parseFloat(p.rating || 5) >= 4.0);
+  }
+
+  // Sorting
+  const sortVal = document.getElementById('sortSelect')?.value || 'relevance';
+  if (sortVal === 'price_asc') {
+    pool.sort((a, b) => (a.discountPrice || a.originalPrice) - (b.discountPrice || b.originalPrice));
+  } else if (sortVal === 'price_desc') {
+    pool.sort((a, b) => (b.discountPrice || b.originalPrice) - (a.discountPrice || a.originalPrice));
+  } else if (sortVal === 'rating') {
+    pool.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+  }
+
+  if (pool.length > 0) {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    const paged = pool.slice(start, start + ITEMS_PER_PAGE);
+    renderProducts(paged, pool.length);
+    renderPagination(pool.length);
+  } else {
+    renderProducts([], 0);
+    renderPagination(0);
+  }
+
+  // Close mobile drawer after apply
+  const sb = document.getElementById('filterSidebar');
+  const ov = document.getElementById('filterOverlay');
+  if (sb) sb.classList.remove('active');
+  if (ov) ov.classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+function renderProducts(items, totalCount) {
+  document.getElementById('resultCount').textContent = totalCount;
+  const grid = document.getElementById('productGrid');
+  if (!grid) return;
+
+  if (items.length === 0) {
+    const catName = queryParams.slug ? decodeURIComponent(queryParams.slug) : '';
+    const searchVal = queryParams.search ? decodeURIComponent(queryParams.search) : '';
+    let msg = 'আপনার নির্বাচিত ফিল্টার অথবা সার্চের সাথে কোনো পণ্য মেলেনি।';
+    if (catName) {
+      msg = `"${escapeHtml(catName)}" ক্যাটাগরিতে বর্তমানে কোনো পণ্য যুক্ত নেই। খুব শীঘ্রই নতুন পণ্য নিয়ে আসা হচ্ছে।`;
+    } else if (searchVal) {
+      msg = `"${escapeHtml(searchVal)}" এর সাথে মেলে এমন কোনো পণ্য পাওয়া যায়নি।`;
+    }
+
+    grid.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state-icon">
+          <i class="fa-solid fa-box-open"></i>
+        </div>
+        <h3>কোনো পণ্য পাওয়া যায়নি</h3>
+        <p>${msg}</p>
+        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:16px;">
+          <a href="categories.html" class="btn-apply-filters" style="max-width:200px;text-decoration:none;text-align:center;padding:10px 18px;display:inline-block;">সকল ক্যাটাগরি</a>
+          <button class="btn-apply-filters" style="max-width:200px;background:rgba(255,255,255,0.06);color:inherit;border:1px solid rgba(255,255,255,0.15);" onclick="resetFilters()">ফিল্টার রিসেট</button>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  // Uses createProductCardHTML from script.js
+  if (typeof createProductCardHTML === 'function') {
+    grid.innerHTML = items.map(p => createProductCardHTML(p)).join('');
+  } else {
+    grid.innerHTML = items.map(p => `
+      <div class="sa-prod-card" onclick="location.href='product.html?id=${p.id}'">
+        <div class="sa-pc-top">
+          <div class="sa-pc-img"><img src="${p.image}" alt="${escapeHtml(p.title)}" loading="lazy"></div>
+        </div>
+        <div class="sa-pc-title">${escapeHtml(p.title)}</div>
+        <div class="sa-pc-price">
+          <span class="sa-pc-now">৳${Number(p.discountPrice || p.originalPrice).toLocaleString()}</span>
+        </div>
+        <button class="sa-btn sa-btn-primary sa-atc-btn" onclick="event.stopPropagation(); addToCart('${p.id}')">
+          <i class="fa-solid fa-cart-shopping"></i> Add to Cart
+        </button>
+      </div>
+    `).join('');
+  }
+}
+
+function renderPagination(totalCount) {
+  const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
+  const wrap = document.getElementById('paginationWrap');
+  if (!wrap) return;
+
+  if (totalPages <= 1) {
+    wrap.innerHTML = '';
+    return;
+  }
+
+  let html = `<button class="page-btn" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}><i class="fa-solid fa-chevron-left"></i></button>`;
+
+  for (let i = 1; i <= totalPages; i++) {
+    if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+      html += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">${i}</button>`;
+    } else if (i === 2 || i === totalPages - 1) {
+      html += `<span style="color:#94a3b8; margin:0 4px; font-weight:700;">...</span>`;
+    }
+  }
+
+  html += `<button class="page-btn" onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}><i class="fa-solid fa-chevron-right"></i></button>`;
+
+  wrap.innerHTML = html;
+}
+
+function changePage(newPage) {
+  currentPage = newPage;
+  applyFilters(false);
+  window.scrollTo({ top: 300, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>

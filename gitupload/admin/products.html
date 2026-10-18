@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SatheAchi Admin | Products</title>
+  <link rel="icon" href="../logo.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="admin-style.css?v=3">
+  <style>
+    /* Quick View Modal extra styles */
+    .qv-img { width:100%;height:200px;object-fit:cover;border-radius:var(--radius-md);background:var(--surface-2); }
+    .qv-price { font-size:28px;font-weight:900;color:var(--primary);margin:12px 0 4px; }
+    .qv-sale { font-size:15px;color:var(--text-muted);text-decoration:line-through; }
+    .qv-grid { display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px; }
+    .qv-item label { font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);display:block;margin-bottom:3px; }
+    .qv-item div { font-size:14px;font-weight:700; }
+    .filter-bar { display:flex;gap:10px;flex-wrap:wrap;margin:20px 0; }
+    .filter-bar input,.filter-bar select { flex:1;min-width:160px;padding:10px 14px;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:var(--surface-2);color:var(--text-dark);font-size:13px;outline:none;font-family:'Inter';transition:.2s; }
+    .filter-bar input:focus,.filter-bar select:focus { border-color:var(--primary);background:var(--surface); }
+    .stock-ok { color:var(--success);font-weight:800; }
+    .stock-low { color:var(--warning);font-weight:800; }
+    .stock-out { color:var(--danger);font-weight:800; }
+    .page-btn { padding:7px 13px;border-radius:var(--radius-xs);border:1.5px solid var(--border);background:var(--surface);color:var(--text-dark);cursor:pointer;font-weight:700;font-size:13px;transition:.2s; }
+    .page-btn:hover { border-color:var(--primary);color:var(--primary); }
+    .page-btn.active { background:var(--primary);border-color:var(--primary);color:#fff;box-shadow:0 3px 10px rgba(255,107,0,.25); }
+    .row-check { width:16px;height:16px;cursor:pointer;accent-color:var(--primary); }
+  </style>
+</head>
+<body>
+<div class="admin-layout">
+  <div class="sa-sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+  <!-- SIDEBAR -->
+  <aside class="sa-sidebar" id="adminSidebar">
+    <div class="sa-sidebar-header">
+      <a href="index.html" class="sa-sidebar-logo"><i class="fa-solid fa-bag-shopping"></i> SatheAchi</a>
+      <button class="sa-sidebar-close" id="sidebarCloseBtn"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <nav class="sa-sidebar-nav">
+      <a href="index.html" class="sa-nav-item"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+      <a href="products.html" class="sa-nav-item active"><i class="fa-solid fa-box"></i> Products</a>
+      <a href="categories.html" class="sa-nav-item"><i class="fa-solid fa-tags"></i> Categories</a>
+      <a href="orders.html" class="sa-nav-item"><i class="fa-solid fa-cart-shopping"></i> Orders</a>
+      <a href="customers.html" class="sa-nav-item"><i class="fa-solid fa-users"></i> Customers</a>
+      <a href="banners.html" class="sa-nav-item"><i class="fa-regular fa-image"></i> Banners</a>
+      <a href="coupons.html" class="sa-nav-item"><i class="fa-solid fa-ticket"></i> Coupons</a>
+      <a href="notifications.html" class="sa-nav-item"><i class="fa-regular fa-bell"></i> Notifications</a>
+      <a href="reviews.html" class="sa-nav-item"><i class="fa-regular fa-star"></i> Reviews</a>
+      <div style="flex:1"></div>
+      <a href="settings.html" class="sa-nav-item"><i class="fa-solid fa-gear"></i> Settings</a>
+      <div style="height: 20px;"></div>
+      <a href="#" class="sa-nav-item" onclick="adminLogout();return false;" style="margin-top: auto; border-top: 1px solid var(--border);"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+    </nav>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="sa-main">
+    <header class="sa-topbar">
+      <div class="sa-tb-left">
+        <button class="sa-menu-btn" id="mobileMenuBtn"><i class="fa-solid fa-bars"></i></button>
+        <div class="sa-tb-title">Products</div>
+      </div>
+      <div class="sa-tb-right">
+        <button class="sa-icon-btn" id="adminThemeBtn"><i class="fa-regular fa-moon"></i></button>
+        <div class="sa-admin-profile">
+          <div class="sa-admin-avatar"><i class="fa-solid fa-user-tie"></i></div>
+          <div class="sa-admin-info">
+            <span class="sa-admin-name" id="topbarAdminName">Admin</span>
+            <span class="sa-admin-role">Super Admin</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="sa-page-content">
+
+      <!-- STATS -->
+      <div class="sa-stats-grid" style="margin-bottom:22px;">
+        <div class="sa-stat-card">
+          <div class="sa-stat-icon" style="background:linear-gradient(135deg,#667eea,#764ba2);"><i class="fa-solid fa-box"></i></div>
+          <div><div class="sa-stat-value" id="stTotal">—</div><div class="sa-stat-label">Total</div></div>
+        </div>
+        <div class="sa-stat-card">
+          <div class="sa-stat-icon" style="background:linear-gradient(135deg,#30d158,#34c759);"><i class="fa-solid fa-circle-check"></i></div>
+          <div><div class="sa-stat-value" id="stActive">—</div><div class="sa-stat-label">Active</div></div>
+        </div>
+        <div class="sa-stat-card">
+          <div class="sa-stat-icon" style="background:linear-gradient(135deg,#ff453a,#ff6961);"><i class="fa-solid fa-bolt"></i></div>
+          <div><div class="sa-stat-value" id="stFlash">—</div><div class="sa-stat-label">Flash Sale</div></div>
+        </div>
+        <div class="sa-stat-card">
+          <div class="sa-stat-icon" style="background:linear-gradient(135deg,#ff9f0a,#ffd60a);"><i class="fa-solid fa-triangle-exclamation"></i></div>
+          <div><div class="sa-stat-value" id="stLowStock">—</div><div class="sa-stat-label">Low Stock</div></div>
+        </div>
+      </div>
+
+      <!-- BULK ACTION BAR -->
+      <div class="bulk-bar" id="bulkBar">
+        <div class="bulk-count"><span id="bulkNum">0</span> selected</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;">
+          <button class="sa-btn sa-btn-secondary sa-btn-sm" onclick="bulkClear()"><i class="fa-solid fa-xmark"></i> Clear</button>
+          <button class="sa-btn sa-btn-danger sa-btn-sm" onclick="bulkDelete()"><i class="fa-solid fa-trash"></i> Delete</button>
+        </div>
+      </div>
+
+      <!-- TABLE CARD -->
+      <div class="sa-table-card">
+        <div class="sa-card-header" style="flex-wrap:wrap;gap:14px;">
+          <div>
+            <div class="sa-card-title">All Products</div>
+            <div style="font-size:12px;color:var(--text-muted);margin-top:2px;" id="tableSubtitle">Loading...</div>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <a href="product-add.html" class="sa-btn sa-btn-primary">
+              <i class="fa-solid fa-plus"></i> Add Product
+            </a>
+          </div>
+        </div>
+
+        <!-- FILTERS -->
+        <div class="filter-bar">
+          <input type="text" id="fSearch" placeholder="🔍  Search name, SKU, brand..." oninput="filterAndRender()">
+          <select id="fCat" onchange="filterAndRender()"><option value="all">All Categories</option></select>
+          <select id="fStatus" onchange="filterAndRender()">
+            <option value="all">All Status</option>
+            <option value="active">Active</option>
+            <option value="draft">Draft</option>
+            <option value="inactive">Inactive</option>
+          </select>
+          <select id="fFeatured" onchange="filterAndRender()">
+            <option value="all">All Products</option>
+            <option value="featured">Featured</option>
+            <option value="flash">Flash Sale</option>
+            <option value="low_stock">Low Stock</option>
+          </select>
+        </div>
+
+        <!-- TABLE -->
+        <div class="sa-table-resp-wrap">
+          <table class="sa-table">
+            <thead>
+              <tr>
+                <th style="width:40px;"><input type="checkbox" class="row-check" id="checkAll" onchange="toggleAll(this)"></th>
+                <th>Product</th>
+                <th>Category</th>
+                <th>Type</th>
+                <th>Price</th>
+                <th>Stock</th>
+                <th>Status</th>
+                <th>Created</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="prodTbody">
+              <tr><td colspan="9">
+                <div class="sa-skeleton" style="height:50px;margin-bottom:8px;"></div>
+                <div class="sa-skeleton" style="height:50px;margin-bottom:8px;"></div>
+                <div class="sa-skeleton" style="height:50px;"></div>
+              </td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="sa-mobile-cards" id="prodMobileCards">
+          <div style="text-align:center;padding:20px;color:var(--text-muted);">Loading products...</div>
+        </div>
+
+        <!-- PAGINATION -->
+        <div id="pagination" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;padding-top:16px;margin-top:16px;border-top:1px solid var(--border);">
+          <div style="font-size:13px;color:var(--text-muted);" id="pagInfo"></div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;" id="pagBtns"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- QUICK VIEW MODAL -->
+<div class="sa-modal" id="qvModal">
+  <div class="sa-modal-box" style="max-width:500px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+      <div style="font-size:18px;font-weight:800;">Quick View</div>
+      <button style="background:var(--surface-2);border:1px solid var(--border);width:32px;height:32px;border-radius:50%;cursor:pointer;color:var(--text-muted);font-size:14px;display:flex;align-items:center;justify-content:center;" onclick="closeQv()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div id="qvContent"></div>
+    <div style="display:flex;gap:10px;margin-top:20px;">
+      <button class="sa-btn sa-btn-secondary" style="flex:1;" onclick="closeQv()">Close</button>
+      <a id="qvEditBtn" href="#" class="sa-btn sa-btn-primary" style="flex:1;justify-content:center;"><i class="fa-solid fa-pen"></i> Edit</a>
+    </div>
+  </div>
+</div>
+
+<script src="admin-app.js"></script>
+<script>
+let allProducts = [];
+let categories  = [];
+let currentPage = 1;
+const PER_PAGE  = 12;
+
+// ── INIT ──
+document.addEventListener('DOMContentLoaded', () => {
+  // Wait for window.db to be initialized by admin-app.js
+  const waitForDb = setInterval(() => {
+    if (window.db) {
+      clearInterval(waitForDb);
+      loadCategories();
+      loadProducts();
+    }
+  }, 100);
+  // Fallback: timeout after 5 seconds
+  setTimeout(() => {
+    clearInterval(waitForDb);
+    if (!window.db) {
+      document.getElementById('prodTbody').innerHTML = `<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--danger);">Database not initialized. Please refresh the page.</td></tr>`;
+    }
+  }, 5000);
+});
+
+document.getElementById('mobileMenuBtn').addEventListener('click', () => {
+  document.getElementById('adminSidebar').classList.add('show');
+  document.getElementById('sidebarOverlay').classList.add('show');
+});
+function closeSidebar() {
+  document.getElementById('adminSidebar').classList.remove('show');
+  document.getElementById('sidebarOverlay').classList.remove('show');
+}
+
+// ── CATEGORIES ──
+async function loadCategories() {
+  try {
+    const { data, error } = await window.db.from('categories').select('id,name,slug');
+    if (error) console.warn('Categories load error:', error.message);
+    if (data) {
+      categories = data;
+      const sel = document.getElementById('fCat');
+      let opts = '<option value="all">All Categories</option>';
+      data.forEach(c => opts += `<option value="${c.id}">${c.name}</option>`);
+      sel.innerHTML = opts;
+    }
+  } catch(e) { console.warn('Categories exception:', e); }
+}
+
+// ── PRODUCTS ──
+async function loadProducts() {
+  try {
+    if (!window.db) throw new Error('Database not initialized');
+
+    // Fetch products without join first (safer with RLS on categories)
+    const { data: prodData, error: prodError } = await window.db
+      .from('products')
+      .select('*')
+      .order('created_at', { ascending: false });
+    if (prodError) throw prodError;
+
+    if (!prodData || prodData.length === 0) {
+      allProducts = [];
+      updateStats();
+      filterAndRender();
+      return;
+    }
+
+    // Fetch images for all products
+    const productIds = prodData.map(p => p.id);
+    const { data: imgData } = await window.db
+      .from('product_images')
+      .select('product_id, image_url, sort_order')
+      .in('product_id', productIds);
+
+    // Fetch categories separately
+    const { data: catData } = await window.db
+      .from('categories')
+      .select('id, name');
+
+    const catMap = {};
+    (catData || []).forEach(c => catMap[c.id] = c);
+
+    const imgMap = {};
+    (imgData || []).forEach(img => {
+      if (!imgMap[img.product_id]) imgMap[img.product_id] = [];
+      imgMap[img.product_id].push(img);
+    });
+
+    // Merge data
+    allProducts = prodData.map(p => ({
+      ...p,
+      categories: catMap[p.category_id] || null,
+      product_images: imgMap[p.id] || []
+    }));
+
+    updateStats();
+    filterAndRender();
+  } catch (e) {
+    console.error('Products load error:', e);
+    showToast('Failed to load products: ' + e.message, 'error');
+    document.getElementById('prodTbody').innerHTML = `<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--danger);">
+      <i class="fa-solid fa-circle-exclamation" style="font-size:32px;margin-bottom:10px;display:block;"></i>
+      <b>Error loading products</b><br><small>${e.message}</small>
+    </td></tr>`;
+  }
+}
+
+// ── STATS ──
+function updateStats() {
+  document.getElementById('stTotal').textContent = allProducts.length;
+  document.getElementById('stActive').textContent = allProducts.filter(p => p.status === 'active').length;
+  document.getElementById('stFlash').textContent = allProducts.filter(p => p.is_flash_sale).length;
+  document.getElementById('stLowStock').textContent = allProducts.filter(p => p.stock > 0 && p.stock <= (p.low_stock_alert || 5)).length;
+}
+
+// ── FILTER + RENDER ──
+function filterAndRender() {
+  const search   = document.getElementById('fSearch').value.toLowerCase();
+  const cat      = document.getElementById('fCat').value;
+  const status   = document.getElementById('fStatus').value;
+  const featured = document.getElementById('fFeatured').value;
+
+  let filtered = allProducts.filter(p => {
+    const ms = !search || p.name?.toLowerCase().includes(search) || (p.sku||'').toLowerCase().includes(search) || (p.brand||'').toLowerCase().includes(search);
+    const mc = cat === 'all' || p.category_id === cat;
+    const mst = status === 'all' || p.status === status;
+    let mf = true;
+    if (featured === 'featured') mf = p.featured;
+    else if (featured === 'flash') mf = p.is_flash_sale;
+    else if (featured === 'low_stock') mf = p.stock > 0 && p.stock <= (p.low_stock_alert || 5);
+    return ms && mc && mst && mf;
+  });
+
+  currentPage = 1;
+  renderTable(filtered);
+}
+
+function renderTable(data) {
+  const tbody = document.getElementById('prodTbody');
+  const mobCards = document.getElementById('prodMobileCards');
+  document.getElementById('tableSubtitle').textContent = `${data.length} product(s) found`;
+
+  if (!data.length) {
+    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:60px 20px;">
+      <i class="fa-solid fa-box-open" style="font-size:40px;color:var(--border);margin-bottom:12px;display:block;"></i>
+      <div style="font-weight:700;font-size:16px;margin-bottom:6px;">No products found</div>
+      <div style="font-size:13px;color:var(--text-muted);">Try a different search or <a href="product-add.html" style="color:var(--primary);font-weight:700;">add a product</a></div>
+    </td></tr>`;
+    if (mobCards) {
+      mobCards.innerHTML = `<div style="text-align:center;padding:40px 20px;">
+        <i class="fa-solid fa-box-open" style="font-size:40px;color:var(--border);margin-bottom:12px;display:block;"></i>
+        <div style="font-weight:700;font-size:16px;margin-bottom:6px;">No products found</div>
+      </div>`;
+    }
+    document.getElementById('pagInfo').textContent = '';
+    document.getElementById('pagBtns').innerHTML = '';
+    return;
+  }
+
+  const totalPages = Math.ceil(data.length / PER_PAGE);
+  const start = (currentPage - 1) * PER_PAGE;
+  const paged = data.slice(start, start + PER_PAGE);
+
+  // Synchronize checked status map
+  const checkedIds = new Set();
+  document.querySelectorAll('.row-check:checked').forEach(cb => {
+    if (cb.value && cb.value !== 'on') checkedIds.add(cb.value);
+  });
+
+  tbody.innerHTML = paged.map(p => {
+    const imgs = (p.product_images || []).sort((a,b) => a.sort_order - b.sort_order);
+    const imgUrl = imgs[0]?.image_url || null;
+    const statusClass = p.status === 'active' ? 'status-delivered' : p.status === 'draft' ? 'status-processing' : 'status-cancelled';
+    const salePrice = p.sale_price ? `<span style="font-size:11px;color:var(--text-muted);text-decoration:line-through;">৳${Number(p.price).toLocaleString()}</span> <span style="color:var(--danger);font-weight:800;">৳${Number(p.sale_price).toLocaleString()}</span>` : `<span style="font-weight:800;">৳${Number(p.price||0).toLocaleString()}</span>`;
+    const stockClass = p.stock === 0 ? 'stock-out' : (p.stock <= (p.low_stock_alert||5) ? 'stock-low' : 'stock-ok');
+    const typeEmoji = { simple:'📦', mobile:'📱', fashion:'👗', watch:'⌚' }[p.product_type] || '📦';
+    const created = p.created_at ? new Date(p.created_at).toLocaleDateString('en-BD', {day:'2-digit',month:'short',year:'numeric'}) : '—';
+    const isChecked = checkedIds.has(p.id) ? 'checked' : '';
+
+    let badges = '';
+    if (p.featured) badges += `<span style="font-size:9px;background:rgba(255,159,10,.15);color:#ff9f0a;border-radius:4px;padding:1px 5px;font-weight:700;">⭐ Featured</span> `;
+    if (p.is_flash_sale) badges += `<span style="font-size:9px;background:rgba(255,69,58,.12);color:#ff453a;border-radius:4px;padding:1px 5px;font-weight:700;">⚡ Flash</span>`;
+
+    return `<tr>
+      <td><input type="checkbox" class="row-check" value="${p.id}" ${isChecked} onchange="handleCheck(this)"></td>
+      <td style="min-width:220px;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          ${imgUrl
+            ? `<img src="${imgUrl}" style="width:48px;height:48px;border-radius:10px;object-fit:cover;border:1px solid var(--border);flex-shrink:0;" alt="">`
+            : `<div style="width:48px;height:48px;border-radius:10px;background:var(--surface-2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:20px;">📷</div>`}
+          <div>
+            <div style="font-weight:700;font-size:13px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${p.name}</div>
+            <div style="font-size:11px;color:var(--text-muted);font-family:monospace;">${p.sku || 'No SKU'}</div>
+            <div style="margin-top:3px;">${badges}</div>
+          </div>
+        </div>
+      </td>
+      <td style="font-size:13px;white-space:nowrap;">${p.categories?.name || '—'}</td>
+      <td style="font-size:13px;white-space:nowrap;">${typeEmoji} ${p.product_type || 'simple'}</td>
+      <td style="white-space:nowrap;">${salePrice}</td>
+      <td><span class="${stockClass}">${p.stock}</span></td>
+      <td><span class="sa-status-badge ${statusClass}">${p.status}</span></td>
+      <td style="font-size:12px;color:var(--text-muted);white-space:nowrap;">${created}</td>
+      <td style="white-space:nowrap;">
+        <button class="action-btn btn-view" onclick="quickView('${p.id}')" title="Quick View"><i class="fa-solid fa-eye"></i></button>
+        <a class="action-btn btn-edit" href="product-add.html?edit=${p.id}" title="Edit"><i class="fa-solid fa-pen"></i></a>
+        <a class="action-btn btn-dup" href="product-add.html?clone=${p.id}" title="Duplicate"><i class="fa-solid fa-copy"></i></a>
+        <button class="action-btn btn-del" onclick="deleteProduct('${p.id}')" title="Delete"><i class="fa-solid fa-trash"></i></button>
+      </td>
+    </tr>`;
+  }).join('');
+
+  if (mobCards) {
+    mobCards.innerHTML = paged.map(p => {
+      const imgs = (p.product_images || []).sort((a,b) => a.sort_order - b.sort_order);
+      const imgUrl = imgs[0]?.image_url || null;
+      const statusClass = p.status === 'active' ? 'status-delivered' : p.status === 'draft' ? 'status-processing' : 'status-cancelled';
+      const salePrice = p.sale_price ? `<span style="font-size:11px;color:var(--text-muted);text-decoration:line-through;">৳${Number(p.price).toLocaleString()}</span> <span style="color:var(--danger);font-weight:800;">৳${Number(p.sale_price).toLocaleString()}</span>` : `<span style="font-weight:800;">৳${Number(p.price||0).toLocaleString()}</span>`;
+      const stockClass = p.stock === 0 ? 'stock-out' : (p.stock <= (p.low_stock_alert||5) ? 'stock-low' : 'stock-ok');
+      const typeEmoji = { simple:'📦', mobile:'📱', fashion:'👗', watch:'⌚' }[p.product_type] || '📦';
+      const isChecked = checkedIds.has(p.id) ? 'checked' : '';
+
+      let badges = '';
+      if (p.featured) badges += `<span style="font-size:9px;background:rgba(255,159,10,.15);color:#ff9f0a;border-radius:4px;padding:1px 5px;font-weight:700;">⭐ Featured</span> `;
+      if (p.is_flash_sale) badges += `<span style="font-size:9px;background:rgba(255,69,58,.12);color:#ff453a;border-radius:4px;padding:1px 5px;font-weight:700;">⚡ Flash</span>`;
+
+      return `<div class="sa-mob-card">
+        <div class="sa-mob-card-header">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <input type="checkbox" class="row-check" value="${p.id}" ${isChecked} onchange="handleCheck(this)">
+            <div class="sa-mob-card-title" style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${p.name}</div>
+          </div>
+          <span class="sa-status-badge ${statusClass}">${p.status}</span>
+        </div>
+        <div class="sa-mob-card-body">
+          <div style="display:flex;gap:12px;align-items:center;margin-bottom:8px;">
+            ${imgUrl
+              ? `<img src="${imgUrl}" style="width:52px;height:52px;border-radius:10px;object-fit:cover;border:1px solid var(--border);" alt="">`
+              : `<div style="width:52px;height:52px;border-radius:10px;background:var(--surface-2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:24px;">📷</div>`}
+            <div>
+              <div style="font-size:12px;color:var(--text-muted);font-family:monospace;">SKU: ${p.sku || 'None'}</div>
+              <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">Type: ${typeEmoji} ${p.product_type || 'simple'}</div>
+            </div>
+          </div>
+          <div class="sa-mob-field">
+            <span class="sa-mob-field-label">Category</span>
+            <span class="sa-mob-field-val">${p.categories?.name || '—'}</span>
+          </div>
+          <div class="sa-mob-field">
+            <span class="sa-mob-field-label">Price</span>
+            <span class="sa-mob-field-val">${salePrice}</span>
+          </div>
+          <div class="sa-mob-field">
+            <span class="sa-mob-field-label">Stock</span>
+            <span class="sa-mob-field-val"><span class="${stockClass}">${p.stock}</span></span>
+          </div>
+        </div>
+        <div class="sa-mob-card-actions">
+          <button class="sa-btn sa-btn-secondary sa-btn-sm" onclick="quickView('${p.id}')"><i class="fa-solid fa-eye"></i> View</button>
+          <a class="sa-btn sa-btn-secondary sa-btn-sm" href="product-add.html?edit=${p.id}"><i class="fa-solid fa-pen"></i> Edit</a>
+          <a class="sa-btn sa-btn-secondary sa-btn-sm" href="product-add.html?clone=${p.id}"><i class="fa-solid fa-copy"></i> Clone</a>
+          <button class="sa-btn sa-btn-danger sa-btn-sm" onclick="deleteProduct('${p.id}')"><i class="fa-solid fa-trash"></i> Delete</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // Pagination
+  document.getElementById('pagInfo').textContent = `Showing ${start+1}–${Math.min(start+PER_PAGE, data.length)} of ${data.length}`;
+  let pagHtml = '';
+  for (let i = 1; i <= totalPages; i++) {
+    pagHtml += `<button class="page-btn${i===currentPage?' active':''}" onclick="gotoPage(${i}, this)">${i}</button>`;
+  }
+  document.getElementById('pagBtns').innerHTML = pagHtml;
+}
+
+function gotoPage(page, btn) {
+  currentPage = page;
+  document.querySelectorAll('.page-btn').forEach(b => b.classList.remove('active'));
+  btn?.classList.add('active');
+  filterAndRender();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── BULK ──
+function toggleAll(src) {
+  document.querySelectorAll('.row-check').forEach(cb => cb.checked = src.checked);
+  updateBulkBar();
+}
+function handleCheck(el) {
+  if (el) {
+    const val = el.value;
+    const checked = el.checked;
+    document.querySelectorAll(`.row-check[value="${val}"]`).forEach(cb => cb.checked = checked);
+  }
+  const allDesktop = document.querySelectorAll('.sa-table tbody .row-check');
+  if (allDesktop.length) {
+    document.getElementById('checkAll').checked = Array.from(allDesktop).every(c => c.checked);
+  }
+  updateBulkBar();
+}
+function updateBulkBar() {
+  const checkedVals = new Set();
+  document.querySelectorAll('.row-check:checked').forEach(cb => {
+    if (cb.value && cb.value !== 'on') checkedVals.add(cb.value);
+  });
+  const n = checkedVals.size;
+  const bar = document.getElementById('bulkBar');
+  document.getElementById('bulkNum').textContent = n;
+  if (n > 0) bar.classList.add('show'); else bar.classList.remove('show');
+}
+function bulkClear() {
+  document.querySelectorAll('.row-check').forEach(c => c.checked = false);
+  document.getElementById('checkAll').checked = false;
+  updateBulkBar();
+}
+async function bulkDelete() {
+  const ids = Array.from(document.querySelectorAll('.row-check:checked')).map(c => c.value);
+  if (!ids.length) return;
+  saConfirm(`Delete ${ids.length} product(s)?`, async () => {
+    const { error } = await window.db.from('products').delete().in('id', ids);
+    if (!error) { showToast(`Deleted ${ids.length} products`); bulkClear(); loadProducts(); }
+    else showToast(error.message, 'error');
+  });
+}
+
+// ── DELETE ──
+function deleteProduct(id) {
+  saConfirm('Delete this product permanently?', async () => {
+    const { error } = await window.db.from('products').delete().eq('id', id);
+    if (!error) { showToast('Product deleted'); loadProducts(); }
+    else showToast(error.message, 'error');
+  });
+}
+
+// ── QUICK VIEW ──
+function quickView(id) {
+  const p = allProducts.find(x => x.id === id);
+  if (!p) return;
+  const imgs = (p.product_images || []).sort((a,b) => a.sort_order - b.sort_order);
+  const img = imgs[0]?.image_url;
+
+  document.getElementById('qvContent').innerHTML = `
+    ${img ? `<img src="${img}" class="qv-img" alt="">` : `<div class="qv-img" style="display:flex;align-items:center;justify-content:center;font-size:60px;">📷</div>`}
+    <div class="qv-price">৳${Number(p.price||0).toLocaleString()}${p.sale_price ? ` <span class="qv-sale">৳${Number(p.price).toLocaleString()}</span>` : ''}</div>
+    <div style="font-size:18px;font-weight:800;margin-bottom:8px;">${p.name}</div>
+    <div style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">${p.short_description || ''}</div>
+    <div class="qv-grid">
+      <div class="qv-item"><label>Category</label><div>${p.categories?.name || '—'}</div></div>
+      <div class="qv-item"><label>Brand</label><div>${p.brand || '—'}</div></div>
+      <div class="qv-item"><label>Stock</label><div>${p.stock}</div></div>
+      <div class="qv-item"><label>SKU</label><div>${p.sku || '—'}</div></div>
+      <div class="qv-item"><label>Status</label><div>${p.status}</div></div>
+      <div class="qv-item"><label>Type</label><div>${p.product_type || 'simple'}</div></div>
+    </div>`;
+  document.getElementById('qvEditBtn').href = `product-add.html?edit=${p.id}`;
+  document.getElementById('qvModal').classList.add('show');
+}
+function closeQv() { document.getElementById('qvModal').classList.remove('show'); }
+document.getElementById('qvModal').addEventListener('click', e => { if (e.target === e.currentTarget) closeQv(); });
+</script>
+</body>
+</html>

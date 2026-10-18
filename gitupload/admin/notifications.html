@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sathe Achi | Notifications</title>
+  <link rel="icon" href="../logo.png" type="image/png">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="admin-style.css?v=4">
+  <style>
+    .notif-filters { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+    .notif-filter-btn { padding: 10px 18px; border-radius: 20px; border: 1px solid var(--border); background: var(--bg-color); color: var(--text-muted); font-family: 'Inter'; font-size: 13px; font-weight: 600; cursor: pointer; transition: var(--trans); min-height: var(--touch-min); }
+    .notif-filter-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+    .notif-list { display: flex; flex-direction: column; gap: 0; }
+    .notif-item { display: flex; align-items: flex-start; gap: 14px; padding: 16px; border-bottom: 1px solid var(--border); cursor: pointer; transition: var(--trans); position: relative; }
+    .notif-item:last-child { border-bottom: none; }
+    .notif-item:hover { background: var(--bg-color); }
+    .notif-item.unread { background: var(--primary-light); }
+    .notif-item.unread::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--primary); border-radius: 0 2px 2px 0; }
+    
+    .notif-icon { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+    .notif-icon-order { background: rgba(10,132,255,0.12); color: var(--info); }
+    .notif-icon-payment { background: rgba(48,209,88,0.12); color: var(--success); }
+    .notif-icon-review { background: rgba(255,214,10,0.12); color: #ffd60a; }
+    .notif-icon-system { background: rgba(175,82,222,0.12); color: var(--purple); }
+    .notif-icon-warning { background: rgba(255,159,10,0.12); color: var(--warning); }
+
+    .notif-content { flex: 1; min-width: 0; }
+    .notif-title { font-size: 14px; font-weight: 700; color: var(--text-dark); margin-bottom: 4px; }
+    .notif-desc { font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 6px; }
+    .notif-time { font-size: 11px; color: var(--text-muted); }
+    .notif-dot { width: 10px; height: 10px; background: var(--primary); border-radius: 50%; flex-shrink: 0; margin-top: 6px; }
+    
+    .notif-actions-bar { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+    .notif-count-badge { background: var(--primary); color: #fff; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 700; display: inline-block; margin-left: 6px; }
+
+    .empty-notif { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+    .empty-notif i { font-size: 52px; margin-bottom: 16px; display: block; opacity: 0.4; }
+    .empty-notif p { font-size: 15px; font-weight: 600; }
+  </style>
+</head>
+<body>
+
+<div class="admin-layout">
+  <div class="sa-sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- SIDEBAR -->
+  <aside class="sa-sidebar" id="adminSidebar">
+    <div class="sa-sidebar-header">
+      <a href="index.html" class="sa-sidebar-logo"><i class="fa-solid fa-bag-shopping"></i> SatheAchi</a>
+      <button class="sa-sidebar-close" id="sidebarCloseBtn"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <nav class="sa-sidebar-nav">
+      <a href="index.html" class="sa-nav-item"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+      <a href="products.html" class="sa-nav-item"><i class="fa-solid fa-box"></i> Products</a>
+      <a href="categories.html" class="sa-nav-item"><i class="fa-solid fa-tags"></i> Categories</a>
+      <a href="orders.html" class="sa-nav-item"><i class="fa-solid fa-cart-shopping"></i> Orders</a>
+      <a href="customers.html" class="sa-nav-item"><i class="fa-solid fa-users"></i> Customers</a>
+      <a href="banners.html" class="sa-nav-item"><i class="fa-regular fa-image"></i> Banners</a>
+      <a href="coupons.html" class="sa-nav-item"><i class="fa-solid fa-ticket"></i> Coupons</a>
+      <a href="reviews.html" class="sa-nav-item"><i class="fa-regular fa-star"></i> Reviews</a>
+      <div style="flex:1"></div>
+      <a href="notifications.html" class="sa-nav-item active"><i class="fa-solid fa-bell"></i> Notifications</a>
+      <a href="settings.html" class="sa-nav-item"><i class="fa-solid fa-gear"></i> Settings</a>
+      <a href="#" class="sa-nav-item" onclick="event.preventDefault(); adminLogout();"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
+    </nav>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="sa-main">
+    <header class="sa-topbar">
+      <div class="sa-tb-left">
+        <button class="sa-menu-btn" id="mobileMenuBtn"><i class="fa-solid fa-bars"></i></button>
+        <h1 class="sa-tb-title">Notifications</h1>
+      </div>
+      <div class="sa-tb-right">
+        <button class="sa-icon-btn" id="adminThemeBtn"><i class="fa-regular fa-moon"></i></button>
+        <div class="sa-admin-profile">
+          <div class="sa-admin-avatar"><i class="fa-solid fa-user-tie"></i></div>
+          <div class="sa-admin-info"><span class="sa-admin-name" id="topbarAdminName">Admin</span><span class="sa-admin-role">Super Admin</span></div>
+        </div>
+      </div>
+    </header>
+
+    <div class="sa-page-content">
+      <div class="sa-table-card">
+        <div class="sa-card-header">
+          <h3 class="sa-card-title">All Notifications <span class="notif-count-badge" id="unreadCount">0</span></h3>
+          <button class="sa-btn" onclick="markAllRead()" style="border:1px solid var(--border); background:var(--bg-color); color:var(--text-muted);">
+            <i class="fa-solid fa-check-double"></i> Mark All Read
+          </button>
+        </div>
+
+        <div style="padding: 16px 0;">
+          <div class="notif-filters">
+            <button class="notif-filter-btn active" data-filter="all" onclick="applyFilter(this, 'all')">All</button>
+            <button class="notif-filter-btn" data-filter="unread" onclick="applyFilter(this, 'unread')">Unread</button>
+            <button class="notif-filter-btn" data-filter="order" onclick="applyFilter(this, 'order')">Orders</button>
+            <button class="notif-filter-btn" data-filter="payment" onclick="applyFilter(this, 'payment')">Payments</button>
+            <button class="notif-filter-btn" data-filter="review" onclick="applyFilter(this, 'review')">Reviews</button>
+          </div>
+
+          <div class="notif-list" id="notifList">
+            <div class="sa-skeleton" style="height:80px; border-radius:var(--radius-md); margin-bottom:8px;"></div>
+            <div class="sa-skeleton" style="height:80px; border-radius:var(--radius-md); margin-bottom:8px;"></div>
+            <div class="sa-skeleton" style="height:80px; border-radius:var(--radius-md);"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="admin-app.js"></script>
+<script>
+  let notifications = [];
+  let currentFilter = 'all';
+
+  document.getElementById('mobileMenuBtn').addEventListener('click', () => {
+    document.getElementById('adminSidebar').classList.add('show');
+    document.getElementById('sidebarOverlay').classList.add('show');
+  });
+  document.getElementById('sidebarOverlay').addEventListener('click', () => {
+    document.getElementById('adminSidebar').classList.remove('show');
+    document.getElementById('sidebarOverlay').classList.remove('show');
+  });
+
+  document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(loadNotifications, 500);
+  });
+
+  async function loadNotifications() {
+    try {
+      const { data, error } = await window.db
+        .from('notifications')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(100);
+      
+      if (error) throw error;
+      notifications = data || [];
+      updateUnreadCount();
+      renderNotifications();
+    } catch (err) {
+      // If table doesn't exist yet, show empty state
+      renderEmpty();
+      console.warn('Notifications table not available:', err.message);
+    }
+  }
+
+  function updateUnreadCount() {
+    const unread = notifications.filter(n => !n.is_read).length;
+    document.getElementById('unreadCount').textContent = unread;
+    document.getElementById('unreadCount').style.display = unread > 0 ? 'inline-block' : 'none';
+  }
+
+  function applyFilter(btn, filter) {
+    document.querySelectorAll('.notif-filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter = filter;
+    renderNotifications();
+  }
+
+  function getIconClass(type) {
+    const map = {
+      order: 'notif-icon-order',
+      payment: 'notif-icon-payment',
+      review: 'notif-icon-review',
+      system: 'notif-icon-system',
+      warning: 'notif-icon-warning'
+    };
+    return map[type] || 'notif-icon-system';
+  }
+
+  function getIcon(type) {
+    const icons = {
+      order: 'fa-cart-shopping',
+      payment: 'fa-credit-card',
+      review: 'fa-star',
+      system: 'fa-gear',
+      warning: 'fa-triangle-exclamation'
+    };
+    return icons[type] || 'fa-bell';
+  }
+
+  function timeAgo(dateStr) {
+    const now = new Date();
+    const d = new Date(dateStr);
+    const diff = Math.floor((now - d) / 1000);
+    if (diff < 60) return 'Just now';
+    if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+    return `${Math.floor(diff / 86400)}d ago`;
+  }
+
+  function renderNotifications() {
+    let filtered = notifications;
+    if (currentFilter === 'unread') filtered = notifications.filter(n => !n.is_read);
+    else if (currentFilter !== 'all') filtered = notifications.filter(n => n.type === currentFilter);
+
+    const list = document.getElementById('notifList');
+    if (filtered.length === 0) {
+      renderEmpty();
+      return;
+    }
+
+    list.innerHTML = filtered.map(n => `
+      <div class="notif-item ${n.is_read ? '' : 'unread'}" onclick="markRead('${n.id}')">
+        <div class="notif-icon ${getIconClass(n.type)}">
+          <i class="fa-solid ${getIcon(n.type)}"></i>
+        </div>
+        <div class="notif-content">
+          <div class="notif-title">${n.title || 'Notification'}</div>
+          <div class="notif-desc">${n.message || n.body || ''}</div>
+          <div class="notif-time"><i class="fa-regular fa-clock" style="margin-right:4px;"></i>${timeAgo(n.created_at)}</div>
+        </div>
+        ${!n.is_read ? '<div class="notif-dot"></div>' : ''}
+      </div>
+    `).join('');
+  }
+
+  function renderEmpty() {
+    document.getElementById('notifList').innerHTML = `
+      <div class="empty-notif">
+        <i class="fa-regular fa-bell"></i>
+        <p>No notifications yet</p>
+        <small style="color:var(--text-muted); margin-top:8px; display:block;">You're all caught up!</small>
+      </div>
+    `;
+  }
+
+  async function markRead(id) {
+    try {
+      await window.db.from('notifications').update({ is_read: true }).eq('id', id);
+      const n = notifications.find(x => x.id === id);
+      if (n) n.is_read = true;
+      updateUnreadCount();
+      renderNotifications();
+    } catch (err) {
+      console.warn('Could not mark notification as read:', err.message);
+    }
+  }
+
+  async function markAllRead() {
+    try {
+      await window.db.from('notifications').update({ is_read: true }).eq('is_read', false);
+      notifications.forEach(n => n.is_read = true);
+      updateUnreadCount();
+      renderNotifications();
+      showToast('All marked as read', 'success');
+    } catch (err) {
+      showToast('Error updating notifications', 'error');
+    }
+  }
+</script>
+</body>
+</html>

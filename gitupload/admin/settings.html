@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sathe Achi | Settings Management</title>
+  <link rel="icon" href="../logo.png" type="image/png">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="admin-style.css?v=4">
+  <style>
+    .settings-grid { display: grid; grid-template-columns: 250px 1fr; gap: 30px; align-items: start; }
+    
+    .settings-nav { background: var(--surface); border-radius: var(--radius-md); border: 1px solid var(--border); overflow: hidden; position: sticky; top: 100px; }
+    .set-nav-item { padding: 16px 20px; border-bottom: 1px solid var(--border); cursor: pointer; font-weight: 600; color: var(--text-muted); transition: var(--trans); display: flex; align-items: center; gap: 10px; }
+    .set-nav-item:last-child { border-bottom: none; }
+    .set-nav-item:hover { background: var(--bg-color); color: var(--text-dark); }
+    .set-nav-item.active { background: var(--primary-light); color: var(--primary); border-left: 3px solid var(--primary); }
+
+    .settings-panel { display: none; background: var(--surface); padding: 30px; border-radius: var(--radius-lg); border: 1px solid var(--border); box-shadow: var(--shadow-sm); animation: fadeIn 0.3s; }
+    .settings-panel.active { display: block; }
+    
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    .panel-title { font-size: 20px; font-weight: 800; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+    
+    .form-group { margin-bottom: 20px; }
+    .form-row { display: flex; gap: 20px; margin-bottom: 20px; }
+    .form-row .form-group { margin-bottom: 0; flex: 1; }
+    .form-group label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 8px; color: var(--text-muted); }
+    .form-input { width: 100%; padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--bg-color); color: var(--text-dark); font-family: 'Inter'; outline: none; }
+    .form-input:focus { border-color: var(--primary); }
+    
+    .logo-preview { width: 120px; height: 120px; border-radius: var(--radius-sm); border: 2px dashed var(--border); display: flex; align-items: center; justify-content: center; background: var(--bg-color); margin-top: 10px; overflow: hidden; }
+    .logo-preview img { width: 100%; height: 100%; object-fit: contain; padding: 10px; }
+
+    /* MODAL STYLES */
+    .sa-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 1000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: var(--trans); }
+    .sa-modal.show { opacity: 1; pointer-events: auto; }
+    .sa-modal-content { background: var(--surface); width: 100%; max-width: 500px; padding: 30px; border-radius: var(--radius-lg); transform: translateY(20px); transition: var(--trans); box-shadow: var(--shadow-lg); border: 1px solid var(--glass-border); max-height: 90vh; overflow-y: auto; color: var(--text-dark); }
+    .sa-modal.show .sa-modal-content { transform: translateY(0); }
+    .sa-modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 16px; }
+    .sa-modal-title { font-size: 20px; font-weight: 800; margin: 0; }
+    .sa-modal-close { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-muted); display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; transition: var(--trans); }
+    .sa-modal-close:hover { background: var(--bg-color); color: var(--text-dark); }
+
+    /* Touch-friendly inputs */
+    .form-input { min-height: 48px; }
+    .set-nav-item { min-height: 48px; }
+
+    @media (max-width: 768px) {
+      .settings-grid { grid-template-columns: 1fr; }
+      .settings-nav { position: relative; top: 0; display: flex; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
+      .set-nav-item { border-bottom: none; border-right: 1px solid var(--border); border-left: none !important; min-width: 80px; justify-content: center; flex-direction: column; gap: 4px; font-size: 11px; padding: 10px 14px; }
+      .set-nav-item i { font-size: 16px; }
+      .set-nav-item.active { border-bottom: 3px solid var(--primary); }
+      .settings-panel { padding: 20px 16px; }
+      .panel-title { font-size: 18px; margin-bottom: 20px; }
+      .form-row { flex-direction: column; gap: 0; }
+      .form-row .form-group { margin-bottom: 20px; }
+      /* Bottom-sheet modals */
+      .sa-modal { align-items: flex-end; padding: 0; }
+      .sa-modal-content { border-radius: var(--radius-xl) var(--radius-xl) 0 0; max-height: 92vh; transform: translateY(100%); padding: 24px 20px calc(env(safe-area-inset-bottom, 0px) + 24px); }
+      .sa-modal.show .sa-modal-content { transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="admin-layout">
+  <div class="sa-sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- SIDEBAR -->
+  <aside class="sa-sidebar" id="adminSidebar">
+    <div class="sa-sidebar-header">
+      <a href="index.html" class="sa-sidebar-logo"><i class="fa-solid fa-bag-shopping"></i> SatheAchi</a>
+      <button class="sa-sidebar-close" id="sidebarCloseBtn"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <nav class="sa-sidebar-nav">
+      <a href="index.html" class="sa-nav-item"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+      <a href="products.html" class="sa-nav-item"><i class="fa-solid fa-box"></i> Products</a>
+      <a href="categories.html" class="sa-nav-item"><i class="fa-solid fa-tags"></i> Categories</a>
+      <a href="orders.html" class="sa-nav-item"><i class="fa-solid fa-cart-shopping"></i> Orders</a>
+      <a href="customers.html" class="sa-nav-item"><i class="fa-solid fa-users"></i> Customers</a>
+      <a href="banners.html" class="sa-nav-item"><i class="fa-regular fa-image"></i> Banners</a>
+      <a href="coupons.html" class="sa-nav-item"><i class="fa-solid fa-ticket"></i> Coupons</a>
+      <a href="reviews.html" class="sa-nav-item"><i class="fa-regular fa-star"></i> Reviews</a>
+      <div style="flex:1"></div>
+      <a href="settings.html" class="sa-nav-item active"><i class="fa-solid fa-gear"></i> Settings</a>
+      <a href="#" class="sa-nav-item" onclick="event.preventDefault(); adminLogout();"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
+    </nav>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="sa-main">
+    <header class="sa-topbar">
+      <div class="sa-tb-left">
+        <button class="sa-menu-btn" id="mobileMenuBtn"><i class="fa-solid fa-bars"></i></button>
+        <h1 class="sa-tb-title">Settings</h1>
+      </div>
+      <div class="sa-tb-right">
+        <button class="sa-icon-btn" id="adminThemeBtn"><i class="fa-regular fa-moon"></i></button>
+        <div class="sa-admin-profile">
+          <div class="sa-admin-avatar"><i class="fa-solid fa-user-tie"></i></div>
+          <div class="sa-admin-info"><span class="sa-admin-name" id="topbarAdminName">Admin</span><span class="sa-admin-role">Super Admin</span></div>
+        </div>
+      </div>
+    </header>
+
+    <div class="sa-page-content">
+      
+      <div class="settings-grid">
+        <!-- Settings Navigation -->
+        <div class="settings-nav">
+          <div class="set-nav-item active" data-target="general"><i class="fa-solid fa-globe"></i> General</div>
+          <div class="set-nav-item" data-target="contact"><i class="fa-solid fa-address-book"></i> Contact Info</div>
+          <div class="set-nav-item" data-target="social"><i class="fa-solid fa-hashtag"></i> Social Links</div>
+          <div class="set-nav-item" data-target="seo"><i class="fa-solid fa-magnifying-glass"></i> SEO Settings</div>
+          <div class="set-nav-item" data-target="payment"><i class="fa-solid fa-credit-card"></i> Payment Methods</div>
+          <div class="set-nav-item" data-target="delivery"><i class="fa-solid fa-truck"></i> Delivery Settings</div>
+        </div>
+
+        <!-- Settings Content -->
+        <div class="settings-content">
+          
+          <!-- GENERAL -->
+          <div class="settings-panel active" id="panel-general">
+            <h2 class="panel-title">General Settings</h2>
+            <form id="formGeneral">
+              <div class="form-group">
+                <label>Website Name</label>
+                <input type="text" id="setSiteName" class="form-input" value="SatheAchi.com">
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Website Logo</label>
+                  <input type="file" id="setLogoFile" accept="image/*" class="form-input">
+                  <div class="logo-preview" id="setLogoPreview">
+                    <i class="fa-solid fa-bag-shopping" style="font-size:40px; color:var(--text-muted)"></i>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Website Favicon</label>
+                  <input type="file" id="setFaviconFile" accept="image/*" class="form-input">
+                  <div class="logo-preview" id="setFaviconPreview">
+                    <i class="fa-solid fa-circle" style="font-size:40px; color:var(--text-muted)"></i>
+                  </div>
+                </div>
+              </div>
+              <button type="submit" class="sa-btn sa-btn-primary">Save Changes</button>
+            </form>
+          </div>
+
+          <!-- CONTACT -->
+          <div class="settings-panel" id="panel-contact">
+            <h2 class="panel-title">Contact Information</h2>
+            <form id="formContact">
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Support Email</label>
+                  <input type="email" id="setContactEmail" class="form-input" value="support@satheachi.com">
+                </div>
+                <div class="form-group">
+                  <label>Support Phone</label>
+                  <input type="text" id="setContactPhone" class="form-input" value="+880 1234 567890">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Office Address</label>
+                  <textarea id="setContactAddress" class="form-input" rows="2">Dhaka, Bangladesh</textarea>
+                </div>
+                <div class="form-group">
+                  <label>Business Hours</label>
+                  <input type="text" id="setContactBusinessHours" class="form-input" placeholder="e.g. 9:00 AM - 8:00 PM (Sat-Thu)">
+                </div>
+              </div>
+              <button type="submit" class="sa-btn sa-btn-primary">Save Changes</button>
+            </form>
+          </div>
+
+          <!-- SOCIAL -->
+          <div class="settings-panel" id="panel-social">
+            <h2 class="panel-title">Social Media & Chat Links</h2>
+            <form id="formSocial">
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Facebook Page URL</label>
+                  <input type="url" id="setSocialFb" class="form-input" placeholder="https://facebook.com/...">
+                </div>
+                <div class="form-group">
+                  <label>Instagram URL</label>
+                  <input type="url" id="setSocialIg" class="form-input" placeholder="https://instagram.com/...">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>YouTube Channel URL</label>
+                  <input type="url" id="setSocialYt" class="form-input" placeholder="https://youtube.com/...">
+                </div>
+                <div class="form-group">
+                  <label>TikTok URL</label>
+                  <input type="url" id="setSocialTikTok" class="form-input" placeholder="https://tiktok.com/@...">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Messenger URL</label>
+                  <input type="url" id="setSocialMessenger" class="form-input" placeholder="https://m.me/...">
+                </div>
+                <div class="form-group">
+                  <label>Telegram URL</label>
+                  <input type="url" id="setSocialTelegram" class="form-input" placeholder="https://t.me/...">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>WhatsApp Number or Chat Link</label>
+                  <input type="text" id="setSocialWhatsApp" class="form-input" placeholder="e.g. +8801700000000 or https://wa.me/...">
+                </div>
+              </div>
+              <button type="submit" class="sa-btn sa-btn-primary">Save Changes</button>
+            </form>
+          </div>
+
+          <!-- SEO -->
+          <div class="settings-panel" id="panel-seo">
+            <h2 class="panel-title">SEO Configuration</h2>
+            <form id="formSeo">
+              <div class="form-group">
+                <label>Meta Title Format</label>
+                <input type="text" id="setSeoTitle" class="form-input" value="SatheAchi.com - Premium Shopping">
+              </div>
+              <div class="form-group">
+                <label>Meta Description (Global)</label>
+                <textarea id="setSeoDesc" class="form-input" rows="3">SatheAchi is your premium destination for online shopping.</textarea>
+              </div>
+              <div class="form-group">
+                <label>Meta Keywords</label>
+                <input type="text" id="setSeoKeys" class="form-input" value="ecommerce, shopping, premium">
+              </div>
+              <button type="submit" class="sa-btn sa-btn-primary">Save Changes</button>
+            </form>
+          </div>
+
+          <div class="settings-panel" id="panel-payment">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; padding-bottom:16px; border-bottom:1px solid var(--border);">
+              <h2 style="font-size:20px; font-weight:800; margin:0; border:none; padding:0; color:var(--text-dark);">Payment Methods & Merchant Settings</h2>
+              <button type="button" class="sa-btn" onclick="openAddPaymentModal()" style="font-size:13px; padding:8px 16px; border-radius:var(--radius-sm); border:1px solid var(--border); background:var(--surface-2); color:var(--text-dark); display:flex; align-items:center; gap:6px; font-weight:600; cursor:pointer;"><i class="fa-solid fa-plus"></i> Add Method</button>
+            </div>
+            <form id="formPayment">
+              <div id="paymentSettingsContainer" style="display:flex; flex-direction:column; gap:20px;">
+                <div class="sa-skeleton" style="height:120px;"></div>
+                <div class="sa-skeleton" style="height:120px;"></div>
+                <div class="sa-skeleton" style="height:120px;"></div>
+                <div class="sa-skeleton" style="height:120px;"></div>
+              </div>
+              <button type="submit" class="sa-btn sa-btn-primary" style="margin-top:20px;" id="btnSavePaymentSettings">Save Payment Settings</button>
+            </form>
+          </div>
+
+          <!-- DELIVERY SETTINGS -->
+          <div class="settings-panel" id="panel-delivery">
+            <h2 class="panel-title">Delivery Settings</h2>
+            <p style="color:var(--text-muted); font-size:14px; margin-bottom:24px; line-height:1.6;">Configure delivery charges for customers at checkout. Changes take effect immediately for new orders.</p>
+            <form id="formDelivery">
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Inside Dhaka Charge (৳)</label>
+                  <input type="number" id="setShippingInDhaka" class="form-input" min="0" step="1" placeholder="e.g. 60">
+                </div>
+                <div class="form-group">
+                  <label>Outside Dhaka Charge (৳)</label>
+                  <input type="number" id="setShippingOutDhaka" class="form-input" min="0" step="1" placeholder="e.g. 120">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Express Delivery Charge (৳)</label>
+                  <input type="number" id="setShippingExpress" class="form-input" min="0" step="1" placeholder="e.g. 150">
+                </div>
+                <div class="form-group">
+                  <label>Free Delivery Threshold (৳)</label>
+                  <input type="number" id="setShippingFreeThreshold" class="form-input" min="0" step="1" placeholder="e.g. 10000">
+                  <small style="color:var(--text-muted); font-size:12px; margin-top:6px; display:block;">Standard delivery becomes free when order subtotal reaches this amount. Set to 0 to disable.</small>
+                </div>
+              </div>
+              <div style="background:var(--primary-light); border:1px solid rgba(255,107,0,0.2); border-radius:var(--radius-sm); padding:16px; margin-bottom:20px;">
+                <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+                  <i class="fa-solid fa-circle-info" style="color:var(--primary);"></i>
+                  <strong style="font-size:14px; color:var(--primary);">How it works</strong>
+                </div>
+                <ul style="margin:0; padding-left:18px; font-size:13px; color:var(--text-dark); line-height:1.8;">
+                  <li>Customer selects <strong>Dhaka</strong> division → Inside Dhaka charge applies.</li>
+                  <li>Any other division → Outside Dhaka charge applies.</li>
+                  <li>Customer selects <strong>Express Delivery</strong> → Express charge always applies (no free threshold).</li>
+                  <li>Subtotal &ge; Free Delivery Threshold → Standard delivery becomes <strong>FREE</strong>.</li>
+                </ul>
+              </div>
+              <button type="submit" class="sa-btn sa-btn-primary" id="btnSaveDeliverySettings">Save Delivery Settings</button>
+            </form>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- ADD PAYMENT METHOD MODAL -->
+<div class="sa-modal" id="addPaymentModal">
+  <div class="sa-modal-content">
+    <div class="sa-modal-header">
+      <h3 class="sa-modal-title">Add Custom Payment Method</h3>
+      <button class="sa-modal-close" onclick="closeAddPaymentModal()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <form id="addPaymentForm">
+      <div class="form-group">
+        <label>Payment Method ID (Unique, Lowercase, No Spaces)</label>
+        <input type="text" id="newPayId" class="form-input" required placeholder="e.g. upay" pattern="^[a-z0-9]+$" title="Only lowercase letters and numbers are allowed. No spaces.">
+      </div>
+      
+      <div class="form-group">
+        <label>Display Name</label>
+        <input type="text" id="newPayName" class="form-input" required placeholder="e.g. Upay">
+      </div>
+
+      <div class="form-group">
+        <label>Merchant Number (Optional)</label>
+        <input type="text" id="newPayNumber" class="form-input" placeholder="e.g. 01XXXXXXXXX">
+      </div>
+
+      <div class="form-group">
+        <label>Status</label>
+        <select id="newPayStatus" class="form-input">
+          <option value="true">Enabled</option>
+          <option value="false">Disabled</option>
+        </select>
+      </div>
+      
+      <button type="submit" id="addPaySubmitBtn" class="sa-btn sa-btn-primary" style="width:100%; justify-content:center; padding:14px; font-size:16px; margin-top:10px;">Create Payment Method</button>
+    </form>
+  </div>
+</div>
+
+<script src="admin-app.js"></script>
+<script>
+  // Mobile Sidebar
+  document.getElementById('mobileMenuBtn').addEventListener('click', () => {
+    document.getElementById('adminSidebar').classList.add('show');
+    document.getElementById('sidebarOverlay').classList.add('show');
+  });
+  document.getElementById('sidebarOverlay').addEventListener('click', () => {
+    document.getElementById('adminSidebar').classList.remove('show');
+    document.getElementById('sidebarOverlay').classList.remove('show');
+  });
+
+  // Settings Tabs Logic
+  const navItems = document.querySelectorAll('.set-nav-item');
+  const panels = document.querySelectorAll('.settings-panel');
+
+  navItems.forEach(item => {
+    item.addEventListener('click', () => {
+      // Remove active from all
+      navItems.forEach(nav => nav.classList.remove('active'));
+      panels.forEach(pan => pan.classList.remove('active'));
+      
+      // Add active to clicked
+      item.classList.add('active');
+      document.getElementById('panel-' + item.dataset.target).classList.add('active');
+    });
+  });
+
+  // Logo & Favicon Preview
+  document.getElementById('setLogoFile').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if(file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        document.getElementById('setLogoPreview').innerHTML = `<img src="${e.target.result}" style="max-width:100%; max-height:100%; object-fit:contain;">`;
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+
+  document.getElementById('setFaviconFile').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if(file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        document.getElementById('setFaviconPreview').innerHTML = `<img src="${e.target.result}" style="max-width:100%; max-height:100%; object-fit:contain;">`;
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+
+  // Load site settings from database
+  async function loadSiteSettings() {
+    try {
+      const { data, error } = await window.db.from('site_settings').select('*');
+      if (error) throw error;
+
+      if (data && data.length > 0) {
+        const settingsMap = {};
+        data.forEach(item => {
+          settingsMap[item.key] = item.value;
+        });
+
+        if (settingsMap['site_name']) document.getElementById('setSiteName').value = settingsMap['site_name'];
+        const em = settingsMap['contact_email'] || settingsMap['support_email'];
+        if (em) document.getElementById('setContactEmail').value = em;
+        const ph = settingsMap['contact_phone'] || settingsMap['support_phone'];
+        if (ph) document.getElementById('setContactPhone').value = ph;
+        if (settingsMap['contact_address']) document.getElementById('setContactAddress').value = settingsMap['contact_address'];
+        if (settingsMap['business_hours']) document.getElementById('setContactBusinessHours').value = settingsMap['business_hours'];
+        if (settingsMap['social_fb']) document.getElementById('setSocialFb').value = settingsMap['social_fb'];
+        if (settingsMap['social_ig']) document.getElementById('setSocialIg').value = settingsMap['social_ig'];
+        if (settingsMap['social_yt']) document.getElementById('setSocialYt').value = settingsMap['social_yt'];
+        if (settingsMap['social_tiktok']) document.getElementById('setSocialTikTok').value = settingsMap['social_tiktok'];
+        if (settingsMap['whatsapp']) document.getElementById('setSocialWhatsApp').value = settingsMap['whatsapp'];
+        if (settingsMap['social_messenger']) document.getElementById('setSocialMessenger').value = settingsMap['social_messenger'];
+        if (settingsMap['social_telegram']) document.getElementById('setSocialTelegram').value = settingsMap['social_telegram'];
+        if (settingsMap['seo_title']) document.getElementById('setSeoTitle').value = settingsMap['seo_title'];
+        if (settingsMap['seo_desc']) document.getElementById('setSeoDesc').value = settingsMap['seo_desc'];
+        if (settingsMap['seo_keywords']) document.getElementById('setSeoKeys').value = settingsMap['seo_keywords'];
+
+        if (settingsMap['site_logo_url']) {
+          document.getElementById('setLogoPreview').innerHTML = `<img src="${settingsMap['site_logo_url']}" style="max-width:100%; max-height:100%; object-fit:contain;">`;
+        }
+        if (settingsMap['site_favicon_url']) {
+          document.getElementById('setFaviconPreview').innerHTML = `<img src="${settingsMap['site_favicon_url']}" style="max-width:100%; max-height:100%; object-fit:contain;">`;
+        }
+
+        // Delivery settings
+        if (settingsMap['shipping_inside_dhaka']) document.getElementById('setShippingInDhaka').value = settingsMap['shipping_inside_dhaka'];
+        if (settingsMap['shipping_outside_dhaka']) document.getElementById('setShippingOutDhaka').value = settingsMap['shipping_outside_dhaka'];
+        if (settingsMap['shipping_express']) document.getElementById('setShippingExpress').value = settingsMap['shipping_express'];
+        if (settingsMap['shipping_free_threshold']) document.getElementById('setShippingFreeThreshold').value = settingsMap['shipping_free_threshold'];
+      }
+    } catch (err) {
+      console.error("Failed to load site settings:", err);
+    }
+  }
+
+  // Real Save Functions
+  document.getElementById('formGeneral').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = e.target.querySelector('button');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+    btn.disabled = true;
+
+    try {
+      const siteName = document.getElementById('setSiteName').value.trim();
+      const upserts = [
+        { key: 'site_name', value: siteName }
+      ];
+
+      // Upload Logo
+      const logoFile = document.getElementById('setLogoFile').files[0];
+      if (logoFile) {
+        const ext = logoFile.name.split('.').pop();
+        const path = `logo_${Date.now()}.${ext}`;
+        const { data, error } = await window.db.storage.from('banners').upload(path, logoFile);
+        if (error) throw error;
+        const { data: { publicUrl } } = window.db.storage.from('banners').getPublicUrl(path);
+        upserts.push({ key: 'site_logo_url', value: publicUrl });
+      }
+
+      // Upload Favicon
+      const faviconFile = document.getElementById('setFaviconFile').files[0];
+      if (faviconFile) {
+        const ext = faviconFile.name.split('.').pop();
+        const path = `favicon_${Date.now()}.${ext}`;
+        const { data, error } = await window.db.storage.from('banners').upload(path, faviconFile);
+        if (error) throw error;
+        const { data: { publicUrl } } = window.db.storage.from('banners').getPublicUrl(path);
+        upserts.push({ key: 'site_favicon_url', value: publicUrl });
+      }
+
+      const { error } = await window.db.from('site_settings').upsert(upserts);
+      if (error) throw error;
+
+      showToast('General settings saved successfully!', 'success');
+      loadSiteSettings();
+    } catch (err) {
+      console.error(err);
+      showToast(err.message || 'Error saving settings', 'error');
+    } finally {
+      btn.innerHTML = originalText;
+      btn.disabled = false;
+    }
+  });
+
+  document.getElementById('formContact').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = e.target.querySelector('button');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+    btn.disabled = true;
+
+    try {
+      const email = document.getElementById('setContactEmail').value.trim();
+      const phone = document.getElementById('setContactPhone').value.trim();
+      const address = document.getElementById('setContactAddress').value.trim();
+      const hours = document.getElementById('setContactBusinessHours').value.trim();
+      
+      const { error } = await window.db.from('site_settings').upsert([
+        { key: 'contact_email', value: email },
+        { key: 'support_email', value: email },
+        { key: 'contact_phone', value: phone },
+        { key: 'support_phone', value: phone },
+        { key: 'contact_address', value: address },
+        { key: 'business_hours', value: hours }
+      ]);
+      if (error) throw error;
+      showToast('Contact settings saved successfully!', 'success');
+    } catch (err) {
+      console.error(err);
+      showToast(err.message || 'Error saving settings', 'error');
+    } finally {
+      btn.innerHTML = originalText;
+      btn.disabled = false;
+    }
+  });
+
+  document.getElementById('formSocial').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = e.target.querySelector('button');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+    btn.disabled = true;
+
+    try {
+      const fb = document.getElementById('setSocialFb').value.trim();
+      const ig = document.getElementById('setSocialIg').value.trim();
+      const yt = document.getElementById('setSocialYt').value.trim();
+      const tiktok = document.getElementById('setSocialTikTok').value.trim();
+      const whatsapp = document.getElementById('setSocialWhatsApp').value.trim();
+      const messenger = document.getElementById('setSocialMessenger').value.trim();
+      const telegram = document.getElementById('setSocialTelegram').value.trim();
+      
+      const { error } = await window.db.from('site_settings').upsert([
+        { key: 'social_fb', value: fb },
+        { key: 'social_ig', value: ig },
+        { key: 'social_yt', value: yt },
+        { key: 'social_tiktok', value: tiktok },
+        { key: 'whatsapp', value: whatsapp },
+        { key: 'social_messenger', value: messenger },
+        { key: 'social_telegram', value: telegram }
+      ]);
+      if (error) throw error;
+      showToast('Social settings saved successfully!', 'success');
+    } catch (err) {
+      console.error(err);
+      showToast(err.message || 'Error saving settings', 'error');
+    } finally {
+      btn.innerHTML = originalText;
+      btn.disabled = false;
+    }
+  });
+
+  document.getElementById('formSeo').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = e.target.querySelector('button');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+    btn.disabled = true;
+
+    try {
+      const title = document.getElementById('setSeoTitle').value.trim();
+      const desc = document.getElementById('setSeoDesc').value.trim();
+      const keywords = document.getElementById('setSeoKeys').value.trim();
+      
+      const { error } = await window.db.from('site_settings').upsert([
+        { key: 'seo_title', value: title },
+        { key: 'seo_desc', value: desc },
+        { key: 'seo_keywords', value: keywords }
+      ]);
+      if (error) throw error;
+      showToast('SEO settings saved successfully!', 'success');
+    } catch (err) {
+      console.error(err);
+      showToast(err.message || 'Error saving settings', 'error');
+    } finally {
+      btn.innerHTML = originalText;
+      btn.disabled = false;
+    }
+  });
+
+  // Fetch payment settings
+  async function loadPaymentSettings() {
+    try {
+      const { data, error } = await window.db.from('payment_settings').select('*').order('created_at', { ascending: true });
+      if (error) throw error;
+      
+      const container = document.getElementById('paymentSettingsContainer');
+      if (!container) return;
+      
+      const methods = {
+        cod: { name: 'Cash on Delivery', icon: 'fa-solid fa-money-bill-transfer' },
+        bkash: { name: 'bKash', icon: 'fa-solid fa-mobile-screen' },
+        nagad: { name: 'Nagad', icon: 'fa-solid fa-mobile-screen' },
+        rocket: { name: 'Rocket', icon: 'fa-solid fa-mobile-screen' }
+      };
+
+      container.innerHTML = data.map(method => {
+        const isCore = ['cod', 'bkash', 'nagad', 'rocket'].includes(method.id);
+        const displayName = method.name || (methods[method.id] ? methods[method.id].name : (method.id.charAt(0).toUpperCase() + method.id.slice(1)));
+        const iconClass = methods[method.id] ? methods[method.id].icon : 'fa-solid fa-mobile-screen';
+        const hasNumber = method.id !== 'cod';
+        
+        return `
+          <div style="background:var(--surface-2); border:1px solid var(--border); border-radius:var(--radius-md); padding:20px; display:flex; flex-direction:column; gap:16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+              <div style="display:flex; align-items:center; gap:12px;">
+                <div style="width:40px; height:40px; border-radius:10px; background:var(--primary-light); color:var(--primary); display:flex; align-items:center; justify-content:center; font-size:18px;">
+                  <i class="${iconClass}"></i>
+                </div>
+                <div>
+                  <h4 style="font-size:16px; font-weight:700; margin:0; text-transform:capitalize;">${displayName}</h4>
+                  <small style="color:var(--text-muted); font-size:12px;">Enable or disable payment option for customers.</small>
+                </div>
+              </div>
+              <div style="display:flex; align-items:center; gap:12px;">
+                ${!isCore ? `
+                  <button type="button" class="sa-btn" onclick="deletePaymentMethod('${method.id}')" style="background:rgba(255,59,48,0.1); color:var(--danger); border:1px solid rgba(255,59,48,0.2); padding:8px 12px; font-size:13px; font-weight:600; display:flex; align-items:center; gap:6px; height:38px; border-radius:var(--radius-sm); cursor:pointer;">
+                    <i class="fa-solid fa-trash"></i> Delete
+                  </button>
+                ` : ''}
+                <div class="sa-toggle-item ${method.is_enabled ? 'checked' : ''}" id="toggle_item_${method.id}" onclick="togglePaymentSwitch('${method.id}')" style="min-width: 140px; flex: 0 0 auto; height:38px;">
+                  <div class="sa-toggle-sw"></div>
+                  <div class="sa-toggle-label">${method.is_enabled ? 'Enabled' : 'Disabled'}</div>
+                  <input type="checkbox" id="check_${method.id}" style="display:none;" ${method.is_enabled ? 'checked' : ''}>
+                </div>
+              </div>
+            </div>
+            
+            ${!isCore ? `
+            <div class="form-row" style="margin-bottom:0; gap:16px;">
+              <div class="form-group" style="margin-bottom:0; flex:1;">
+                <label class="form-label">Payment Method Name</label>
+                <input type="text" id="name_${method.id}" class="form-input" value="${method.name || ''}" placeholder="e.g. Upay">
+              </div>
+              <div class="form-group" style="margin-bottom:0; flex:1;" id="number_group_${method.id}">
+                <label class="form-label">Merchant Number</label>
+                <input type="text" id="merchant_number_${method.id}" class="form-input" value="${method.merchant_number || ''}" placeholder="01XXXXXXXXX">
+              </div>
+            </div>
+            ` : (hasNumber ? `
+            <div class="form-group" style="margin-bottom:0;" id="number_group_${method.id}">
+              <label class="form-label">Merchant Number</label>
+              <input type="text" id="merchant_number_${method.id}" class="form-input" value="${method.merchant_number || ''}" placeholder="01XXXXXXXXX">
+            </div>
+            ` : '')}
+          </div>
+        `;
+      }).join('');
+      
+    } catch(err) {
+      console.error(err);
+      showToast('Error loading payment settings', 'error');
+    }
+  }
+  
+  window.togglePaymentSwitch = function(id) {
+    const item = document.getElementById('toggle_item_' + id);
+    const check = document.getElementById('check_' + id);
+    if (!item || !check) return;
+    
+    check.checked = !check.checked;
+    if (check.checked) {
+      item.classList.add('checked');
+      item.querySelector('.sa-toggle-label').textContent = 'Enabled';
+    } else {
+      item.classList.remove('checked');
+      item.querySelector('.sa-toggle-label').textContent = 'Disabled';
+    }
+  };
+
+  document.getElementById('formPayment').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('btnSavePaymentSettings');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+    btn.disabled = true;
+    
+    try {
+      const checkBoxes = document.querySelectorAll('#paymentSettingsContainer input[id^="check_"]');
+      const ids = Array.from(checkBoxes).map(cb => cb.id.replace('check_', ''));
+      
+      const promises = ids.map(async id => {
+        const isEnabled = document.getElementById('check_' + id)?.checked || false;
+        const numberInput = document.getElementById('merchant_number_' + id);
+        const merchantNumber = numberInput ? numberInput.value.trim() : null;
+        
+        const updateData = {
+          is_enabled: isEnabled,
+          merchant_number: merchantNumber
+        };
+        
+        const nameInput = document.getElementById('name_' + id);
+        if (nameInput) {
+          updateData.name = nameInput.value.trim();
+        }
+        
+        if (['bkash', 'nagad', 'rocket'].includes(id)) {
+          // Sync with site_settings table as well
+          const key = id + '_number';
+          await window.db.from('site_settings').upsert({ key: key, value: merchantNumber || '' });
+        }
+        
+        return window.db.from('payment_settings').update(updateData).eq('id', id);
+      });
+      
+      const results = await Promise.all(promises);
+      const errors = results.filter(r => r.error).map(r => r.error);
+      if (errors.length > 0) throw errors[0];
+      
+      showToast('Payment settings saved successfully!', 'success');
+      loadPaymentSettings();
+    } catch(err) {
+      console.error(err);
+      showToast(err.message || 'Error saving payment settings', 'error');
+    } finally {
+      btn.innerHTML = originalText;
+      btn.disabled = false;
+    }
+  });
+
+  // Modal Open/Close
+  window.openAddPaymentModal = function() {
+    document.getElementById('addPaymentForm').reset();
+    document.getElementById('addPaymentModal').classList.add('show');
+  };
+  window.closeAddPaymentModal = function() {
+    document.getElementById('addPaymentModal').classList.remove('show');
+  };
+
+  // Add Custom Payment Method Form Submit
+  document.getElementById('addPaymentForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('addPaySubmitBtn');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Creating...';
+    btn.disabled = true;
+
+    try {
+      const id = document.getElementById('newPayId').value.trim().toLowerCase();
+      const name = document.getElementById('newPayName').value.trim();
+      const merchantNumber = document.getElementById('newPayNumber').value.trim() || null;
+      const isEnabled = document.getElementById('newPayStatus').value === 'true';
+
+      // Verify uniqueness
+      const { data: existing } = await window.db.from('payment_settings').select('id').eq('id', id).maybeSingle();
+      if (existing) {
+        throw new Error('A payment method with this ID already exists.');
+      }
+
+      const payload = {
+        id,
+        name,
+        merchant_number: merchantNumber,
+        is_enabled: isEnabled
+      };
+
+      const { error } = await window.db.from('payment_settings').insert([payload]);
+      if (error) throw error;
+
+      showToast('Payment method created successfully!', 'success');
+      closeAddPaymentModal();
+      loadPaymentSettings();
+    } catch (err) {
+      console.error(err);
+      showToast(err.message || 'Error creating payment method', 'error');
+    } finally {
+      btn.innerHTML = originalText;
+      btn.disabled = false;
+    }
+  });
+
+  // Delete Custom Payment Method
+  window.deletePaymentMethod = function(id) {
+    window.saConfirm(`Are you sure you want to delete the payment method "${id}"? This action cannot be undone.`, async () => {
+      try {
+        const { error } = await window.db.from('payment_settings').delete().eq('id', id);
+        if (error) throw error;
+        showToast('Payment method deleted successfully!', 'success');
+        loadPaymentSettings();
+      } catch(err) {
+        console.error(err);
+        showToast(err.message || 'Error deleting payment method', 'error');
+      }
+    });
+  };
+
+  // Delivery Settings Form
+  document.getElementById('formDelivery').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('btnSaveDeliverySettings');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+    btn.disabled = true;
+
+    try {
+      const inDhaka = document.getElementById('setShippingInDhaka').value.trim() || '60';
+      const outDhaka = document.getElementById('setShippingOutDhaka').value.trim() || '120';
+      const express = document.getElementById('setShippingExpress').value.trim() || '150';
+      const freeThreshold = document.getElementById('setShippingFreeThreshold').value.trim() || '10000';
+
+      const { error } = await window.db.from('site_settings').upsert([
+        { key: 'shipping_inside_dhaka', value: inDhaka },
+        { key: 'shipping_outside_dhaka', value: outDhaka },
+        { key: 'shipping_express', value: express },
+        { key: 'shipping_free_threshold', value: freeThreshold }
+      ], { onConflict: 'key' });
+      if (error) throw error;
+      showToast('Delivery settings saved successfully!', 'success');
+    } catch (err) {
+      console.error(err);
+      showToast(err.message || 'Error saving delivery settings', 'error');
+    } finally {
+      btn.innerHTML = originalText;
+      btn.disabled = false;
+    }
+  });
+
+  // Call loadPaymentSettings and loadSiteSettings when settings page is ready
+  document.addEventListener('DOMContentLoaded', () => {
+    loadPaymentSettings();
+    loadSiteSettings();
+  });
+</script>
+</body>
+</html>

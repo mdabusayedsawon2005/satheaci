@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /abusayed/
+
+# Host
+Sitemap: /sitemap.xml

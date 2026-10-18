@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+  <defs>
+    <!-- Premium orange-to-red-orange gradient -->
+    <linearGradient id="logoGrad" x1="15%" y1="15%" x2="85%" y2="85%">
+      <stop offset="0%" stop-color="#ff7b00" />
+      <stop offset="50%" stop-color="#ff5100" />
+      <stop offset="100%" stop-color="#d93d00" />
+    </linearGradient>
+    
+    <!-- Subtle dropshadow for depth -->
+    <filter id="logoShadow" x="-20%" y="-10%" width="140%" height="130%">
+      <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#ff5100" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+
+  <!-- Bag Handle -->
+  <path d="M 36,32 A 14,14 0 0,1 64,32" 
+        fill="none" 
+        stroke="url(#logoGrad)" 
+        stroke-width="5.5" 
+        stroke-linecap="round" />
+
+  <!-- Main Bag Body -->
+  <rect x="22" y="32" width="56" height="50" rx="14" 
+        fill="url(#logoGrad)" 
+        filter="url(#logoShadow)" />
+
+  <!-- White Support Heart Emblem (Representing 'Sathe Achi' - Togetherness) -->
+  <path d="M 50,72 
+           C 50,72 36,60 36,52 
+           C 36,46.5 40.5,42.5 46,42.5 
+           C 48.5,42.5 50,44 50,44 
+           C 50,44 51.5,42.5 54,42.5 
+           C 59.5,42.5 64,46.5 64,52 
+           C 64,60 50,72 50,72 Z" 
+        fill="#ffffff" 
+        opacity="0.95" />
+
+  <!-- Inline connection lines in the heart to represent cooperative hand clasp -->
+  <path d="M 44,53 H 56 M 46,57 H 54" 
+        fill="none" 
+        stroke="url(#logoGrad)" 
+        stroke-width="2" 
+        stroke-linecap="round" 
+        opacity="0.85" />
+</svg>

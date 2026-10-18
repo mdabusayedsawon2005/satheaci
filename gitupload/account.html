@@ -1,0 +1,1546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script>
+    (function(){try{if(localStorage.getItem('sathe_achi_theme')==='dark'){document.documentElement.setAttribute('data-theme','dark');}else{document.documentElement.removeAttribute('data-theme');}}catch(e){}})();
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Account | SatheAchi.com</title>
+  <link rel="icon" href="logo.png" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="sa-style.css?v=36">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
+  <style>
+    /* ══════════════════════════════════════════════════
+       APPLE VISION OS / NATIVE iOS INSPIRED ACCOUNT UI
+    ══════════════════════════════════════════════════ */
+    body { background: #f2f2f7; } /* Classic iOS gray background */
+    [data-theme="dark"] body { background: #000; }
+
+    .sa-acc-container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px 16px 120px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* ─── DESKTOP 2-COLUMN DASHBOARD (PC Friendly) ─── */
+    @media (min-width: 992px) {
+      .sa-acc-container {
+        max-width: 1240px;
+        margin: 28px auto 80px;
+        padding: 0 24px;
+        display: grid;
+        grid-template-columns: 310px 1fr;
+        gap: 32px;
+        align-items: start;
+      }
+
+      .sa-acc-sidebar {
+        position: sticky;
+        top: 96px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .sa-acc-sidebar-nav {
+        display: flex;
+        flex-direction: column;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(24px) saturate(180%);
+        -webkit-backdrop-filter: blur(24px) saturate(180%);
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.7);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+        padding: 12px;
+        gap: 4px;
+      }
+      [data-theme="dark"] .sa-acc-sidebar-nav {
+        background: rgba(28, 28, 30, 0.75);
+        border-color: rgba(255,255,255,0.08);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      }
+
+      .sa-acc-nav-link {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 12px 16px;
+        border-radius: 12px;
+        text-decoration: none;
+        color: #3a3a3c;
+        font-size: 14px;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        width: 100%;
+        text-align: left;
+      }
+      [data-theme="dark"] .sa-acc-nav-link { color: #e5e5ea; }
+      .sa-acc-nav-link i {
+        font-size: 16px;
+        width: 22px;
+        text-align: center;
+        color: #8e8e93;
+        transition: color 0.2s;
+      }
+      .sa-acc-nav-link:hover {
+        background: rgba(212, 175, 55, 0.1);
+        color: var(--sa-gold, #d4af37);
+      }
+      .sa-acc-nav-link:hover i {
+        color: var(--sa-gold, #d4af37);
+      }
+      .sa-acc-nav-link.active {
+        background: linear-gradient(135deg, rgba(212, 175, 55, 0.18), rgba(212, 175, 55, 0.08));
+        color: var(--sa-gold, #b89025);
+        border: 1px solid rgba(212, 175, 55, 0.3);
+      }
+      .sa-acc-nav-link.active i {
+        color: var(--sa-gold, #d4af37);
+      }
+      .sa-acc-nav-logout {
+        color: #ff3b30 !important;
+        margin-top: 6px;
+        border-top: 1px solid rgba(0,0,0,0.06);
+        padding-top: 14px;
+      }
+      [data-theme="dark"] .sa-acc-nav-logout { border-top-color: rgba(255,255,255,0.08); }
+      .sa-acc-nav-logout i { color: #ff3b30 !important; }
+      .sa-acc-nav-logout:hover { background: rgba(255, 59, 48, 0.08) !important; }
+
+      .sa-nav-counter {
+        margin-left: auto;
+        font-size: 11.5px;
+        font-weight: 700;
+        background: rgba(0,0,0,0.06);
+        color: #636366;
+        padding: 2px 8px;
+        border-radius: 99px;
+      }
+      [data-theme="dark"] .sa-nav-counter { background: rgba(255,255,255,0.1); color: #aeaeb2; }
+      .sa-nav-badge-pill {
+        margin-left: auto;
+        font-size: 11px;
+        font-weight: 800;
+        background: linear-gradient(135deg, #FF9500, #FF5E3A);
+        color: #fff;
+        padding: 2px 8px;
+        border-radius: 99px;
+      }
+
+      .sa-acc-main {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
+
+      /* Desktop Welcome Banner */
+      .sa-acc-welcome-banner {
+        background: linear-gradient(135deg, #060b17 0%, #0c1a32 50%, #15243f 100%);
+        border: 1px solid rgba(212, 175, 55, 0.25);
+        border-radius: 20px;
+        padding: 24px 28px;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      }
+      .sa-acc-welcome-banner::after {
+        content: '';
+        position: absolute;
+        right: -20px;
+        top: -50px;
+        width: 180px;
+        height: 180px;
+        background: radial-gradient(circle, rgba(212, 175, 55, 0.25) 0%, transparent 70%);
+        pointer-events: none;
+      }
+      .sa-acc-welcome-sub {
+        font-size: 11px;
+        font-weight: 800;
+        color: #d4af37;
+        letter-spacing: 1.5px;
+        margin-bottom: 4px;
+      }
+      .sa-acc-welcome-title {
+        font-size: 22px;
+        font-weight: 800;
+        margin: 0 0 6px;
+        color: #ffffff;
+      }
+      .sa-acc-welcome-desc {
+        font-size: 13.5px;
+        color: #cbd5e1;
+        margin: 0;
+        max-width: 580px;
+        line-height: 1.5;
+      }
+      .sa-acc-vip-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: linear-gradient(135deg, rgba(212,175,55,0.25), rgba(212,175,55,0.08));
+        border: 1px solid rgba(212,175,55,0.5);
+        color: #f3e5ab;
+        padding: 8px 16px;
+        border-radius: 99px;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        flex-shrink: 0;
+      }
+
+      .sa-mobile-settings-block {
+        display: none !important;
+      }
+    }
+
+    @media (max-width: 991px) {
+      .sa-acc-sidebar-nav { display: none !important; }
+      .sa-acc-welcome-banner { display: none !important; }
+    }
+
+    /* ─── 1. PROFILE HEADER (Liquid Glass) ─── */
+    .sa-acc-profile-card {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border-radius: 20px;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.04), inset 0 1px 1px rgba(255,255,255,0.8);
+      position: relative;
+      overflow: hidden;
+    }
+    [data-theme="dark"] .sa-acc-profile-card {
+      background: rgba(28, 28, 30, 0.65);
+      border-color: rgba(255,255,255,0.08);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+    }
+    
+    /* Subtle background glow */
+    .sa-acc-profile-card::before {
+      content: ''; position: absolute; top: -50%; right: -50%; width: 200px; height: 200px;
+      background: radial-gradient(circle, rgba(255,107,0,0.15) 0%, transparent 70%);
+      border-radius: 50%; pointer-events: none;
+    }
+
+    .sa-acc-profile-left { display: flex; align-items: center; gap: 16px; position: relative; z-index: 1; }
+    .sa-acc-avatar {
+      width: 70px; height: 70px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), #ff9a3c);
+      color: #fff; font-size: 28px; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 8px 20px rgba(255,107,0,0.3);
+      border: 2px solid rgba(255,255,255,0.4);
+    }
+    .sa-acc-info { display: flex; flex-direction: column; gap: 4px; }
+    .sa-acc-name { font-size: 22px; font-weight: 800; color: #1c1c1e; letter-spacing: -0.5px; margin: 0; line-height: 1.1; }
+    [data-theme="dark"] .sa-acc-name { color: #fff; }
+    
+    .sa-acc-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: linear-gradient(135deg, #FFD700, #FDB931);
+      color: #000; font-size: 11px; font-weight: 800;
+      padding: 4px 10px; border-radius: 20px;
+      text-transform: uppercase; letter-spacing: 0.5px;
+      box-shadow: 0 2px 8px rgba(253,185,49,0.4);
+      width: fit-content;
+    }
+
+    .sa-acc-edit-btn {
+      background: rgba(0, 0, 0, 0.05);
+      color: var(--primary); font-weight: 700; font-size: 13px;
+      padding: 8px 16px; border-radius: 999px;
+      border: none; cursor: pointer;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s cubic-bezier(0.32, 0.72, 0, 1.2);
+    }
+    .sa-acc-edit-btn:active { transform: scale(0.92); }
+    [data-theme="dark"] .sa-acc-edit-btn { background: rgba(255,255,255,0.1); }
+
+    /* ─── 2. WALLET STYLE ORDERS ─── */
+    .sa-acc-sec-title {
+      font-size: 18px; font-weight: 700; color: #1c1c1e; margin: 0 0 12px 4px; letter-spacing: -0.3px;
+    }
+    [data-theme="dark"] .sa-acc-sec-title { color: #f2f2f7; }
+
+    .sa-wallet-stack {
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .sa-wallet-card {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border-radius: 16px;
+      padding: 18px;
+      display: flex; align-items: center; justify-content: space-between;
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.32, 0.72, 0, 1.2);
+      -webkit-tap-highlight-color: transparent;
+    }
+    .sa-wallet-card:active { transform: scale(0.96); box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
+    [data-theme="dark"] .sa-wallet-card {
+      background: #1c1c1e; border-color: rgba(255,255,255,0.05); box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+
+    .sa-wallet-left { display: flex; align-items: center; gap: 16px; }
+    .sa-wallet-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+    /* Dynamic Wallet Colors */
+    .sa-wallet-card.pending .sa-wallet-icon { background: rgba(255,149,0,0.15); color: #FF9500; }
+    .sa-wallet-card.processing .sa-wallet-icon { background: rgba(0,122,255,0.15); color: #007AFF; }
+    .sa-wallet-card.shipped .sa-wallet-icon { background: rgba(88,86,214,0.15); color: #5856D6; }
+    .sa-wallet-card.delivered .sa-wallet-icon { background: rgba(52,199,89,0.15); color: #34C759; }
+
+    .sa-wallet-text h3 { font-size: 16px; font-weight: 600; color: #1c1c1e; margin: 0 0 2px; }
+    .sa-wallet-text p { font-size: 13px; color: #8e8e93; margin: 0; }
+    [data-theme="dark"] .sa-wallet-text h3 { color: #fff; }
+
+    .sa-wallet-count {
+      font-size: 20px; font-weight: 800; color: #1c1c1e;
+    }
+    [data-theme="dark"] .sa-wallet-count { color: #fff; }
+
+    /* ─── 3. QUICK ACTIONS GRID ─── */
+    .sa-quick-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;
+    }
+    .sa-quick-card {
+      background: rgba(255,255,255,0.7);
+      backdrop-filter: blur(24px); border-radius: 16px;
+      padding: 16px; display: flex; flex-direction: column; gap: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.32, 0.72, 0, 1.2);
+      -webkit-tap-highlight-color: transparent;
+    }
+    .sa-quick-card:active { transform: scale(0.95); }
+    [data-theme="dark"] .sa-quick-card { background: rgba(28,28,30,0.8); border-color: rgba(255,255,255,0.05); }
+
+    .sa-quick-card i { font-size: 24px; color: var(--primary); }
+    .sa-quick-card span { font-size: 14px; font-weight: 600; color: #1c1c1e; }
+    [data-theme="dark"] .sa-quick-card span { color: #fff; }
+
+    /* ─── 4. APPLE SETTINGS LISTS ─── */
+    .sa-settings-group {
+      background: #fff;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+    }
+    [data-theme="dark"] .sa-settings-group { background: #1c1c1e; }
+
+    .sa-settings-item {
+      display: flex; align-items: center; padding: 14px 16px;
+      text-decoration: none; color: #1c1c1e;
+      position: relative;
+      background: transparent;
+      transition: background 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .sa-settings-item:active { background: #e5e5ea; }
+    [data-theme="dark"] .sa-settings-item { color: #fff; }
+    [data-theme="dark"] .sa-settings-item:active { background: #2c2c2e; }
+
+    /* Separator line except last child */
+    .sa-settings-item:not(:last-child)::after {
+      content: ''; position: absolute; bottom: 0; left: 56px; right: 0;
+      height: 1px; background: rgba(0,0,0,0.08);
+    }
+    [data-theme="dark"] .sa-settings-item:not(:last-child)::after { background: rgba(255,255,255,0.1); }
+
+    .sa-set-icon {
+      width: 28px; height: 28px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 14px; margin-right: 14px; flex-shrink: 0;
+    }
+    /* Apple-like icon colors */
+    .sa-set-icon.blue { background: #007AFF; }
+    .sa-set-icon.green { background: #34C759; }
+    .sa-set-icon.gray { background: #8E8E93; }
+    .sa-set-icon.orange { background: #FF9500; }
+    .sa-set-icon.indigo { background: #5856D6; }
+    .sa-set-icon.red { background: #FF3B30; }
+
+    .sa-set-text { flex: 1; font-size: 16px; font-weight: 500; }
+    .sa-set-arrow { color: #c7c7cc; font-size: 14px; font-weight: 600; }
+    [data-theme="dark"] .sa-set-arrow { color: #636366; }
+
+    /* ─── LOGOUT BUTTON ─── */
+    .sa-logout-btn {
+      width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;
+      background: #fff; color: #FF3B30; font-size: 16px; font-weight: 600;
+      padding: 16px; border-radius: 16px; border: none;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+      cursor: pointer; transition: all 0.3s cubic-bezier(0.32, 0.72, 0, 1.2);
+    }
+    .sa-logout-btn:active { transform: scale(0.96); background: #fde8e8; }
+    [data-theme="dark"] .sa-logout-btn { background: #1c1c1e; }
+    [data-theme="dark"] .sa-logout-btn:active { background: #2c1e1e; }
+
+    /* ─── STATS GRID (Interactive) ─── */
+    .sa-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+    .sa-stat-card {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border-radius: 16px;
+      padding: 16px 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+      cursor: pointer;
+      position: relative;
+      transition: all 0.25s cubic-bezier(0.32, 0.72, 0, 1.2);
+      gap: 3px;
+    }
+    .sa-stat-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(212, 175, 55, 0.18);
+      border-color: rgba(212, 175, 55, 0.5);
+    }
+    .sa-stat-card.active {
+      border-color: var(--sa-gold, #d4af37) !important;
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.15), rgba(255, 255, 255, 0.95)) !important;
+      box-shadow: 0 6px 20px rgba(212, 175, 55, 0.22) !important;
+    }
+    [data-theme="dark"] .sa-stat-card {
+      background: #1c1c1e;
+      border-color: rgba(255, 255, 255, 0.05);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+    [data-theme="dark"] .sa-stat-card.active {
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), #1c1c1e) !important;
+      border-color: var(--sa-gold, #d4af37) !important;
+    }
+    .sa-stat-icon-wrap {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: rgba(212, 175, 55, 0.12);
+      color: var(--sa-gold, #d4af37);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      margin-bottom: 2px;
+    }
+    .sa-stat-icon-wrap.pending { background: rgba(255, 149, 0, 0.12); color: #FF9500; }
+    .sa-stat-icon-wrap.completed { background: rgba(52, 199, 89, 0.12); color: #34C759; }
+    .sa-stat-icon-wrap.wishlist { background: rgba(255, 45, 85, 0.12); color: #FF2D55; }
+
+    .sa-stat-val {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--primary);
+      line-height: 1;
+    }
+    .sa-stat-lbl {
+      font-size: 11px;
+      font-weight: 700;
+      color: #8e8e93;
+      margin-top: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.2px;
+    }
+
+    /* Order Filter Pills */
+    .sa-order-filter-pills {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(0,0,0,0.04);
+      padding: 3px;
+      border-radius: 99px;
+    }
+    [data-theme="dark"] .sa-order-filter-pills { background: rgba(255,255,255,0.08); }
+    .sa-of-pill {
+      background: transparent;
+      border: none;
+      padding: 5px 14px;
+      border-radius: 99px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #8e8e93;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .sa-of-pill.active {
+      background: #ffffff;
+      color: var(--primary, #FF6B00);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      font-weight: 700;
+    }
+    [data-theme="dark"] .sa-of-pill.active { background: #2c2c2e; color: #fff; }
+
+    /* Coupons Modal Styling */
+    .sa-coupons-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 14px;
+      margin-top: 14px;
+    }
+    .sa-coupon-card {
+      background: #ffffff;
+      border: 1.5px dashed rgba(212, 175, 55, 0.5);
+      border-radius: 14px;
+      padding: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.03);
+      transition: all 0.2s ease;
+    }
+    [data-theme="dark"] .sa-coupon-card {
+      background: #1c1c1e;
+      border-color: rgba(212, 175, 55, 0.35);
+    }
+    .sa-coupon-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(212, 175, 55, 0.15);
+      border-color: var(--sa-gold, #d4af37);
+    }
+    .sa-coupon-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      padding: 2px 7px;
+      border-radius: 6px;
+      background: rgba(0, 122, 255, 0.1);
+      color: #007AFF;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+    }
+    .sa-coupon-badge.gold { background: rgba(212, 175, 55, 0.15); color: #b89025; }
+    .sa-coupon-badge.free-ship { background: rgba(52, 199, 89, 0.15); color: #34C759; }
+    .sa-coupon-badge.mega { background: rgba(255, 59, 48, 0.15); color: #FF3B30; }
+    .sa-coupon-discount {
+      font-size: 18px;
+      font-weight: 800;
+      color: #1c1c1e;
+      line-height: 1.2;
+    }
+    [data-theme="dark"] .sa-coupon-discount { color: #fff; }
+    .sa-coupon-terms {
+      font-size: 12px;
+      color: #8e8e93;
+      margin: 3px 0;
+    }
+    .sa-coupon-expiry {
+      font-size: 11px;
+      color: #a1a1aa;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .sa-coupon-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 6px;
+      border-left: 1px dashed rgba(0,0,0,0.1);
+      padding-left: 14px;
+    }
+    [data-theme="dark"] .sa-coupon-right { border-left-color: rgba(255,255,255,0.1); }
+    .sa-coupon-code {
+      font-size: 13px;
+      font-weight: 800;
+      font-family: monospace;
+      letter-spacing: 0.8px;
+      color: var(--sa-gold, #d4af37);
+      background: rgba(212, 175, 55, 0.1);
+      padding: 4px 8px;
+      border-radius: 6px;
+    }
+    .sa-coupon-copy-btn {
+      background: var(--primary, #FF6B00);
+      color: #fff;
+      border: none;
+      border-radius: 99px;
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 6px 12px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s;
+    }
+    .sa-coupon-copy-btn:hover { background: #e05e00; transform: scale(1.04); }
+    .sa-coupon-copy-btn:active { transform: scale(0.95); }
+
+    /* ─── WISHLIST RAIL ─── */
+    .sa-wishlist-rail {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      padding: 4px 0 16px;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+    }
+    .sa-wishlist-rail::-webkit-scrollbar {
+      display: none;
+    }
+    .sa-wishlist-item-card {
+      flex: 0 0 145px;
+      scroll-snap-align: start;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      border-radius: 16px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      position: relative;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+      transition: all 0.2s ease;
+    }
+    [data-theme="dark"] .sa-wishlist-item-card {
+      background: #1c1c1e;
+      border-color: rgba(255, 255, 255, 0.05);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+    .sa-wishlist-item-card:active {
+      transform: scale(0.96);
+    }
+    .sa-wishlist-item-img {
+      width: 100%;
+      height: 95px;
+      border-radius: 10px;
+      object-fit: cover;
+      background: #f1f5f9;
+      border: 1px solid rgba(0,0,0,0.05);
+    }
+    [data-theme="dark"] .sa-wishlist-item-img {
+      border-color: rgba(255,255,255,0.05);
+      background: #2c2c2e;
+    }
+    .sa-wishlist-item-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: #1c1c1e;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-top: 2px;
+    }
+    [data-theme="dark"] .sa-wishlist-item-title {
+      color: #fff;
+    }
+    .sa-wishlist-item-price {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--primary);
+    }
+    .sa-wishlist-item-remove {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      background: rgba(0,0,0,0.4);
+      color: #fff;
+      border: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      cursor: pointer;
+      z-index: 2;
+      transition: background 0.2s;
+    }
+    .sa-wishlist-item-remove:hover {
+      background: rgba(0,0,0,0.6);
+    }
+
+    /* ─── AVATAR UPLOAD PREVIEW ─── */
+    #epAvatarUploadWrap {
+      display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 20px;
+    }
+    #epAvatarPreview {
+      width: 92px; height: 92px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), #ff9a3c);
+      color: #fff; font-size: 34px; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 8px 20px rgba(255,107,0,0.35);
+      border: 3px solid rgba(255,255,255,0.55);
+      overflow: hidden;
+      cursor: pointer;
+      position: relative;
+      transition: box-shadow 0.25s;
+    }
+    #epAvatarPreview:active { transform: scale(0.94); }
+    #epAvatarOverlay {
+      position: absolute; inset: 0;
+      background: rgba(0,0,0,0);
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.25s;
+      border-radius: 50%;
+    }
+    #epAvatarPreview:hover #epAvatarOverlay { background: rgba(0,0,0,0.35); }
+    #epCameraIcon { color: #fff; font-size: 22px; opacity: 0; transition: opacity 0.25s; }
+    #epAvatarPreview:hover #epCameraIcon { opacity: 1; }
+    .ep-change-photo-btn {
+      background: rgba(255,107,0,0.1); color: var(--primary);
+      border: none; padding: 8px 18px; border-radius: 999px;
+      font-size: 13px; font-weight: 700; cursor: pointer;
+      display: flex; align-items: center; gap: 6px;
+      transition: background 0.2s;
+    }
+    .ep-change-photo-btn:hover { background: rgba(255,107,0,0.18); }
+    #epAvatarStatus {
+      font-size: 12px; color: #34C759; font-weight: 600;
+      min-height: 16px;
+    }
+    .ep-upload-progress {
+      width: 100%; height: 4px; background: rgba(0,0,0,0.08);
+      border-radius: 2px; overflow: hidden; display: none;
+    }
+    .ep-upload-progress-bar {
+      height: 100%; background: var(--primary); border-radius: 2px;
+      animation: uploadPulse 1.5s ease-in-out infinite;
+    }
+    @keyframes uploadPulse {
+      0% { width: 10%; } 50% { width: 80%; } 100% { width: 100%; }
+    }
+    [data-theme="dark"] #epAvatarPreview { border-color: rgba(255,255,255,0.2); }
+    [data-theme="dark"] .ep-change-photo-btn { background: rgba(255,107,0,0.15); }
+
+    /* ─── CROP MODAL STYLES ─── */
+    .sa-crop-container {
+      width: 100%; height: 300px; margin: 15px 0;
+      background: #f2f2f7; border-radius: 12px; overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+    }
+    [data-theme="dark"] .sa-crop-container { background: #1c1c1e; }
+    .cropper-view-box, .cropper-face { border-radius: 50%; }
+
+    #epAvatarText {
+      width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+    }
+    #epAvatarText img {
+      width: 100%; height: 100%; object-fit: cover; border-radius: 50%;
+    }
+
+    .sa-form-group select {
+      width: 100%; padding: 14px 16px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.1); font-size: 16px; background: #fff; outline: none; transition: border-color 0.2s;
+      color: #1c1c1e;
+    }
+    [data-theme="dark"] .sa-form-group select {
+      background: #2c2c2e; border-color: rgba(255,255,255,0.05); color: #fff;
+    }
+  </style>
+</head>
+<body class="sa-has-back-btn">
+
+<button class="sa-back-btn" onclick="navigateBack()" aria-label="Go back">
+  <i class="fa-solid fa-chevron-left"></i>
+</button>
+
+  <header class="sa-header" id="saHeader">
+    <div class="sa-wrap sa-header-inner">
+      <a href="index.html" class="sa-logo">
+        <img src="logo.png" alt="SatheAchi.com" class="sa-logo-img sa-logo-mobile" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+      <img src="sathe_achi_brand_logo.svg" alt="Sathe Achi" class="sa-logo-desktop">
+        <div class="sa-logo-icon" style="display:none;"><i class="fa-solid fa-handshake-simple"></i></div>
+      </a>
+      <div class="sa-search-wrap">
+        <div class="sa-search-box" id="saSearchBox">
+          <i class="fa-solid fa-magnifying-glass sa-search-icon"></i>
+          <input type="text" id="saSearch" placeholder="Search products, brands..." autocomplete="off">
+          <button type="button" class="sa-search-clear" id="saSearchClear" aria-label="Clear search"><i class="fa-solid fa-xmark"></i></button>
+          <button class="sa-search-btn" id="saSearchBtn" aria-label="Search"><i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+        <div class="sa-search-suggestions" id="saSearchSuggestions"></div>
+      </div>
+      <div class="sa-hdr-actions">
+        <button class="sa-icon-btn theme-toggle" id="saTheme" title="Dark Mode"><i class="fa-regular fa-moon"></i></button>
+        <a href="wishlist.html" class="sa-icon-btn" title="Wishlist"><i class="fa-regular fa-heart"></i></a>
+        <a href="cart.html" class="sa-icon-btn" title="Cart"><i class="fa-solid fa-cart-shopping"></i><span class="sa-badge cart-count">0</span></a>
+        <div style="position:relative;">
+          <button class="sa-icon-btn" id="saProfileBtn" title="Profile" aria-label="Profile menu"><i class="fa-regular fa-circle-user"></i></button>
+          <div class="sa-profile-dropdown" id="saProfileDropdown">
+            <div class="sa-dropdown-logged-in" style="display:none;">
+              <div class="sa-dropdown-header"><div class="sa-dropdown-user-info"><span class="sa-user-name">Loading...</span><span class="sa-user-email"></span></div></div>
+              <div class="sa-dropdown-divider"></div>
+              <a href="account.html" class="sa-dropdown-item"><i class="fa-regular fa-user"></i> My Account</a>
+              <a href="orders.html" class="sa-dropdown-item"><i class="fa-solid fa-box"></i> My Orders</a>
+              <a href="wishlist.html" class="sa-dropdown-item"><i class="fa-regular fa-heart"></i> Wishlist</a>
+              <div class="sa-dropdown-divider"></div>
+              <a href="#" class="sa-dropdown-item" id="saHeaderLogout" style="color:#ef4444;"><i class="fa-solid fa-right-from-bracket" style="color:#ef4444;"></i> Logout</a>
+            </div>
+            <div class="sa-dropdown-guest">
+              <div class="sa-dropdown-header"><div class="sa-dropdown-user-info"><span class="sa-user-name">Welcome!</span><span class="sa-user-email">Sign in to your account</span></div></div>
+              <a href="login.html" class="sa-dropdown-login-btn">Sign In</a>
+              <a href="signup.html" class="sa-dropdown-item" style="justify-content:center; font-size:12px; color:var(--text-muted);">Create Account</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ═══ 2. LUXURY CELESTIAL CATEGORY NAV ═══ -->
+  <nav class="sa-category-nav">
+    <div class="sa-wrap sa-category-nav-inner">
+      <a href="index.html" class="sa-cnav-item">Home</a>
+      <span class="sa-cnav-div"></span>
+      <a href="category.html?slug=Fashion" class="sa-cnav-item">Fashion</a>
+      <span class="sa-cnav-div"></span>
+      <a href="category.html?slug=Electronics" class="sa-cnav-item">Electronics</a>
+      <span class="sa-cnav-div"></span>
+      <a href="category.html?slug=Mobiles" class="sa-cnav-item">Mobiles</a>
+      <span class="sa-cnav-div"></span>
+      <a href="category.html?slug=Watches" class="sa-cnav-item">Watches</a>
+    </div>
+  </nav>
+
+  <main class="sa-acc-container">
+
+    <!-- ═══ LEFT SIDEBAR (Desktop Sticky Nav & Profile) ═══ -->
+    <aside class="sa-acc-sidebar">
+      <!-- 1. PROFILE CARD -->
+      <div class="sa-acc-profile-card sa-card-hidden">
+        <div class="sa-acc-profile-left">
+          <div class="sa-acc-avatar">R</div>
+          <div class="sa-acc-info">
+            <h1 class="sa-acc-name">Rahim Uddin</h1>
+            <div class="sa-acc-badge"><i class="fa-solid fa-crown" style="margin-right:2px;"></i> Gold Member</div>
+            <div class="sa-acc-email-sub" id="accEmailDisplay" style="font-size:12px; color:var(--text-muted, #8e8e93); margin-top:2px;">rahim@satheachi.com</div>
+          </div>
+        </div>
+        <button class="sa-acc-edit-btn" onclick="openModal('editProfileModal')">Edit</button>
+      </div>
+
+      <!-- DESKTOP SIDEBAR NAVIGATION -->
+      <nav class="sa-acc-sidebar-nav">
+        <a href="#overview" class="sa-acc-nav-link active" onclick="event.preventDefault(); filterDashboardOrders('all');">
+          <i class="fa-solid fa-chart-pie"></i>
+          <span>Dashboard Overview</span>
+        </a>
+        <a href="#orders" class="sa-acc-nav-link" onclick="event.preventDefault(); filterDashboardOrders('all');">
+          <i class="fa-solid fa-box"></i>
+          <span>My Orders</span>
+          <span class="sa-nav-counter" id="sideNavOrderCount">0</span>
+        </a>
+        <a href="wishlist.html" class="sa-acc-nav-link">
+          <i class="fa-regular fa-heart"></i>
+          <span>My Wishlist</span>
+          <span class="sa-nav-counter" id="sideNavWishlistCount">0</span>
+        </a>
+        <a href="#" class="sa-acc-nav-link" onclick="event.preventDefault(); openModal('addressesModal');">
+          <i class="fa-solid fa-location-dot"></i>
+          <span>Saved Addresses</span>
+        </a>
+        <a href="#" class="sa-acc-nav-link" onclick="event.preventDefault(); openModal('couponsModal');">
+          <i class="fa-solid fa-ticket"></i>
+          <span>Coupons & Rewards</span>
+          <span class="sa-nav-badge-pill">4 Active</span>
+        </a>
+        <a href="#" class="sa-acc-nav-link" onclick="event.preventDefault(); openModal('paymentMethodsModal');">
+          <i class="fa-regular fa-credit-card"></i>
+          <span>Payment Methods</span>
+        </a>
+        <a href="#" class="sa-acc-nav-link" onclick="event.preventDefault(); openModal('changePasswordModal');">
+          <i class="fa-solid fa-shield-halved"></i>
+          <span>Security & Password</span>
+        </a>
+        <a href="#" class="sa-acc-nav-link" onclick="event.preventDefault(); openModal('notificationsModal');">
+          <i class="fa-regular fa-bell"></i>
+          <span>Notifications</span>
+        </a>
+        <a href="help-center.html" class="sa-acc-nav-link">
+          <i class="fa-solid fa-circle-question"></i>
+          <span>Help & Support</span>
+        </a>
+        <button class="sa-acc-nav-link sa-acc-nav-logout" onclick="openModal('logoutModal')">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          <span>Log Out</span>
+        </button>
+      </nav>
+    </aside>
+
+    <!-- ═══ RIGHT MAIN CONTENT (Desktop Dynamic Dashboard) ═══ -->
+    <div class="sa-acc-main">
+      <!-- Desktop Welcome Banner -->
+      <div class="sa-acc-welcome-banner sa-card-hidden">
+        <div>
+          <div class="sa-acc-welcome-sub">✦ SATHE ACHI PRIVILEGE ✦</div>
+          <h2 class="sa-acc-welcome-title">Welcome to Your Personal Dashboard</h2>
+          <p class="sa-acc-welcome-desc">Monitor your recent purchases, track live deliveries, manage addresses, and redeem VIP discount vouchers.</p>
+        </div>
+        <div class="sa-acc-vip-pill">
+          <i class="fa-solid fa-crown" style="color:#FFD700;"></i> Gold Tier
+        </div>
+      </div>
+
+      <!-- DASHBOARD STATS GRID (Interactive) -->
+      <div class="sa-stats-grid sa-card-hidden" style="animation-delay: 25ms;">
+        <div class="sa-stat-card active" id="statCardTotal" onclick="filterDashboardOrders('all', this)" title="Click to view all orders">
+          <div class="sa-stat-icon-wrap"><i class="fa-solid fa-boxes-stacked"></i></div>
+          <span class="sa-stat-val" id="statTotalOrders">0</span>
+          <span class="sa-stat-lbl">Total Orders</span>
+        </div>
+        <div class="sa-stat-card" id="statCardPending" onclick="filterDashboardOrders('pending', this)" title="Click to view pending orders">
+          <div class="sa-stat-icon-wrap pending"><i class="fa-solid fa-clock-rotate-left"></i></div>
+          <span class="sa-stat-val" id="statPendingOrders">0</span>
+          <span class="sa-stat-lbl">Pending</span>
+        </div>
+        <div class="sa-stat-card" id="statCardCompleted" onclick="filterDashboardOrders('completed', this)" title="Click to view completed orders">
+          <div class="sa-stat-icon-wrap completed"><i class="fa-solid fa-circle-check"></i></div>
+          <span class="sa-stat-val" id="statCompletedOrders">0</span>
+          <span class="sa-stat-lbl">Completed</span>
+        </div>
+        <div class="sa-stat-card" id="statCardWishlist" onclick="location.href='wishlist.html'" title="Click to open wishlist">
+          <div class="sa-stat-icon-wrap wishlist"><i class="fa-solid fa-heart"></i></div>
+          <span class="sa-stat-val" id="statWishlistCount">0</span>
+          <span class="sa-stat-lbl">Wishlist</span>
+        </div>
+      </div>
+
+      <!-- 2. QUICK ACTIONS -->
+      <div class="sa-card-hidden" style="animation-delay: 50ms;">
+        <h2 class="sa-acc-sec-title">Quick Access</h2>
+        <div class="sa-quick-grid">
+          <a href="wishlist.html" class="sa-quick-card">
+            <i class="fa-regular fa-heart" style="color: #FF2D55;"></i>
+            <span>Wishlist</span>
+          </a>
+          <a href="cart.html" class="sa-quick-card">
+            <i class="fa-solid fa-cart-shopping" style="color: #007AFF;"></i>
+            <span>My Cart</span>
+          </a>
+          <a href="#" class="sa-quick-card" onclick="event.preventDefault(); openModal('couponsModal');">
+            <i class="fa-solid fa-ticket" style="color: #FF9500;"></i>
+            <span>Coupons (4)</span>
+          </a>
+          <a href="#" class="sa-quick-card" onclick="event.preventDefault(); openModal('addressesModal');">
+            <i class="fa-solid fa-location-dot" style="color: #34C759;"></i>
+            <span>Addresses</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- WISHLIST RAIL SECTION -->
+      <div class="sa-card-hidden" style="animation-delay: 75ms;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <h2 class="sa-acc-sec-title" style="margin:0;">My Wishlist</h2>
+          <a href="wishlist.html" style="font-size:13px; font-weight:700; color:var(--primary, #FF6B00); text-decoration:none;">View All <i class="fa-solid fa-arrow-right"></i></a>
+        </div>
+        <div id="saWishlistRail" class="sa-wishlist-rail">
+          <!-- Dynamic Rail -->
+        </div>
+      </div>
+
+      <!-- 3. WALLET STYLE ORDERS OVERVIEW WITH STATUS TABS -->
+      <div class="sa-card-hidden" id="orders" style="animation-delay: 100ms;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+          <h2 class="sa-acc-sec-title" style="margin:0;">Recent Orders</h2>
+          <div class="sa-order-filter-pills" id="orderFilterPills">
+            <button class="sa-of-pill active" onclick="filterDashboardOrders('all', this)">All</button>
+            <button class="sa-of-pill" onclick="filterDashboardOrders('pending', this)">Pending</button>
+            <button class="sa-of-pill" onclick="filterDashboardOrders('completed', this)">Completed</button>
+          </div>
+        </div>
+        <div id="saRecentOrdersList" style="display:flex; flex-direction:column; gap:12px;">
+          <!-- JS Injected Recent Orders -->
+        </div>
+      </div>
+
+      <!-- 4. MOBILE-ONLY ACCOUNT MANAGEMENT (Apple Settings Style) -->
+      <div class="sa-card-hidden sa-mobile-settings-block" style="animation-delay: 150ms;">
+        <h2 class="sa-acc-sec-title">Account</h2>
+        <div class="sa-settings-group">
+          <a href="#" class="sa-settings-item" onclick="event.preventDefault(); openModal('editProfileModal');">
+            <div class="sa-set-icon blue"><i class="fa-solid fa-user"></i></div>
+            <div class="sa-set-text">Personal Information</div>
+            <i class="fa-solid fa-chevron-right sa-set-arrow"></i>
+          </a>
+          <a href="#" class="sa-settings-item" onclick="event.preventDefault(); openModal('changePasswordModal');">
+            <div class="sa-set-icon green"><i class="fa-solid fa-shield-halved"></i></div>
+            <div class="sa-set-text">Security & Password</div>
+            <i class="fa-solid fa-chevron-right sa-set-arrow"></i>
+          </a>
+          <a href="#" class="sa-settings-item" onclick="event.preventDefault(); openModal('paymentMethodsModal');">
+            <div class="sa-set-icon orange"><i class="fa-regular fa-credit-card"></i></div>
+            <div class="sa-set-text">Payment Methods</div>
+            <i class="fa-solid fa-chevron-right sa-set-arrow"></i>
+          </a>
+          <a href="#" class="sa-settings-item" onclick="event.preventDefault(); openModal('notificationsModal');">
+            <div class="sa-set-icon gray" style="position: relative;">
+              <i class="fa-solid fa-bell"></i>
+              <span class="sa-notif-badge" style="display: none; position: absolute; top: -4px; right: -4px; background: var(--primary); color: #fff; font-size: 9px; font-weight: 700; width: 14px; height: 14px; border-radius: 50%; align-items: center; justify-content: center; border: 1.5px solid #f2f2f7;">0</span>
+            </div>
+            <div class="sa-set-text">Notifications</div>
+            <i class="fa-solid fa-chevron-right sa-set-arrow"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- 5. MOBILE-ONLY SUPPORT SECTION -->
+      <div class="sa-card-hidden sa-mobile-settings-block" style="animation-delay: 200ms;">
+        <h2 class="sa-acc-sec-title">Support</h2>
+        <div class="sa-settings-group">
+          <a href="help-center.html" class="sa-settings-item">
+            <div class="sa-set-icon indigo"><i class="fa-solid fa-circle-question"></i></div>
+            <div class="sa-set-text">Help Center &amp; FAQ</div>
+            <i class="fa-solid fa-chevron-right sa-set-arrow"></i>
+          </a>
+          <a href="#" class="sa-settings-item" onclick="event.preventDefault(); window.openWhatsAppSupport ? window.openWhatsAppSupport() : showToast('Contact info loading...', 'info');">
+            <div class="sa-set-icon blue"><i class="fa-solid fa-headset"></i></div>
+            <div class="sa-set-text">Contact Support</div>
+            <i class="fa-solid fa-chevron-right sa-set-arrow"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- 6. MOBILE-ONLY LOGOUT -->
+      <div class="sa-card-hidden sa-mobile-settings-block" style="animation-delay: 250ms;">
+        <button class="sa-logout-btn" onclick="openModal('logoutModal')">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i> Log Out
+        </button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- MOBILE BOTTOM NAV -->
+  <div class="sa-bottom-nav">
+    <a href="index.html" class="sa-bn-item">
+      <div class="sa-bn-icon-wrap">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+      </div>
+      <span class="sa-bn-label">Home</span>
+    </a>
+    <a href="categories.html" class="sa-bn-item">
+      <div class="sa-bn-icon-wrap">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"></rect><rect x="14" y="3" width="7" height="7" rx="2"></rect><rect x="14" y="14" width="7" height="7" rx="2"></rect><rect x="3" y="14" width="7" height="7" rx="2"></rect></svg>
+      </div>
+      <span class="sa-bn-label">Categories</span>
+    </a>
+    <a href="cart.html" class="sa-bn-item">
+      <div class="sa-bn-icon-wrap">
+        <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+        <span class="sa-cart-count sa-bn-badge" style="display:none;">0</span>
+      </div>
+      <span class="sa-bn-label">Cart</span>
+    </a>
+    <a href="wishlist.html" class="sa-bn-item">
+      <div class="sa-bn-icon-wrap">
+        <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+      </div>
+      <span class="sa-bn-label">Wishlist</span>
+    </a>
+    <a href="account.html" class="sa-bn-item active">
+      <div class="sa-bn-icon-wrap">
+        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+      </div>
+      <span class="sa-bn-label">Account</span>
+    </a>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       SLIDE-UP MODALS (iOS Style)
+       ══════════════════════════════════════════════════ -->
+
+  <!-- 1. Edit Profile Modal -->
+  <div class="sa-modal-overlay" id="editProfileModal">
+    <div class="sa-modal-sheet">
+      <div class="sa-modal-drag"></div>
+      <div class="sa-modal-header">
+        <h3 class="sa-modal-title">Edit Profile</h3>
+        <button class="sa-modal-close" onclick="closeModal('editProfileModal')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form class="sa-modal-form" id="editProfileForm">
+
+        <!-- Profile Picture Upload UI -->
+        <div id="epAvatarUploadWrap">
+          <div id="epAvatarPreview" onclick="document.getElementById('epAvatarFile').click()" title="Tap to change photo">
+            <span id="epAvatarText">U</span>
+            <div id="epAvatarOverlay">
+              <i class="fa-solid fa-camera" id="epCameraIcon"></i>
+            </div>
+          </div>
+          <!-- Hidden File Input -->
+          <input type="file" id="epAvatarFile" accept="image/jpeg,image/png,image/webp" style="display:none;">
+          <button type="button" class="ep-change-photo-btn" onclick="document.getElementById('epAvatarFile').click()">
+            <i class="fa-solid fa-camera"></i> Change Photo
+          </button>
+          <div class="ep-upload-progress" id="epUploadProgress">
+            <div class="ep-upload-progress-bar"></div>
+          </div>
+          <span id="epAvatarStatus"></span>
+        </div>
+
+        <div class="sa-form-group">
+          <label>Full Name</label>
+          <input type="text" id="epName" required autocomplete="name" placeholder="Your full name">
+        </div>
+        <div class="sa-form-group">
+          <label>Email Address (Read-only)</label>
+          <input type="email" id="epEmail" disabled style="opacity: 0.6; cursor: not-allowed;">
+        </div>
+        <div class="sa-form-group">
+          <label>Phone Number</label>
+          <input type="tel" id="epPhone" required autocomplete="tel" placeholder="01XXXXXXXXX">
+        </div>
+
+        <button type="submit" class="sa-modal-btn" id="epSaveBtn">Save Changes</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 2. Addresses Modal -->
+  <div class="sa-modal-overlay" id="addressesModal">
+    <div class="sa-modal-sheet">
+      <div class="sa-modal-drag"></div>
+      <div class="sa-modal-header">
+        <h3 class="sa-modal-title">Saved Addresses</h3>
+        <button class="sa-modal-close" onclick="closeModal('addressesModal')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div id="addressListContainer" style="display:flex; flex-direction:column; gap:12px;">
+        <!-- JS Injected -->
+      </div>
+      <button class="sa-modal-btn" style="background:rgba(255,107,0,0.1); color:var(--primary); margin-top:20px;" onclick="openAddressForm()"><i class="fa-solid fa-plus"></i> Add New Address</button>
+    </div>
+  </div>
+
+  <!-- 3. Notifications Modal (Empty State) -->
+  <div class="sa-modal-overlay" id="notificationsModal">
+    <div class="sa-modal-sheet">
+      <div class="sa-modal-drag"></div>
+      <div class="sa-modal-header">
+        <h3 class="sa-modal-title">Notifications</h3>
+        <button class="sa-modal-close" onclick="closeModal('notificationsModal')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      
+      <!-- Notifications Controls -->
+      <div id="notifControls" style="display:none; justify-content:space-between; align-items:center; margin-top:12px; margin-bottom:12px; padding:0 4px;">
+        <span style="font-size:12px; color:var(--text-muted);" id="notifCountText">0 notifications</span>
+        <button onclick="markAllNotificationsAsRead()" style="background:none; border:none; color:var(--primary); font-size:12px; font-weight:600; cursor:pointer; padding:0; display:flex; align-items:center; gap:4px;"><i class="fa-solid fa-check-double"></i> Mark all read</button>
+      </div>
+
+      <!-- Notifications Content Container -->
+      <div id="notificationsContent" style="display:none; flex-direction:column; gap:12px; max-height:350px; overflow-y:auto; padding-right:4px; margin-bottom:16px;"></div>
+
+      <div class="sa-empty-state">
+        <div class="sa-empty-icon"><i class="fa-regular fa-bell"></i></div>
+        <h4 class="sa-empty-title">You're all caught up!</h4>
+        <p class="sa-empty-p">You don't have any new notifications at the moment.</p>
+        <button class="sa-modal-btn" onclick="closeModal('notificationsModal')" style="width:auto; padding:12px 32px;">Got it</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Coupons Modal (Interactive Rewards & Vouchers) -->
+  <div class="sa-modal-overlay" id="couponsModal">
+    <div class="sa-modal-sheet" style="max-height:85vh; overflow-y:auto; padding-bottom:30px;">
+      <div class="sa-modal-drag"></div>
+      <div class="sa-modal-header">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div style="width:36px; height:36px; border-radius:10px; background:rgba(212,175,55,0.15); color:var(--sa-gold, #d4af37); display:flex; align-items:center; justify-content:center; font-size:16px;">
+            <i class="fa-solid fa-ticket"></i>
+          </div>
+          <div>
+            <h3 class="sa-modal-title" style="margin:0; font-size:18px;">My Coupons & Rewards</h3>
+            <p style="margin:2px 0 0; font-size:12px; color:#8e8e93;">Exclusive discount vouchers for your account</p>
+          </div>
+        </div>
+        <button class="sa-modal-close" onclick="closeModal('couponsModal')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <!-- Coupon Cards Grid -->
+      <div class="sa-coupons-grid">
+        <!-- Coupon 1 -->
+        <div class="sa-coupon-card">
+          <div class="sa-coupon-left">
+            <span class="sa-coupon-badge">WELCOME GIFT</span>
+            <div class="sa-coupon-discount">৳১০০ ছাড়</div>
+            <div class="sa-coupon-terms">সর্বনিম্ন ৳১,০০০ কেনাকাটায় প্রযোজ্য</div>
+            <div class="sa-coupon-expiry"><i class="fa-regular fa-clock"></i> মেয়াদ: ৩১ ডিসেম্বর, ২০২৬</div>
+          </div>
+          <div class="sa-coupon-right">
+            <div class="sa-coupon-code">WELCOME100</div>
+            <button class="sa-coupon-copy-btn" onclick="copyCouponCode('WELCOME100', this)">
+              <i class="fa-regular fa-copy"></i> Copy
+            </button>
+          </div>
+        </div>
+
+        <!-- Coupon 2 -->
+        <div class="sa-coupon-card">
+          <div class="sa-coupon-left">
+            <span class="sa-coupon-badge gold">GOLD VIP PRIVILEGE</span>
+            <div class="sa-coupon-discount">১০% ক্যাশব্যাক</div>
+            <div class="sa-coupon-terms">ফ্যাশন ও ইলেকট্রনিক্সে ৳২,০০০+ অর্ডারে</div>
+            <div class="sa-coupon-expiry"><i class="fa-regular fa-clock"></i> মেয়াদ: ৩১ ডিসেম্বর, ২০২৬</div>
+          </div>
+          <div class="sa-coupon-right">
+            <div class="sa-coupon-code">ROYAL10</div>
+            <button class="sa-coupon-copy-btn" onclick="copyCouponCode('ROYAL10', this)">
+              <i class="fa-regular fa-copy"></i> Copy
+            </button>
+          </div>
+        </div>
+
+        <!-- Coupon 3 -->
+        <div class="sa-coupon-card">
+          <div class="sa-coupon-left">
+            <span class="sa-coupon-badge free-ship">FREE SHIPPING</span>
+            <div class="sa-coupon-discount">ফ্রি হোম ডেলিভারি</div>
+            <div class="sa-coupon-terms">সারা বাংলাদেশে ৳১,৫০০+ অর্ডারে প্রযোজ্য</div>
+            <div class="sa-coupon-expiry"><i class="fa-regular fa-clock"></i> মেয়াদ: ৩১ ডিসেম্বর, ২০২৬</div>
+          </div>
+          <div class="sa-coupon-right">
+            <div class="sa-coupon-code">FREESHIP</div>
+            <button class="sa-coupon-copy-btn" onclick="copyCouponCode('FREESHIP', this)">
+              <i class="fa-regular fa-copy"></i> Copy
+            </button>
+          </div>
+        </div>
+
+        <!-- Coupon 4 -->
+        <div class="sa-coupon-card">
+          <div class="sa-coupon-left">
+            <span class="sa-coupon-badge mega">MEGA SAVINGS</span>
+            <div class="sa-coupon-discount">৳৫০০ ডিসকাউন্ট</div>
+            <div class="sa-coupon-terms">৳৫,০০০ এর বেশি যেকোনো প্রিমিয়াম অর্ডারে</div>
+            <div class="sa-coupon-expiry"><i class="fa-regular fa-clock"></i> মেয়াদ: ৩১ ডিসেম্বর, ২০২৬</div>
+          </div>
+          <div class="sa-coupon-right">
+            <div class="sa-coupon-code">SATHE500</div>
+            <button class="sa-coupon-copy-btn" onclick="copyCouponCode('SATHE500', this)">
+              <i class="fa-regular fa-copy"></i> Copy
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:16px; padding:12px 16px; background:rgba(0,122,255,0.06); border:1px solid rgba(0,122,255,0.15); border-radius:12px; display:flex; align-items:center; gap:10px; font-size:12.5px; color:#007AFF;">
+        <i class="fa-solid fa-circle-info" style="font-size:16px; flex-shrink:0;"></i>
+        <span>কুপন কোডটি কপি করে চেকআউট পেজের <strong>"Apply Coupon"</strong> বক্সে পেস্ট করলেই ইন্সট্যান্ট ডিসকাউন্ট পেয়ে যাবেন।</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. Logout Confirmation Modal (Action Sheet Style) -->
+  <div class="sa-modal-overlay" id="logoutModal">
+    <div class="sa-modal-sheet" style="padding-bottom:24px;">
+      <div class="sa-modal-drag"></div>
+      <div style="text-align:center; margin-bottom:24px;">
+        <h3 style="font-size:20px; font-weight:800; color:#1c1c1e; margin-bottom:8px;">Log Out</h3>
+        <p style="font-size:15px; color:#8e8e93;">Are you sure you want to log out of your account?</p>
+      </div>
+      <button class="sa-modal-btn" id="confirmLogoutBtn" style="background:#FF3B30; color:#fff; margin-bottom:12px;">Yes, Log Out</button>
+      <button class="sa-modal-btn" onclick="closeModal('logoutModal')" style="background:#e5e5ea; color:#1c1c1e;">Cancel</button>
+    </div>
+  </div>
+
+  <!-- 6. Order Details Modal (Dynamic sheet) -->
+  <div class="sa-modal-overlay" id="orderDetailsModal">
+    <div class="sa-modal-sheet" style="max-height:85vh; overflow-y:auto; padding-bottom:30px;">
+      <div class="sa-modal-drag"></div>
+      <div class="sa-modal-header">
+        <h3 class="sa-modal-title">Order Details</h3>
+        <button class="sa-modal-close" onclick="closeModal('orderDetailsModal')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div id="odContent" style="display:flex; flex-direction:column; gap:16px; margin-top:10px;">
+        <!-- Dynamic content -->
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. Address Form Modal (Add / Edit) -->
+  <div class="sa-modal-overlay" id="addressFormModal">
+    <div class="sa-modal-sheet">
+      <div class="sa-modal-drag"></div>
+      <div class="sa-modal-header">
+        <h3 class="sa-modal-title" id="addrModalTitle">Add New Address</h3>
+        <button class="sa-modal-close" onclick="closeModal('addressFormModal')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form class="sa-modal-form" id="addressForm">
+        <input type="hidden" id="addrId">
+        <div class="sa-form-group">
+          <label>Full Name</label>
+          <input type="text" id="addrFullName" required>
+        </div>
+        <div class="sa-form-group">
+          <label>Phone Number</label>
+          <input type="tel" id="addrPhone" required>
+        </div>
+        <div class="sa-form-group">
+          <label>Division <span>*</span></label>
+          <select id="addrDivision" required>
+            <option value="">Select Division</option>
+            <option value="Dhaka">Dhaka</option>
+            <option value="Chattogram">Chattogram</option>
+            <option value="Rajshahi">Rajshahi</option>
+            <option value="Khulna">Khulna</option>
+            <option value="Barishal">Barishal</option>
+            <option value="Sylhet">Sylhet</option>
+            <option value="Rangpur">Rangpur</option>
+            <option value="Mymensingh">Mymensingh</option>
+          </select>
+        </div>
+        <div class="sa-form-group">
+          <label>District <span>*</span></label>
+          <select id="addrDistrictSelect" required>
+            <option value="">Select District</option>
+          </select>
+        </div>
+        <div class="sa-form-group">
+          <label>Area / Thana <span>*</span></label>
+          <select id="addrThanaSelect" required>
+            <option value="">Select Area / Thana</option>
+          </select>
+          <input type="text" id="addrThanaManual" placeholder="Type Area / Thana manually" style="display: none; margin-top: 8px;">
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px;">
+          <div class="sa-form-group" style="gap: 6px;">
+            <label style="font-size: 13px;">House <span>*</span></label>
+            <input type="text" id="addrHouse" placeholder="e.g. House 12" required>
+          </div>
+          <div class="sa-form-group" style="gap: 6px;">
+            <label style="font-size: 13px;">Road <span>*</span></label>
+            <input type="text" id="addrRoad" placeholder="e.g. Road 5" required>
+          </div>
+          <div class="sa-form-group" style="gap: 6px;">
+            <label style="font-size: 13px;">Village/Sector <span>*</span></label>
+            <input type="text" id="addrVillage" placeholder="e.g. Sector 3" required>
+          </div>
+          <div class="sa-form-group" style="gap: 6px;">
+            <label style="font-size: 13px;">Landmark</label>
+            <input type="text" id="addrLandmark" placeholder="e.g. Near Mosque">
+          </div>
+        </div>
+        <div class="sa-form-group" style="display:flex; align-items:center; gap:8px; flex-direction:row; margin:10px 0;">
+          <input type="checkbox" id="addrIsDefault" style="width:20px; height:20px; margin:0; cursor:pointer;">
+          <label for="addrIsDefault" style="margin:0; font-weight:600; cursor:pointer;">Set as default address</label>
+        </div>
+        <button type="submit" class="sa-modal-btn" id="addrSubmitBtn">Save Address</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 8. Change Password Modal -->
+  <div class="sa-modal-overlay" id="changePasswordModal">
+    <div class="sa-modal-sheet">
+      <div class="sa-modal-drag"></div>
+      <div class="sa-modal-header">
+        <h3 class="sa-modal-title">Change Password</h3>
+        <button class="sa-modal-close" onclick="closeModal('changePasswordModal')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form class="sa-modal-form" id="changePasswordForm">
+        <div class="sa-form-group">
+          <label>Current Password</label>
+          <input type="password" id="currentPassword" required autocomplete="current-password">
+        </div>
+        <div class="sa-form-group">
+          <label>New Password</label>
+          <input type="password" id="newPassword" required minlength="6" autocomplete="new-password">
+        </div>
+        <div class="sa-form-group">
+          <label>Confirm New Password</label>
+          <input type="password" id="confirmPassword" required minlength="6" autocomplete="new-password">
+        </div>
+        <button type="submit" class="sa-modal-btn" id="changePasswordSubmitBtn">Update Password</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 9. Payment Methods Modal -->
+  <div class="sa-modal-overlay" id="paymentMethodsModal">
+    <div class="sa-modal-sheet">
+      <div class="sa-modal-drag"></div>
+      <div class="sa-modal-header">
+        <h3 class="sa-modal-title">Payment Methods</h3>
+        <button class="sa-modal-close" onclick="closeModal('paymentMethodsModal')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <p style="font-size:13px; color:#8e8e93; margin:0 0 16px; line-height:1.5;">Active payment options accepted by the store.</p>
+      <div id="paymentMethodsList" style="display:flex; flex-direction:column; gap:12px;">
+        <!-- JS Injected -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Crop Image Modal -->
+  <div class="sa-modal-overlay" id="cropModal">
+    <div class="sa-modal-sheet" style="max-height: 85vh;">
+      <div class="sa-modal-drag"></div>
+      <div class="sa-modal-header">
+        <h3 class="sa-modal-title">Crop Photo</h3>
+        <button class="sa-modal-close" onclick="closeModal('cropModal')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="sa-crop-container">
+        <img id="cropImage" src="" style="max-width: 100%; display: block;">
+      </div>
+      <div style="display: flex; gap: 12px; margin-top: 15px; width: 100%;">
+        <button type="button" class="sa-modal-btn" style="background:#e5e5ea; color:#1c1c1e; flex: 1;" onclick="closeModal('cropModal')">Cancel</button>
+        <button type="button" class="sa-modal-btn" id="cropApplyBtn" style="flex: 1;">Crop & Save</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="sa-motion.js?v=4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="script.js?v=36"></script>
+  <script>
+    // Copy Coupon Code Helper
+    function copyCouponCode(code, btn) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(code).then(() => {
+          showCouponSuccess(code, btn);
+        }).catch(() => {
+          fallbackCopyText(code, btn);
+        });
+      } else {
+        fallbackCopyText(code, btn);
+      }
+    }
+
+    function showCouponSuccess(code, btn) {
+      if (window.showToast) window.showToast(`কুপন কোড "${code}" কপি হয়েছে!`, "success");
+      const origText = btn.innerHTML;
+      btn.innerHTML = '<i class="fa-solid fa-check"></i> Copied!';
+      btn.style.background = '#10b981';
+      setTimeout(() => {
+        btn.innerHTML = origText;
+        btn.style.background = '';
+      }, 2500);
+    }
+
+    function fallbackCopyText(text, btn) {
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      document.body.appendChild(textArea);
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        showCouponSuccess(text, btn);
+      } catch (err) {
+        if (window.showToast) window.showToast(`Code: ${text}`, "info");
+      }
+      document.body.removeChild(textArea);
+    }
+
+    // Dashboard Order Filter (Total / Pending / Completed)
+    function filterDashboardOrders(status, triggerEl) {
+      // Sync active state on pills & stat cards
+      const allPills = document.querySelectorAll('.sa-of-pill');
+      allPills.forEach(p => p.classList.remove('active'));
+      
+      const allStatCards = document.querySelectorAll('.sa-stat-card');
+      allStatCards.forEach(c => c.classList.remove('active'));
+
+      if (triggerEl) {
+        triggerEl.classList.add('active');
+      }
+
+      const statTotal = document.getElementById('statCardTotal');
+      const statPending = document.getElementById('statCardPending');
+      const statCompleted = document.getElementById('statCardCompleted');
+
+      if (status === 'all' && statTotal) statTotal.classList.add('active');
+      if (status === 'pending' && statPending) statPending.classList.add('active');
+      if (status === 'completed' && statCompleted) statCompleted.classList.add('active');
+
+      // Update pills
+      const targetPill = Array.from(allPills).find(p => p.textContent.trim().toLowerCase() === (status === 'all' ? 'all' : status));
+      if (targetPill) targetPill.classList.add('active');
+
+      const container = document.getElementById('saRecentOrdersList');
+      if (!container) return;
+
+      const orders = window._dashboardOrders || [];
+      let filtered = orders;
+      if (status === 'pending') {
+        filtered = orders.filter(o => ['pending', 'confirmed', 'processing', 'shipped'].includes(o.order_status));
+      } else if (status === 'completed') {
+        filtered = orders.filter(o => ['delivered', 'completed'].includes(o.order_status));
+      }
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="sa-empty-state" style="padding:28px 16px; text-align:center; background:rgba(255,255,255,0.7); backdrop-filter:blur(20px); border-radius:16px; border:1px solid rgba(255,255,255,0.5);">
+            <div class="sa-empty-icon" style="font-size:28px; margin-bottom:8px; color:var(--primary);"><i class="fa-solid fa-box-open"></i></div>
+            <h4 class="sa-empty-title" style="font-size:14px; margin-bottom:4px; font-weight:700; color:#1c1c1e;">No ${status === 'all' ? '' : status} orders found</h4>
+            <p class="sa-empty-p" style="font-size:12px; color:#8e8e93; margin:0;">Explore our collections to place an order.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = filtered.map(o => {
+        const date = new Date(o.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+        return `
+          <div class="sa-wallet-card" onclick="openOrderDetails('${o.id}')">
+            <div class="sa-wallet-left">
+              <div class="sa-wallet-icon" style="background:rgba(255,107,0,0.1); color:var(--primary); width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center;">
+                <i class="fa-solid fa-receipt"></i>
+              </div>
+              <div class="sa-wallet-text">
+                <h3 style="font-size:15px; font-weight:700; margin:0; color:#1c1c1e;">Order #${o.order_number}</h3>
+                <p style="font-size:12px; color:#8e8e93; margin:2px 0 0;">${date} • Total: ৳${o.total.toLocaleString()}</p>
+              </div>
+            </div>
+            <div style="text-align:right; display:flex; flex-direction:column; gap:4px; align-items:flex-end;">
+              <span class="sa-status-badge status-${o.order_status}" style="font-size:10px; font-weight:800; text-transform:uppercase; padding:4px 8px; border-radius:20px;">${o.order_status}</span>
+              <span style="font-size:11px; font-weight:600; color:${o.payment_status === 'paid' ? '#10b981' : '#f59e0b'};">${o.payment_status === 'paid' ? 'Paid' : 'Unpaid'}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    window.copyCouponCode = copyCouponCode;
+    window.filterDashboardOrders = filterDashboardOrders;
+
+    window.addEventListener('DOMContentLoaded', () => {
+      if (window.location.hash === '#coupons') {
+        setTimeout(() => openModal('couponsModal'), 350);
+      } else if (window.location.hash === '#addresses') {
+        setTimeout(() => openModal('addressesModal'), 350);
+      }
+    });
+  </script>
+</body>
+</html>
+

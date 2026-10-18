@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script>
+    (function(){try{if(localStorage.getItem('sathe_achi_theme')==='dark'){document.documentElement.setAttribute('data-theme','dark');}else{document.documentElement.removeAttribute('data-theme');}}catch(e){}})();
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Categories | Sathe Achi</title>
+  <link rel="icon" href="logo.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="sa-style.css?v=31">
+  <style>
+    /* ─── PAGE SEARCH BAR ─── */
+    .pg-search { background: var(--navy); padding: 14px 0; }
+    .pg-search-box { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.08); border-radius: var(--radius-full); padding: 11px 18px; border: 1px solid rgba(255,255,255,0.12); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+    .pg-search-box input { flex: 1; background: transparent; border: none; color: #fff; font-size: 14px; outline: none; }
+    .pg-search-box input::placeholder { color: rgba(255,255,255,0.5); }
+    .pg-search-box i { color: rgba(255,255,255,0.6); font-size: 15px; }
+
+    /* ─── POPULAR BANNERS ─── */
+    .pop-banners { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 10px; }
+    .pop-banner { border-radius: var(--radius-md); overflow: hidden; position: relative; height: 110px; display: flex; align-items: flex-end; padding: 14px; }
+    .pop-banner img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .pop-banner-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 60%); }
+    .pop-banner-text { position: relative; z-index: 2; }
+    .pop-banner-text h3 { color: #fff; font-size: 15px; font-weight: 800; line-height: 1.2; }
+    .pop-banner-text span { color: var(--primary); font-size: 11px; font-weight: 700; text-transform: uppercase; }
+
+    /* ─── CATEGORY LIST ─── */
+    .cats-list-wrap { display: flex; gap: 0; background: var(--white); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); border: 1px solid var(--border); }
+    .cats-sidebar { width: 95px; background: rgba(0, 0, 0, 0.02); border-right: 1px solid var(--border); display: flex; flex-direction: column; overflow-y: auto; flex-shrink: 0; }
+    [data-theme="dark"] .cats-sidebar { background: rgba(0, 0, 0, 0.2); }
+    .cat-tab { padding: 14px 8px; text-align: center; font-size: 11px; font-weight: 600; color: var(--text-muted); cursor: pointer; border-left: 3px solid transparent; transition: var(--trans); line-height: 1.3; }
+    .cat-tab:active { transform: scale(0.95); }
+    .cat-tab.active { color: var(--primary); background: var(--white); border-left-color: var(--primary); font-weight: 700; }
+    .cat-tab i { display: block; font-size: 18px; margin-bottom: 4px; }
+
+    .cats-products { flex: 1; padding: 15px; overflow-y: auto; }
+    .cats-products-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; align-items: stretch; }
+    .cp-card { 
+      display: flex; 
+      flex-direction: column; 
+      align-items: stretch; 
+      text-align: center; 
+      gap: 6px; 
+      cursor: pointer; 
+      transition: all 0.25s ease;
+      background: var(--white);
+      padding: 8px 6px 10px;
+      border-radius: 14px;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+      position: relative;
+    }
+    .cp-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08); border-color: rgba(255, 107, 0, 0.25); }
+    .cp-card:active { transform: scale(0.96); }
+    .cp-card-img { width: 100%; aspect-ratio: 1; border-radius: 10px; overflow: hidden; background: #f8fafc; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(0, 0, 0, 0.04); position: relative; }
+    .cp-card-img img { width: 85%; height: 85%; object-fit: contain; transition: transform 0.3s ease; }
+    .cp-card:hover .cp-card-img img { transform: scale(1.06); }
+    .cp-disc-badge { position: absolute; top: 4px; left: 4px; background: linear-gradient(135deg, #ef4444, #f97316); color: #fff; font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 10px; z-index: 2; line-height: 1; }
+    .cp-card-name { 
+      font-size: 11px; 
+      font-weight: 600; 
+      color: var(--text-dark); 
+      line-height: 1.35; 
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      height: 2.7em; /* Exactly 2 lines height */
+      margin-top: 2px;
+      word-break: break-word;
+    }
+    .cp-card-price { font-size: 12px; font-weight: 800; color: var(--primary); margin-top: auto; padding-top: 2px; }
+    .cp-card-btn {
+      margin-top: 4px;
+      padding: 6px 8px;
+      border: none;
+      border-radius: 20px;
+      background: rgba(255,107,0,0.1);
+      color: var(--primary);
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      transition: all 0.2s ease;
+    }
+    .cp-card-btn:hover { background: var(--primary); color: #fff; }
+    .cp-card-btn.added { background: #10b981 !important; color: #fff !important; }
+    [data-theme="dark"] .cp-card { background: rgba(30, 41, 59, 0.7); border-color: rgba(255, 255, 255, 0.08); }
+    [data-theme="dark"] .cp-card-img { background: rgba(15, 23, 42, 0.6); border-color: rgba(255, 255, 255, 0.05); }
+    [data-theme="dark"] .cp-card-name { color: #e2e8f0; }
+    [data-theme="dark"] .cp-card-btn { background: rgba(255,107,0,0.18); color: #ff9a3c; }
+
+    /* ─── QUICK SORT CHIPS ─── */
+    .cp-sort-bar {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding: 2px 0 12px 0;
+      margin-bottom: 8px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .cp-sort-bar::-webkit-scrollbar { display: none; }
+    .cp-sort-chip {
+      padding: 6px 14px;
+      border-radius: 20px;
+      background: var(--bg-color);
+      border: 1px solid var(--border);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      outline: none;
+    }
+    .cp-sort-chip i { font-size: 10px; }
+    .cp-sort-chip:hover { border-color: var(--primary); color: var(--primary); }
+    .cp-sort-chip.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+      box-shadow: 0 3px 10px rgba(255,107,0,0.25);
+    }
+    .cp-count-badge {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--primary);
+      background: rgba(255,107,0,0.1);
+      padding: 4px 12px;
+      border-radius: 20px;
+    }
+    .cat-tab-badge {
+      display: inline-block;
+      font-size: 9px;
+      font-weight: 700;
+      background: rgba(0, 0, 0, 0.07);
+      color: #64748b;
+      padding: 1px 5px;
+      border-radius: 10px;
+      margin-top: 3px;
+    }
+    .cat-tab.active .cat-tab-badge {
+      background: rgba(255, 107, 0, 0.15);
+      color: var(--primary);
+    }
+    .cp-stock-warn {
+      font-size: 9px;
+      font-weight: 800;
+      color: #ef4444;
+      background: #fee2e2;
+      padding: 1px 6px;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      margin-bottom: 2px;
+    }
+    .pg-search-box { position: relative; }
+    .pg-search-clear {
+      background: none;
+      border: none;
+      color: rgba(255, 255, 255, 0.7);
+      cursor: pointer;
+      font-size: 16px;
+      padding: 0 4px;
+      display: flex;
+      align-items: center;
+      transition: color 0.2s;
+    }
+    .pg-search-clear:hover { color: #fff; }
+
+    [data-theme="dark"] .cp-sort-chip {
+      background: rgba(30, 41, 59, 0.6);
+      border-color: rgba(255, 255, 255, 0.08);
+      color: #94a3b8;
+    }
+    [data-theme="dark"] .cp-sort-chip.active {
+      background: var(--primary);
+      color: #fff;
+    }
+    [data-theme="dark"] .cp-stock-warn {
+      background: rgba(239, 68, 68, 0.2);
+      color: #f87171;
+    }
+    [data-theme="dark"] .cat-tab-badge {
+      background: rgba(255, 255, 255, 0.1);
+      color: #cbd5e1;
+    }
+
+    /* Shimmer Skeleton Loader */
+    @keyframes cpShimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+    .cp-skeleton-card {
+      background: var(--bg-card);
+      border-radius: var(--radius-md);
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+    }
+    .cp-skeleton-img {
+      width: 100%;
+      aspect-ratio: 1;
+      border-radius: 8px;
+      background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+      background-size: 200% 100%;
+      animation: cpShimmer 1.4s infinite;
+    }
+    .cp-skeleton-line {
+      height: 12px;
+      border-radius: 4px;
+      background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+      background-size: 200% 100%;
+      animation: cpShimmer 1.4s infinite;
+    }
+    [data-theme="dark"] .cp-skeleton-img,
+    [data-theme="dark"] .cp-skeleton-line {
+      background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
+      background-size: 200% 100%;
+    }
+
+    @media (max-width: 768px) {
+      .pop-banners {
+        display: flex;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        gap: 10px;
+        padding-bottom: 4px;
+        margin-bottom: 12px;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+      }
+      .pop-banners::-webkit-scrollbar { display: none; }
+      .pop-banner {
+        flex: 0 0 135px;
+        height: 70px;
+        padding: 8px 10px;
+        border-radius: 12px;
+        scroll-snap-align: start;
+      }
+      .pop-banner-text h3 { font-size: 13px; margin: 0; line-height: 1.2; }
+      .pop-banner-text span { font-size: 9px; }
+
+      .cats-sidebar { width: 80px; }
+      .cat-tab { padding: 12px 4px; font-size: 10.5px; }
+      .cat-tab i { font-size: 17px; margin-bottom: 3px; }
+      .cat-tab-badge { font-size: 8.5px; }
+      .cats-products { padding: 10px 8px; }
+      .cats-products-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 8px; }
+      .cp-card { padding: 8px 6px 10px; border-radius: 12px; }
+      .cp-card-img { border-radius: 8px; }
+      .cp-disc-badge { font-size: 9px; padding: 2px 5px; }
+      .cp-card-name { font-size: 12px; line-height: 1.35; height: 2.7em; }
+      .cp-card-price { font-size: 13.5px; }
+      .cp-card-btn { padding: 6px 8px; font-size: 11.5px; border-radius: 18px; }
+    }
+
+    @media (min-width: 769px) {
+      .pop-banners { grid-template-columns: repeat(4, 1fr); }
+      .cats-sidebar { width: 140px; }
+      .cat-tab { font-size: 13px; padding: 15px 10px; }
+      .cats-products-grid { grid-template-columns: repeat(4, 1fr); gap: 15px; }
+      .cp-card-name { font-size: 12.5px; height: 2.7em; }
+    }
+    @media (min-width: 1025px) {
+      .cats-sidebar { width: 170px; }
+      .cat-tab { font-size: 13px; padding: 15px 14px; text-align: left; display: flex; align-items: center; gap: 10px; }
+      .cat-tab i { margin-bottom: 0; font-size: 16px; }
+      .cats-products-grid { grid-template-columns: repeat(5, 1fr); gap: 16px; }
+      .cp-card { padding: 12px 10px 14px; }
+    }
+  </style>
+</head>
+<body>
+<div class="sa-toasts" id="toastContainer"></div>
+
+<!-- HEADER -->
+<header class="sa-header" id="saHeader">
+  <div class="sa-wrap sa-header-inner">
+    <a href="index.html" class="sa-logo">
+      <img src="logo.png" alt="SatheAchi.com" class="sa-logo-img sa-logo-mobile" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+      <img src="sathe_achi_brand_logo.svg" alt="Sathe Achi" class="sa-logo-desktop">
+      <div class="sa-logo-icon" style="display:none;"><i class="fa-solid fa-handshake-simple"></i></div>
+    </a>
+    <div class="sa-search-wrap">
+      <div class="sa-search-box" id="saSearchBox">
+        <i class="fa-solid fa-magnifying-glass sa-search-icon"></i>
+        <input type="text" id="saSearch" placeholder="Search products, brands..." autocomplete="off">
+        <button type="button" class="sa-search-clear" id="saSearchClear" aria-label="Clear search"><i class="fa-solid fa-xmark"></i></button>
+        <button class="sa-search-btn" id="saSearchBtn" aria-label="Search"><i class="fa-solid fa-arrow-right"></i></button>
+      </div>
+      <div class="sa-search-suggestions" id="saSearchSuggestions"></div>
+    </div>
+    <div class="sa-hdr-actions">
+      <a href="index.html" class="sa-icon-btn sa-pc-home-btn" title="Home" aria-label="Home">
+        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+      </a>
+      <button class="sa-icon-btn theme-toggle" id="saTheme" title="Dark Mode" aria-label="Toggle theme">
+        <svg class="theme-icon-moon" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        <svg class="theme-icon-sun" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+      </button>
+      <a href="wishlist.html" class="sa-icon-btn" title="Wishlist" aria-label="Wishlist">
+        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+      </a>
+      <a href="cart.html" class="sa-icon-btn" title="Cart" aria-label="Cart">
+        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+        <span class="sa-badge cart-count">0</span>
+      </a>
+      <div style="position:relative;">
+        <button class="sa-icon-btn" id="saProfileBtn" title="Profile" aria-label="Profile menu">
+          <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        </button>
+        <div class="sa-profile-dropdown" id="saProfileDropdown">
+          <div class="sa-dropdown-logged-in" style="display:none;">
+            <div class="sa-dropdown-header"><div class="sa-dropdown-user-info"><span class="sa-user-name">Loading...</span><span class="sa-user-email"></span></div></div>
+            <div class="sa-dropdown-divider"></div>
+            <a href="account.html" class="sa-dropdown-item"><i class="fa-regular fa-user"></i> My Account</a>
+            <a href="orders.html" class="sa-dropdown-item"><i class="fa-solid fa-box"></i> My Orders</a>
+            <a href="wishlist.html" class="sa-dropdown-item"><i class="fa-regular fa-heart"></i> Wishlist</a>
+            <div class="sa-dropdown-divider"></div>
+            <a href="#" class="sa-dropdown-item" id="saHeaderLogout" style="color:#ef4444;"><i class="fa-solid fa-right-from-bracket" style="color:#ef4444;"></i> Logout</a>
+          </div>
+          <div class="sa-dropdown-guest">
+            <div class="sa-dropdown-header"><div class="sa-dropdown-user-info"><span class="sa-user-name">Welcome!</span><span class="sa-user-email">Sign in to your account</span></div></div>
+            <a href="login.html" class="sa-dropdown-login-btn">Sign In</a>
+            <a href="signup.html" class="sa-dropdown-item" style="justify-content:center; font-size:12px; color:var(--text-muted);">Create Account</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- PAGE SEARCH -->
+<div class="pg-search">
+  <div class="sa-wrap">
+    <div class="pg-search-box">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="text" id="pgSearchInput" placeholder="Search in categories..." autocomplete="off">
+      <button type="button" class="pg-search-clear" id="pgSearchClear" style="display:none;" title="Clear search"><i class="fa-solid fa-circle-xmark"></i></button>
+    </div>
+  </div>
+</div>
+
+<!-- POPULAR CATEGORY QUICK LINKS -->
+<section class="sa-section" style="padding-bottom:0;">
+  <div class="sa-wrap">
+    <div class="sa-sec-head">
+      <h2 class="sa-sec-title"><i class="fa-solid fa-fire" style="color:var(--primary)"></i> Popular Categories</h2>
+    </div>
+    <div class="pop-banners">
+      <a href="category.html?slug=fashion" class="pop-banner" style="text-decoration:none;">
+        <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=600&auto=format&fit=crop" alt="Fashion">
+        <div class="pop-banner-overlay"></div>
+        <div class="pop-banner-text"><span>Trending</span><h3>Fashion</h3></div>
+      </a>
+      <a href="category.html?slug=watches" class="pop-banner" style="text-decoration:none;">
+        <img src="https://images.unsplash.com/photo-1524592094714-0f0654e20314?q=80&w=600&auto=format&fit=crop" alt="Watches">
+        <div class="pop-banner-overlay"></div>
+        <div class="pop-banner-text"><span>New Arrivals</span><h3>Watches</h3></div>
+      </a>
+      <a href="category.html?slug=mobiles" class="pop-banner" style="text-decoration:none;">
+        <img src="https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?q=80&w=600&auto=format&fit=crop" alt="Mobiles">
+        <div class="pop-banner-overlay"></div>
+        <div class="pop-banner-text"><span>Best Sellers</span><h3>Mobiles</h3></div>
+      </a>
+      <a href="category.html?slug=beauty" class="pop-banner" style="text-decoration:none;">
+        <img src="https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=600&auto=format&fit=crop" alt="Beauty">
+        <div class="pop-banner-overlay"></div>
+        <div class="pop-banner-text"><span>Hot Deals</span><h3>Beauty</h3></div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- CATEGORY BROWSER (Sidebar + Products) -->
+<section class="sa-section" style="padding-top: 18px;">
+  <div class="sa-wrap">
+    <div class="sa-sec-head" style="margin-bottom:12px;">
+      <h2 class="sa-sec-title" id="catSectionTitle">Browse All</h2>
+      <span class="cp-count-badge" id="cpCategoryCount">Loading...</span>
+    </div>
+    <div class="cats-list-wrap">
+      <!-- Sidebar Tabs -->
+      <div class="cats-sidebar" id="catSidebar">
+        <div class="cat-tab active" data-cat="all"><i class="fa-solid fa-grip"></i><span>All</span></div>
+        <div class="cat-tab" data-cat="trending"><i class="fa-solid fa-fire"></i><span>Trending</span></div>
+        <div class="cat-tab" data-cat="Fashion"><i class="fa-solid fa-shirt"></i><span>Fashion</span></div>
+        <div class="cat-tab" data-cat="Mobiles"><i class="fa-solid fa-mobile-screen-button"></i><span>Mobiles</span></div>
+        <div class="cat-tab" data-cat="Watches"><i class="fa-solid fa-clock"></i><span>Watches</span></div>
+        <div class="cat-tab" data-cat="Beauty"><i class="fa-solid fa-sparkles"></i><span>Beauty</span></div>
+        <div class="cat-tab" data-cat="hot-deals"><i class="fa-solid fa-tags"></i><span>Hot Deals</span></div>
+      </div>
+      <!-- Products Panel -->
+      <div class="cats-products" id="catsProductsPanel">
+        <!-- Quick Sort Chips -->
+        <div class="cp-sort-bar" id="cpSortBar">
+          <button type="button" class="cp-sort-chip active" data-sort="default">All</button>
+          <button type="button" class="cp-sort-chip" data-sort="price-asc"><i class="fa-solid fa-arrow-up-wide-short"></i> Price: Low to High</button>
+          <button type="button" class="cp-sort-chip" data-sort="price-desc"><i class="fa-solid fa-arrow-down-wide-short"></i> Price: High to Low</button>
+          <button type="button" class="cp-sort-chip" data-sort="rating"><i class="fa-solid fa-star"></i> Top Rated</button>
+          <button type="button" class="cp-sort-chip" data-sort="discount"><i class="fa-solid fa-percent"></i> Big Discounts</button>
+        </div>
+
+        <div class="cats-products-grid" id="catsProductsGrid"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MOBILE BOTTOM NAV -->
+<div class="sa-bottom-nav">
+  <a href="index.html" class="sa-bn-item">
+    <div class="sa-bn-icon-wrap">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+    </div>
+    <span class="sa-bn-label">Home</span>
+  </a>
+  <a href="categories.html" class="sa-bn-item active">
+    <div class="sa-bn-icon-wrap">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"></rect><rect x="14" y="3" width="7" height="7" rx="2"></rect><rect x="14" y="14" width="7" height="7" rx="2"></rect><rect x="3" y="14" width="7" height="7" rx="2"></rect></svg>
+    </div>
+    <span class="sa-bn-label">Categories</span>
+  </a>
+  <a href="cart.html" class="sa-bn-item">
+    <div class="sa-bn-icon-wrap">
+      <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+      <span class="sa-cart-count sa-bn-badge" style="display:none;">0</span>
+    </div>
+    <span class="sa-bn-label">Cart</span>
+  </a>
+  <a href="wishlist.html" class="sa-bn-item">
+    <div class="sa-bn-icon-wrap">
+      <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+    </div>
+    <span class="sa-bn-label">Wishlist</span>
+  </a>
+  <a href="account.html" class="sa-bn-item">
+    <div class="sa-bn-icon-wrap">
+      <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+    </div>
+    <span class="sa-bn-label">Account</span>
+  </a>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="script.js?v=31"></script>
+
+<script>
+  // ── CATEGORIES PAGE SELF-INITIALIZING ENGINE ──
+  // Does NOT depend on storeDataLoaded or PRODUCTS cache.
+  // Fetches its own data directly from Supabase.
+
+  let activeTabKey = 'all';
+  let PAGE_CATEGORIES = [];  // Local CATEGORIES cache for this page
+  let currentLoadedProducts = []; // Working copy of currently loaded products
+  let activeSortKey = 'default';
+
+  // ── Shimmer Skeleton Loader ──
+  function renderShimmerSkeleton(count = 8) {
+    const grid = document.getElementById('catsProductsGrid');
+    if (!grid) return;
+    grid.innerHTML = Array(count).fill(0).map(() => `
+      <div class="cp-skeleton-card">
+        <div class="cp-skeleton-img"></div>
+        <div class="cp-skeleton-line" style="width: 85%; margin-top: 4px;"></div>
+        <div class="cp-skeleton-line" style="width: 60%;"></div>
+        <div class="cp-skeleton-line" style="width: 40%; height: 16px; margin-top: 4px;"></div>
+      </div>
+    `).join('');
+  }
+
+  // ── Compact card renderer for categories browser ──
+  function createCompactCard(p) {
+    const origP = parseFloat(p.originalPrice) || 0;
+    const discP = parseFloat(p.discountPrice) || origP;
+    const discPct = origP > discP ? Math.round(((origP - discP) / origP) * 100) : 0;
+
+    // Clean title: strip extra newlines or trailing descriptions
+    let cleanTitle = (p.title || '').trim();
+    if (cleanTitle.includes('\n')) cleanTitle = cleanTitle.split('\n')[0].trim();
+    if (cleanTitle.length > 70 && cleanTitle.includes('।')) {
+      cleanTitle = cleanTitle.split('।')[0].trim();
+    }
+
+    const stock = typeof p.stock === 'number' ? p.stock : (p.stock ? parseInt(p.stock) : null);
+    const lowStockPill = (stock !== null && stock > 0 && stock <= 5)
+      ? `<span class="cp-stock-warn"><i class="fa-solid fa-bolt"></i> Only ${stock} left</span>`
+      : '';
+
+    return `
+      <div class="cp-card" onclick="location.href='product.html?id=${p.id}'">
+        <div class="cp-card-img">
+          ${discPct > 0 ? `<span class="cp-disc-badge">-${discPct}%</span>` : ''}
+          <img src="${p.image}" alt="${cleanTitle.replace(/"/g, '&quot;')}" loading="lazy">
+        </div>
+        <div class="cp-card-name" title="${cleanTitle.replace(/"/g, '&quot;')}">${cleanTitle}</div>
+        ${lowStockPill}
+        <div class="cp-card-price">৳${discP.toLocaleString()}</div>
+        <button class="cp-card-btn" onclick="event.stopPropagation();triggerCompactAtc(this, '${p.id}')">
+          <i class="fa-solid fa-plus"></i> Add
+        </button>
+      </div>
+    `;
+  }
+
+  function triggerCompactAtc(btn, productId) {
+    if (typeof addToCart === 'function') {
+      addToCart(productId);
+    }
+    if (btn) {
+      const orig = btn.innerHTML;
+      btn.classList.add('added');
+      btn.innerHTML = '<i class="fa-solid fa-check"></i> Added';
+      setTimeout(() => {
+        btn.classList.remove('added');
+        btn.innerHTML = orig;
+      }, 1200);
+    }
+  }
+
+  function getCachedProductsList() {
+    if (typeof PRODUCTS !== 'undefined' && Array.isArray(PRODUCTS) && PRODUCTS.length > 0) {
+      return PRODUCTS;
+    }
+    try {
+      const raw = localStorage.getItem('sa_products_cache');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        const data = (parsed && parsed.data) ? parsed.data : parsed;
+        if (Array.isArray(data)) return data;
+      }
+    } catch(e) {}
+    return [];
+  }
+
+  // ── Live Category Tab Badges ──
+  function updateTabBadges(products) {
+    if (!Array.isArray(products) || products.length === 0) return;
+    document.querySelectorAll('.cat-tab').forEach(tab => {
+      const catKey = tab.dataset.cat;
+      let count = 0;
+      if (catKey === 'all') {
+        count = products.length;
+      } else if (catKey === 'trending') {
+        count = products.filter(p => p.isTrending || p.is_trending).length;
+      } else if (catKey === 'hot-deals') {
+        count = products.filter(p => p.isFlashSale || p.is_flash_sale).length;
+      } else {
+        const lower = catKey.toLowerCase();
+        count = products.filter(p => 
+          (p.category && p.category.toLowerCase() === lower) ||
+          (p.brand && p.brand.toLowerCase() === lower)
+        ).length;
+      }
+      let badge = tab.querySelector('.cat-tab-badge');
+      if (!badge) {
+        badge = document.createElement('span');
+        badge.className = 'cat-tab-badge';
+        tab.appendChild(badge);
+      }
+      badge.textContent = count;
+    });
+  }
+
+  // ── Apply Sort and Render Cards ──
+  function applySortAndRender() {
+    const grid = document.getElementById('catsProductsGrid');
+    const countBadge = document.getElementById('cpCategoryCount');
+    if (!grid) return;
+
+    if (!currentLoadedProducts || currentLoadedProducts.length === 0) {
+      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted);font-size:14px;">No products found in this category.</div>';
+      if (countBadge) countBadge.textContent = '0 Products';
+      return;
+    }
+
+    let sorted = [...currentLoadedProducts];
+    if (activeSortKey === 'price-asc') {
+      sorted.sort((a, b) => (parseFloat(a.discountPrice) || 0) - (parseFloat(b.discountPrice) || 0));
+    } else if (activeSortKey === 'price-desc') {
+      sorted.sort((a, b) => (parseFloat(b.discountPrice) || 0) - (parseFloat(a.discountPrice) || 0));
+    } else if (activeSortKey === 'rating') {
+      sorted.sort((a, b) => (parseFloat(b.rating) || 0) - (parseFloat(a.rating) || 0));
+    } else if (activeSortKey === 'discount') {
+      sorted.sort((a, b) => {
+        const discA = a.originalPrice > a.discountPrice ? ((a.originalPrice - a.discountPrice) / a.originalPrice) : 0;
+        const discB = b.originalPrice > b.discountPrice ? ((b.originalPrice - b.discountPrice) / b.originalPrice) : 0;
+        return discB - discA;
+      });
+    }
+
+    grid.innerHTML = sorted.map(p => createCompactCard(p)).join('');
+    if (countBadge) {
+      countBadge.textContent = `Showing ${sorted.length} Products`;
+    }
+  }
+
+  function renderFromCache(tabKey) {
+    const allProds = getCachedProductsList();
+    if (!allProds || allProds.length === 0) return false;
+
+    updateTabBadges(allProds);
+
+    let filtered = allProds;
+    if (tabKey === 'trending') {
+      filtered = allProds.filter(p => p.isTrending || p.is_trending);
+    } else if (tabKey === 'hot-deals') {
+      filtered = allProds.filter(p => p.isFlashSale || p.is_flash_sale);
+    } else if (tabKey !== 'all') {
+      const lowerTab = tabKey.toLowerCase();
+      filtered = allProds.filter(p => 
+        (p.category && p.category.toLowerCase() === lowerTab) ||
+        (p.brand && p.brand.toLowerCase() === lowerTab)
+      );
+    }
+
+    if (filtered.length > 0) {
+      currentLoadedProducts = filtered;
+      applySortAndRender();
+      return true;
+    }
+    return false;
+  }
+
+  // ── Core loader: fetch products matching a tab filter ──
+  async function loadCategoryProducts(tabKey) {
+    activeTabKey = tabKey;
+    const grid = document.getElementById('catsProductsGrid');
+    const countBadge = document.getElementById('cpCategoryCount');
+    if (countBadge) countBadge.textContent = 'Updating...';
+
+    // 1. Instant Optimistic Render from Local Cache (0ms)
+    const hasCached = renderFromCache(tabKey);
+    if (!hasCached) {
+      renderShimmerSkeleton(8);
+    }
+
+    const sb = window.supabaseClient;
+    if (!sb) {
+      if (!hasCached) {
+        grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#ef4444;">Could not connect. Please refresh.</div>';
+      }
+      return;
+    }
+
+    try {
+      let query = sb.from('products').select('*').eq('status', 'active');
+
+      if (tabKey === 'trending') {
+        query = query.eq('is_trending', true);
+      } else if (tabKey === 'hot-deals') {
+        query = query.eq('is_flash_sale', true);
+      } else if (tabKey !== 'all') {
+        // Resolve category name → id using page-local cache
+        if (PAGE_CATEGORIES.length === 0) {
+          const { data: catData } = await sb.from('categories').select('id, name, slug').eq('is_active', true);
+          PAGE_CATEGORIES = catData || [];
+        }
+        const matchedCat = PAGE_CATEGORIES.find(c =>
+          c.name.toLowerCase() === tabKey.toLowerCase() ||
+          c.slug.toLowerCase() === tabKey.toLowerCase()
+        );
+        if (matchedCat) {
+          query = query.eq('category_id', matchedCat.id);
+        } else {
+          if (!hasCached) {
+            grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted);font-size:14px;">No products found in this category.</div>';
+            if (countBadge) countBadge.textContent = '0 Products';
+          }
+          return;
+        }
+      }
+
+      query = query.limit(60).order('created_at', { ascending: false });
+      const { data: dbProducts, error } = await query;
+      if (error) throw error;
+
+      if (!dbProducts || dbProducts.length === 0) {
+        if (!hasCached) {
+          grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted);font-size:14px;">No products found in this category.</div>';
+          if (countBadge) countBadge.textContent = '0 Products';
+        }
+        return;
+      }
+
+      // Fetch images
+      const productIds = dbProducts.map(p => p.id);
+      const { data: imgData } = await sb.from('product_images').select('product_id, image_url, sort_order').in('product_id', productIds);
+      const imgMap = {};
+      (imgData || []).forEach(img => {
+        if (!imgMap[img.product_id]) imgMap[img.product_id] = [];
+        imgMap[img.product_id].push(img);
+      });
+
+      // Build local catMap
+      if (PAGE_CATEGORIES.length === 0) {
+        const { data: catData } = await sb.from('categories').select('id, name, slug').eq('is_active', true);
+        PAGE_CATEGORIES = catData || [];
+      }
+      const catMap = {};
+      PAGE_CATEGORIES.forEach(c => catMap[c.id] = c);
+
+      const mappedProducts = dbProducts.map(p => {
+        const imgs = (imgMap[p.id] || []).sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+        const cat = catMap[p.category_id];
+        return {
+          id: p.id,
+          title: p.name,
+          category: cat ? cat.name : 'General',
+          originalPrice: parseFloat(p.price),
+          discountPrice: parseFloat(p.sale_price || p.price),
+          rating: parseFloat(p.rating || 5.0),
+          reviewsCount: parseInt(p.reviews_count || 0),
+          image: imgs.length > 0 ? imgs[0].image_url : 'logo.png',
+          isFlashSale: p.is_flash_sale,
+          isTrending: p.is_trending,
+          brand: p.brand,
+          stock: p.stock
+        };
+      });
+
+      currentLoadedProducts = mappedProducts;
+      applySortAndRender();
+
+    } catch (err) {
+      console.error('Failed to load category products:', err);
+      if (!hasCached) {
+        grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#ef4444;font-size:14px;">Error loading products. Please try again.</div>';
+        if (countBadge) countBadge.textContent = 'Error';
+      }
+    }
+  }
+
+  // ── Search inside categories page ──
+  async function loadSearchProducts(q) {
+    const grid = document.getElementById('catsProductsGrid');
+    const countBadge = document.getElementById('cpCategoryCount');
+    if (countBadge) countBadge.textContent = 'Searching...';
+    renderShimmerSkeleton(6);
+
+    const sb = window.supabaseClient;
+    if (!sb) return;
+    try {
+      const { data: dbProducts, error } = await sb.from('products').select('*').eq('status', 'active')
+        .or(`name.ilike.%${q}%,brand.ilike.%${q}%,short_description.ilike.%${q}%`).limit(60);
+      if (error) throw error;
+      if (!dbProducts || dbProducts.length === 0) {
+        grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted);font-size:14px;">No results found for "${q}".</div>`;
+        if (countBadge) countBadge.textContent = '0 Products';
+        currentLoadedProducts = [];
+        return;
+      }
+      const productIds = dbProducts.map(p => p.id);
+      const { data: imgData } = await sb.from('product_images').select('product_id, image_url, sort_order').in('product_id', productIds);
+      const imgMap = {};
+      (imgData || []).forEach(img => { if (!imgMap[img.product_id]) imgMap[img.product_id] = []; imgMap[img.product_id].push(img); });
+      const mappedProducts = dbProducts.map(p => {
+        const imgs = (imgMap[p.id] || []).sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+        return {
+          id: p.id, title: p.name, category: '',
+          originalPrice: parseFloat(p.price),
+          discountPrice: parseFloat(p.sale_price || p.price),
+          rating: parseFloat(p.rating || 5.0), reviewsCount: parseInt(p.reviews_count || 0),
+          image: imgs.length > 0 ? imgs[0].image_url : 'logo.png',
+          brand: p.brand, stock: p.stock
+        };
+      });
+      currentLoadedProducts = mappedProducts;
+      applySortAndRender();
+    } catch (err) {
+      console.error('Search failed:', err);
+      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#ef4444;">Search failed.</div>';
+      if (countBadge) countBadge.textContent = 'Error';
+    }
+  }
+
+  // ── Page initialization ──
+  function initCategories() {
+    const params = new URLSearchParams(window.location.search);
+    const tabParam = params.get('tab');
+    if (tabParam) {
+      const targetTab = document.querySelector(`[data-cat="${tabParam}"]`);
+      if (targetTab) {
+        document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+        targetTab.classList.add('active');
+        document.getElementById('catSectionTitle').textContent =
+          targetTab.textContent.trim() === 'All' ? 'Browse All' : targetTab.textContent.trim();
+        loadCategoryProducts(tabParam);
+        return;
+      }
+    }
+    loadCategoryProducts('all');
+  }
+
+  // ── Self-initialize: don't wait for storeDataLoaded ──
+  function tryInit() {
+    if (window.supabaseClient) {
+      initCategories();
+    } else {
+      let retries = 0;
+      const interval = setInterval(() => {
+        retries++;
+        if (window.supabaseClient) {
+          clearInterval(interval);
+          initCategories();
+        } else if (retries > 20) {
+          clearInterval(interval);
+          const grid = document.getElementById('catsProductsGrid');
+          if (grid) grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#ef4444;">Failed to connect. Please refresh.</div>';
+        }
+      }, 100);
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', tryInit);
+  } else {
+    tryInit();
+  }
+
+  // Silent background update when fresh data arrives
+  document.addEventListener('storeDataLoaded', () => {
+    const all = getCachedProductsList();
+    if (all && all.length > 0) {
+      updateTabBadges(all);
+    }
+    if (activeTabKey) {
+      renderFromCache(activeTabKey);
+    }
+  });
+
+  // ── Tab click listeners ──
+  document.querySelectorAll('.cat-tab').forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const catName = tab.querySelector('span') ? tab.querySelector('span').textContent.trim() : tab.textContent.trim();
+      document.getElementById('catSectionTitle').textContent = catName === 'All' ? 'Browse All' : catName;
+      
+      const pgSearch = document.getElementById('pgSearchInput');
+      const pgClear = document.getElementById('pgSearchClear');
+      if (pgSearch) pgSearch.value = '';
+      if (pgClear) pgClear.style.display = 'none';
+
+      loadCategoryProducts(tab.dataset.cat);
+    });
+  });
+
+  // ── Sort Chip Click Listeners ──
+  document.querySelectorAll('.cp-sort-chip').forEach(function(chip) {
+    chip.addEventListener('click', function() {
+      document.querySelectorAll('.cp-sort-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      activeSortKey = chip.dataset.sort || 'default';
+      applySortAndRender();
+    });
+  });
+
+  // ── Search input & Clear button ──
+  const pgSearch = document.getElementById('pgSearchInput');
+  const pgClear = document.getElementById('pgSearchClear');
+
+  if (pgSearch) {
+    let debounceTimer;
+    pgSearch.addEventListener('input', (e) => {
+      const q = e.target.value.trim();
+      if (pgClear) pgClear.style.display = q.length > 0 ? 'flex' : 'none';
+
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        if (q.length > 0) {
+          document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+          document.getElementById('catSectionTitle').textContent = `Search: "${q}"`;
+          loadSearchProducts(q);
+        } else {
+          const allTab = document.querySelector('[data-cat="all"]');
+          if (allTab) {
+            allTab.classList.add('active');
+            document.getElementById('catSectionTitle').textContent = 'Browse All';
+            loadCategoryProducts('all');
+          }
+        }
+      }, 350);
+    });
+  }
+
+  if (pgClear) {
+    pgClear.addEventListener('click', () => {
+      if (pgSearch) {
+        pgSearch.value = '';
+        pgClear.style.display = 'none';
+        const activeTab = document.querySelector('.cat-tab.active') || document.querySelector('[data-cat="all"]');
+        if (activeTab) {
+          activeTab.classList.add('active');
+          const catName = activeTab.querySelector('span') ? activeTab.querySelector('span').textContent.trim() : activeTab.textContent.trim();
+          document.getElementById('catSectionTitle').textContent = catName === 'All' ? 'Browse All' : catName;
+          loadCategoryProducts(activeTab.dataset.cat);
+        }
+      }
+    });
+  }
+</script>
+
+<script src="sa-motion.js?v=4"></script>
+</body>
+</html>
+

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script>
+    (function(){try{if(localStorage.getItem('sathe_achi_theme')==='dark'){document.documentElement.setAttribute('data-theme','dark');}else{document.documentElement.removeAttribute('data-theme');}}catch(e){}})();
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Successful | Sathe Achi</title>
+  <link rel="icon" href="logo.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="sa-style.css?v=31">
+  <style>
+    body { background: #f4f6f8; }
+    .os-container { max-width: 600px; margin: 60px auto; padding: 0 20px; text-align: center; }
+    
+    .os-card { background: var(--white); border-radius: var(--radius-lg); padding: 40px; box-shadow: var(--shadow-sm); border: 1px solid var(--border); position: relative; overflow: hidden; }
+    
+    .os-icon-wrap { width: 80px; height: 80px; background: #ecfdf5; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; position: relative; z-index: 2; }
+    .os-icon-wrap i { font-size: 40px; color: #10b981; }
+    
+    .os-title { font-size: 24px; font-weight: 800; color: var(--text-dark); margin-bottom: 10px; }
+    .os-desc { font-size: 15px; color: var(--text-muted); margin-bottom: 30px; line-height: 1.5; }
+    
+    .os-details { background: #f9f9fb; border-radius: var(--radius-md); padding: 20px; border: 1px dashed #d1d5db; text-align: left; margin-bottom: 30px; }
+    .os-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px; }
+    .os-row:last-child { margin-bottom: 0; }
+    .os-row span:first-child { color: var(--text-muted); font-weight: 500; }
+    .os-row span:last-child { color: var(--text-dark); font-weight: 700; }
+    
+    .os-actions { display: flex; flex-direction: column; gap: 12px; }
+    .os-btn-track { padding: 14px; border-radius: var(--radius-md); background: var(--primary); color: #fff; font-weight: 700; text-align: center; transition: var(--trans); }
+    .os-btn-track:hover { background: var(--primary-dark); }
+    .os-btn-shop { padding: 14px; border-radius: var(--radius-md); background: #fff; color: var(--text-dark); border: 1px solid var(--border); font-weight: 700; text-align: center; transition: var(--trans); }
+    .os-btn-shop:hover { border-color: var(--primary); color: var(--primary); }
+
+    /* Confetti (very basic CSS animation) */
+    .confetti { position: absolute; width: 10px; height: 10px; background-color: #f00; opacity: 0; }
+    @keyframes fall {
+      0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(300px) rotate(360deg); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="os-container">
+  <div class="os-card">
+    <!-- Basic JS Confetti effect wrapper -->
+    <div id="confettiWrap"></div>
+
+    <div class="os-icon-wrap">
+      <i class="fa-solid fa-check"></i>
+    </div>
+    <h1 class="os-title">Order Placed Successfully!</h1>
+    <p class="os-desc">Thank you for your purchase. We've received your order and are getting it ready to be shipped.</p>
+
+    <div class="os-details" id="orderDetails">
+      <!-- Injected by JS -->
+      <div class="os-row"><span>Order ID</span><span id="osId">Loading...</span></div>
+    </div>
+
+    <div class="os-actions" id="actionWrap">
+      <a href="orders.html" id="trackOrderBtn" class="os-btn-track">Track Your Order</a>
+      <a href="index.html" class="os-btn-shop">Continue Shopping</a>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  const params = new URLSearchParams(window.location.search);
+  const orderNo = params.get('id');
+  
+  if(!orderNo) {
+    document.getElementById('orderDetails').innerHTML = '<div style="color:red; text-align:center; font-weight:700;">Order ID not provided.</div>';
+    document.getElementById('actionWrap').style.display = 'none';
+    return;
+  }
+
+  // Initialize Supabase Client
+  const SUPABASE_URL = 'https://biteosolyhaoxwnzxdxx.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpdGVvc29seWhhb3h3bnp4ZHh4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4OTA3OTcsImV4cCI6MjA5NzQ2Njc5N30.jHjbpWxqqH83dLhGZ4MwYfk1pbnlov5jvP2x9Z0-S2g';
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  try {
+    const { data: order, error } = await supabase
+      .from('orders')
+      .select('*')
+      .eq('order_number', orderNo)
+      .single();
+
+    if(error || !order) {
+      throw new Error(error ? error.message : 'Order not found');
+    }
+
+    // Generate Delivery Date (Est: express -> 2 days, standard -> 4 days)
+    const delDate = new Date(order.created_at);
+    delDate.setDate(delDate.getDate() + (order.delivery_method === 'express' ? 2 : 4));
+    
+    // Formatting Method Names
+    const pmtNames = { 
+      'cod': 'Cash on Delivery', 
+      'bkash': 'bKash Wallet', 
+      'nagad': 'Nagad Wallet',
+      'rocket': 'Rocket Wallet'
+    };
+
+    let pmtDisplayName = pmtNames[order.payment_method] || (order.payment_method.charAt(0).toUpperCase() + order.payment_method.slice(1));
+    try {
+      const { data: pmtSet } = await supabase.from('payment_settings').select('name').eq('id', order.payment_method).maybeSingle();
+      if (pmtSet && pmtSet.name) {
+        pmtDisplayName = pmtSet.name;
+      }
+    } catch (e) {
+      console.warn("Failed to fetch custom payment method name:", e);
+    }
+
+    document.getElementById('orderDetails').innerHTML = `
+      <div class="os-row"><span>Order Number</span><span style="color:var(--primary)">${order.order_number}</span></div>
+      <div class="os-row"><span>Date</span><span>${new Date(order.created_at).toLocaleDateString()}</span></div>
+      <div class="os-row"><span>Total Amount</span><span>৳${Number(order.total).toLocaleString()}</span></div>
+      <div class="os-row"><span>Payment Method</span><span>${pmtDisplayName}</span></div>
+      <div class="os-row"><span>Payment Status</span><span style="text-transform: uppercase; color:${order.payment_status === 'paid' ? '#10b981' : '#f59e0b'};">${order.payment_status}</span></div>
+      <div class="os-row"><span>Order Status</span><span style="text-transform: uppercase; color:var(--primary); font-weight: 700;">${order.order_status}</span></div>
+      <div class="os-row"><span>Est. Delivery</span><span>${delDate.toLocaleDateString()}</span></div>
+    `;
+    // Update Track button link to dedicated tracking page
+    const trackBtn = document.getElementById('trackOrderBtn');
+    if (trackBtn) trackBtn.href = `track-order.html?order=${encodeURIComponent(order.order_number)}`;
+    createConfetti();
+  } catch (err) {
+    console.error(err);
+    document.getElementById('orderDetails').innerHTML = `<div style="color:red; text-align:center; font-weight:700;">Error: ${err.message}</div>`;
+    document.getElementById('actionWrap').style.display = 'none';
+  }
+});
+
+function createConfetti() {
+  const wrap = document.getElementById('confettiWrap');
+  const colors = ['#f59e0b', '#10b981', '#3b82f6', '#ef4444', '#8b5cf6', 'var(--primary)'];
+  for(let i=0; i<30; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti';
+    el.style.left = Math.random() * 100 + '%';
+    el.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+    el.style.animation = `fall ${Math.random() * 2 + 1}s linear forwards`;
+    el.style.animationDelay = `${Math.random() * 0.5}s`;
+    wrap.appendChild(el);
+  }
+}
+</script>
+<script src="sa-motion.js?v=4"></script>
+</body>
+</html>
+

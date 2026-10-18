@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <script>
+    (function(){try{if(localStorage.getItem('sathe_achi_theme')==='dark'){document.documentElement.setAttribute('data-theme','dark');}else{document.documentElement.removeAttribute('data-theme');}}catch(e){}})();
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Developer Profile — EX YOUSUF HUZAIFA</title>
+  
+  <!-- Favicon & Typography -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="sa-style.css?v=31">
+  
+  <style>
+    :root {
+      --gold: #d4af37;
+      --gold-light: #f3e5ab;
+      --gold-glow: rgba(212, 175, 55, 0.25);
+    }
+
+    body {
+      background-color: #080d1a;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(212, 175, 55, 0.08) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(59, 130, 246, 0.06) 0px, transparent 50%),
+        radial-gradient(at 50% 50%, rgba(15, 23, 42, 0.9) 0px, #080d1a 100%);
+      background-attachment: fixed;
+      font-family: 'Plus Jakarta Sans', 'Hind Siliguri', sans-serif;
+      color: #e2e8f0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .dev-container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 20px;
+    }
+
+    .dev-card-master {
+      max-width: 760px;
+      width: 100%;
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      border-radius: 28px;
+      padding: 50px 42px;
+      box-shadow: 
+        0 30px 70px rgba(0, 0, 0, 0.55),
+        0 0 50px rgba(212, 175, 55, 0.08),
+        inset 0 1px 1px rgba(255, 255, 255, 0.1);
+      position: relative;
+      overflow: hidden;
+      text-align: center;
+    }
+
+    .dev-card-master::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, #d4af37, #fef08a, #d4af37, transparent);
+    }
+
+    /* Ambient corner glow */
+    .dev-glow-orb {
+      position: absolute;
+      width: 250px;
+      height: 250px;
+      background: radial-gradient(circle, rgba(212, 175, 55, 0.15) 0%, transparent 70%);
+      top: -100px;
+      left: 50%;
+      transform: translateX(-50%);
+      pointer-events: none;
+      filter: blur(30px);
+    }
+
+    /* Avatar section */
+    .dev-avatar-wrapper {
+      position: relative;
+      width: 112px;
+      height: 112px;
+      margin: 0 auto 24px;
+    }
+
+    .dev-avatar-ring {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      padding: 3px;
+      background: linear-gradient(135deg, #d4af37, rgba(212, 175, 55, 0.2), #d4af37);
+      box-shadow: 0 10px 30px rgba(212, 175, 55, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .dev-avatar-inner {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #1e293b, #090e1a);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #d4af37;
+    }
+
+    .dev-verified-badge {
+      position: absolute;
+      bottom: 2px;
+      right: 4px;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #0ea5e9;
+      border: 3px solid #0f172a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(14, 165, 233, 0.4);
+    }
+
+    /* Headings */
+    .dev-name {
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: 0.8px;
+      margin-bottom: 6px;
+      color: #ffffff;
+      text-transform: uppercase;
+    }
+
+    .dev-role-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      background: rgba(212, 175, 55, 0.1);
+      border: 1px solid rgba(212, 175, 55, 0.35);
+      border-radius: 99px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #d4af37;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      margin-bottom: 28px;
+    }
+
+    /* Statement Quote Box (Clean Bengali) */
+    .dev-statement-card {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01));
+      border: 1px solid rgba(212, 175, 55, 0.22);
+      border-radius: 20px;
+      padding: 26px 30px;
+      margin-bottom: 34px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .dev-statement-bn {
+      font-size: 22px;
+      font-weight: 700;
+      color: #f8fafc;
+      line-height: 1.5;
+      margin-bottom: 6px;
+      letter-spacing: 0.2px;
+    }
+
+    .dev-statement-sub {
+      font-size: 14.5px;
+      font-weight: 500;
+      color: #94a3b8;
+      line-height: 1.5;
+    }
+
+    /* Services Grid with 100/100 Custom SVGs */
+    .dev-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-bottom: 36px;
+      text-align: left;
+    }
+
+    .dev-grid-item {
+      background: rgba(255, 255, 255, 0.025);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 18px;
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      transition: all 0.25s ease;
+    }
+
+    .dev-grid-item:hover {
+      background: rgba(212, 175, 55, 0.05);
+      border-color: rgba(212, 175, 55, 0.4);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    .dev-grid-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: rgba(212, 175, 55, 0.12);
+      border: 1px solid rgba(212, 175, 55, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: #d4af37;
+    }
+
+    .dev-grid-info h4 {
+      font-size: 15px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 2px;
+    }
+
+    .dev-grid-info span {
+      font-size: 12.5px;
+      color: #94a3b8;
+      display: block;
+    }
+
+    /* Action Buttons (100% Crisp SVG Vectors) */
+    .dev-actions-bar {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .dev-btn-action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 15px 32px;
+      border-radius: 99px;
+      font-size: 15px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+    }
+
+    .dev-btn-whatsapp {
+      background: linear-gradient(135deg, #25d366, #128c7e);
+      color: #ffffff;
+      box-shadow: 0 10px 28px rgba(37, 211, 102, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .dev-btn-whatsapp:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 14px 35px rgba(37, 211, 102, 0.5);
+      color: #fff;
+    }
+
+    .dev-btn-call {
+      background: linear-gradient(135deg, #d4af37, #aa8010);
+      color: #090e1a;
+      box-shadow: 0 10px 28px rgba(212, 175, 55, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .dev-btn-call:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 14px 35px rgba(212, 175, 55, 0.5);
+      color: #000;
+    }
+
+    .dev-btn-home {
+      background: rgba(255, 255, 255, 0.05);
+      color: #cbd5e1;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 15px 26px;
+    }
+
+    .dev-btn-home:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+      transform: translateY(-2px);
+    }
+
+    @media (max-width: 680px) {
+      .dev-card-master {
+        padding: 36px 22px;
+      }
+      .dev-name {
+        font-size: 26px;
+      }
+      .dev-statement-bn {
+        font-size: 18px;
+      }
+      .dev-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+      .dev-actions-bar {
+        flex-direction: column;
+        width: 100%;
+      }
+      .dev-btn-action {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sleek Back to Website Button (No Shop Header Bar) -->
+  <div style="position: absolute; top: 24px; left: 24px; z-index: 10;">
+    <a href="index.html" style="display: inline-flex; align-items: center; gap: 8px; color: #94a3b8; text-decoration: none; font-size: 13.5px; font-weight: 600; padding: 8px 18px; border-radius: 99px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); transition: all 0.25s ease;">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+      ওয়েবসাইটে ফিরুন
+    </a>
+  </div>
+
+  <!-- MAIN PROFILE -->
+  <main class="dev-container">
+    <div class="dev-card-master">
+      <div class="dev-glow-orb"></div>
+
+      <!-- Avatar with 100/100 Custom SVG -->
+      <div class="dev-avatar-wrapper">
+        <div class="dev-avatar-ring">
+          <div class="dev-avatar-inner">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="16 18 22 12 16 6"></polyline>
+              <polyline points="8 6 2 12 8 18"></polyline>
+            </svg>
+          </div>
+        </div>
+        <div class="dev-verified-badge" title="Verified Professional">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Identity -->
+      <h1 class="dev-name">EX YOUSUF HUZAIFA</h1>
+      <div>
+        <span class="dev-role-pill">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+          </svg>
+          Software Engineer &amp; Web Developer
+        </span>
+      </div>
+
+      <!-- Exact Core Statement in Bengali (No fluff) -->
+      <div class="dev-statement-card">
+        <div class="dev-statement-bn">
+          "আমি সব ধরনের সফটওয়্যার এবং ওয়েবসাইট নিয়ে কাজ করি।"
+        </div>
+        <div class="dev-statement-sub">
+          যেকোনো কাস্টম প্রজেক্ট, ওয়েব প্ল্যাটফর্ম বা সফটওয়্যার সমাধানের জন্য সরাসরি যোগাযোগ করুন।
+        </div>
+      </div>
+
+      <!-- Core Work Capabilities (100/100 SVG Icons) -->
+      <div class="dev-grid">
+        <div class="dev-grid-item">
+          <div class="dev-grid-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+              <line x1="8" y1="21" x2="16" y2="21"></line>
+              <line x1="12" y1="17" x2="12" y2="21"></line>
+            </svg>
+          </div>
+          <div class="dev-grid-info">
+            <h4>ওয়েবসাইট ও ওয়েব অ্যাপস</h4>
+            <span>Modern &amp; Responsive Solutions</span>
+          </div>
+        </div>
+
+        <div class="dev-grid-item">
+          <div class="dev-grid-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <path d="M16 10a4 4 0 0 1-8 0"></path>
+            </svg>
+          </div>
+          <div class="dev-grid-info">
+            <h4>ই-কমার্স সিস্টেম</h4>
+            <span>Full Store &amp; Payment Gateway</span>
+          </div>
+        </div>
+
+        <div class="dev-grid-item">
+          <div class="dev-grid-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect>
+              <rect x="9" y="9" width="6" height="6"></rect>
+              <line x1="9" y1="1" x2="9" y2="4"></line>
+              <line x1="15" y1="1" x2="15" y2="4"></line>
+              <line x1="9" y1="20" x2="9" y2="23"></line>
+              <line x1="15" y1="20" x2="15" y2="23"></line>
+              <line x1="20" y1="9" x2="23" y2="9"></line>
+              <line x1="20" y1="14" x2="23" y2="14"></line>
+              <line x1="1" y1="9" x2="4" y2="9"></line>
+              <line x1="1" y1="14" x2="4" y2="14"></line>
+            </svg>
+          </div>
+          <div class="dev-grid-info">
+            <h4>কাস্টম সফটওয়্যার</h4>
+            <span>ERP, CRM, POS &amp; Management</span>
+          </div>
+        </div>
+
+        <div class="dev-grid-item">
+          <div class="dev-grid-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+              <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
+              <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+            </svg>
+          </div>
+          <div class="dev-grid-info">
+            <h4>ডাটাবেজ ও ক্লাউড API</h4>
+            <span>Backend, Security &amp; Integration</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons with 100/100 Custom SVG -->
+      <div class="dev-actions-bar">
+        <a href="https://wa.me/8801720072831" target="_blank" rel="noopener" class="dev-btn-action dev-btn-whatsapp">
+          <!-- Official Clean WhatsApp SVG -->
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+          </svg>
+          WhatsApp: 01720072831
+        </a>
+
+        <a href="tel:01720072831" class="dev-btn-action dev-btn-call">
+          <!-- Crisp Handset Call SVG -->
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+          </svg>
+          Call: 01720072831
+        </a>
+
+        <a href="index.html" class="dev-btn-action dev-btn-home">
+          <!-- Back Arrow SVG -->
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          হোম পেজ
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <!-- MINIMAL CLEAN FOOTER -->
+  <footer style="text-align: center; padding: 24px 20px; font-size: 13px; color: #64748b;">
+    <p>© 2026 <a href="index.html" style="color: #94a3b8; text-decoration: none;">SatheAchi.com</a> — Developed by <span style="color: #d4af37; font-weight: 700;">EX YOUSUF HUZAIFA</span></p>
+  </footer>
+
+</body>
+</html>

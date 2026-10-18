@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script>
+    (function(){try{if(localStorage.getItem('sathe_achi_theme')==='dark'){document.documentElement.setAttribute('data-theme','dark');}else{document.documentElement.removeAttribute('data-theme');}}catch(e){}})();
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Track Your Order | Sathe Achi</title>
+  <link rel="icon" href="logo.png" type="image/png">
+  <meta name="description" content="Track your order status and delivery details on Sathe Achi.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="sa-style.css?v=31">
+  <style>
+    body { background: #f4f6f8; font-family: 'Inter', sans-serif; }
+
+    .to-hero {
+      background: linear-gradient(135deg, var(--navy) 0%, #1e293b 100%);
+      padding: 40px 20px 60px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .to-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 70% 50%, rgba(255,107,0,0.15) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .to-hero-logo { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 24px; }
+    .to-hero-logo img { height: 36px; }
+    .to-hero h1 { font-size: 22px; font-weight: 900; color: #fff; margin-bottom: 8px; }
+    .to-hero p { font-size: 14px; color: rgba(255,255,255,0.65); margin-bottom: 28px; }
+
+    /* Search bar */
+    .to-search-wrap { max-width: 480px; margin: 0 auto; position: relative; }
+    .to-search-input {
+      width: 100%;
+      padding: 16px 120px 16px 20px;
+      border-radius: 50px;
+      border: none;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      color: var(--text-dark);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+      outline: none;
+      box-sizing: border-box;
+      letter-spacing: 0.3px;
+    }
+    .to-search-input::placeholder { font-weight: 400; color: #9ca3af; }
+    .to-search-btn {
+      position: absolute;
+      right: 6px;
+      top: 6px;
+      bottom: 6px;
+      padding: 0 20px;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 50px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+    .to-search-btn:hover { background: var(--primary-dark); }
+    .to-search-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    /* Content area */
+    .to-content { max-width: 640px; margin: -28px auto 80px; padding: 0 16px; }
+
+    /* Loading */
+    .to-loading {
+      background: #fff;
+      border-radius: 20px;
+      padding: 60px 20px;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+    .to-loading .spinner {
+      width: 48px; height: 48px;
+      border: 4px solid #f3f4f6;
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+      margin: 0 auto 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .to-loading p { color: var(--text-muted); font-size: 14px; font-weight: 500; }
+
+    /* Error */
+    .to-error {
+      background: #fff;
+      border-radius: 20px;
+      padding: 50px 30px;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+    .to-error i { font-size: 48px; color: #ef4444; margin-bottom: 16px; }
+    .to-error h2 { font-size: 18px; font-weight: 800; color: var(--text-dark); margin-bottom: 8px; }
+    .to-error p { font-size: 14px; color: var(--text-muted); }
+
+    /* Empty / not found */
+    .to-empty {
+      background: #fff;
+      border-radius: 20px;
+      padding: 50px 30px;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+    .to-empty i { font-size: 48px; color: #d1d5db; margin-bottom: 16px; }
+    .to-empty h2 { font-size: 18px; font-weight: 800; color: var(--text-dark); margin-bottom: 8px; }
+    .to-empty p { font-size: 14px; color: var(--text-muted); }
+
+    /* ─── ORDER CARD ─── */
+    .to-card {
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      overflow: hidden;
+      animation: fadeUp 0.4s ease;
+    }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+
+    .to-card-head {
+      background: linear-gradient(135deg, var(--navy), #1e3a5f);
+      padding: 24px 24px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .to-order-num { font-size: 20px; font-weight: 900; color: #fff; }
+    .to-order-date { font-size: 12px; color: rgba(255,255,255,0.6); margin-top: 4px; }
+    .to-status-badge {
+      padding: 6px 16px;
+      border-radius: 50px;
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .to-status-badge.pending   { background: #fef3c7; color: #d97706; }
+    .to-status-badge.confirmed { background: #dbeafe; color: #2563eb; }
+    .to-status-badge.processing{ background: #ede9fe; color: #7c3aed; }
+    .to-status-badge.shipped   { background: #d1fae5; color: #059669; }
+    .to-status-badge.delivered { background: #d1fae5; color: #047857; }
+    .to-status-badge.cancelled { background: #fee2e2; color: #dc2626; }
+
+    /* ─── TIMELINE ─── */
+    .to-timeline-section { padding: 28px 24px 20px; }
+    .to-tl-title { font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 24px; }
+
+    .to-timeline { position: relative; padding-left: 16px; }
+    .to-timeline::before {
+      content: '';
+      position: absolute;
+      left: 11px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: #e5e7eb;
+    }
+    .to-tl-item { position: relative; padding-left: 28px; padding-bottom: 28px; }
+    .to-tl-item:last-child { padding-bottom: 0; }
+
+    .to-tl-dot {
+      position: absolute;
+      left: -5px;
+      top: 0;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: #e5e7eb;
+      border: 3px solid #fff;
+      box-shadow: 0 0 0 2px #e5e7eb;
+      z-index: 2;
+      transition: all 0.3s;
+    }
+    .to-tl-item.tl-done .to-tl-dot {
+      background: #10b981;
+      box-shadow: 0 0 0 3px rgba(16,185,129,0.2);
+    }
+    .to-tl-item.tl-active .to-tl-dot {
+      background: var(--primary);
+      box-shadow: 0 0 0 4px rgba(255,107,0,0.2);
+    }
+    .to-tl-item.tl-done .to-tl-dot::after {
+      content: '';
+      position: absolute;
+      inset: 3px;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 8'%3E%3Cpath d='M1 4L4 7L9 1' stroke='white' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat;
+    }
+
+    .to-tl-label { font-size: 14px; font-weight: 700; color: #9ca3af; margin-bottom: 2px; }
+    .to-tl-item.tl-done .to-tl-label,
+    .to-tl-item.tl-active .to-tl-label { color: var(--text-dark); }
+    .to-tl-desc { font-size: 12px; color: #9ca3af; }
+    .to-tl-item.tl-done .to-tl-desc,
+    .to-tl-item.tl-active .to-tl-desc { color: var(--text-muted); }
+
+    /* Fill line for done steps */
+    .to-tl-item.tl-done::before {
+      content: '';
+      position: absolute;
+      left: -5px;
+      top: 18px;
+      bottom: 0;
+      width: 2px;
+      background: #10b981;
+      margin-left: 8px;
+    }
+
+    /* Cancelled banner */
+    .to-cancelled-banner {
+      margin: 24px 24px 0;
+      padding: 16px 20px;
+      background: #fee2e2;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #dc2626;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    /* ─── DIVIDER ─── */
+    .to-divider { height: 1px; background: #f3f4f6; margin: 0 24px; }
+
+    /* ─── SECTIONS ─── */
+    .to-section { padding: 20px 24px; }
+    .to-section-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 16px;
+    }
+
+    /* Items */
+    .to-item { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid #f3f4f6; align-items: flex-start; }
+    .to-item:last-child { border-bottom: none; }
+    .to-item-img { width: 48px; height: 48px; border-radius: 10px; background: #f9f9fb; border: 1px solid #e5e7eb; padding: 4px; flex-shrink: 0; }
+    .to-item-img img { width: 100%; height: 100%; object-fit: contain; }
+    .to-item-info { flex: 1; min-width: 0; }
+    .to-item-name { font-size: 13px; font-weight: 600; color: var(--text-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .to-item-meta { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+    .to-item-price { font-size: 13px; font-weight: 700; color: var(--text-dark); flex-shrink: 0; }
+
+    /* Info rows */
+    .to-info-row { display: flex; justify-content: space-between; align-items: flex-start; font-size: 13px; margin-bottom: 10px; gap: 12px; }
+    .to-info-row:last-child { margin-bottom: 0; }
+    .to-info-row span:first-child { color: var(--text-muted); flex-shrink: 0; }
+    .to-info-row span:last-child { color: var(--text-dark); font-weight: 600; text-align: right; }
+    .to-total-row { display: flex; justify-content: space-between; align-items: center; font-size: 15px; font-weight: 800; padding-top: 12px; border-top: 2px solid #f3f4f6; margin-top: 8px; }
+    .to-total-row span:last-child { color: var(--primary); font-size: 18px; }
+
+    /* Bottom actions */
+    .to-actions { padding: 16px 24px 28px; display: flex; flex-direction: column; gap: 10px; }
+    .to-btn-back { display: block; padding: 14px; border-radius: 50px; background: var(--primary); color: #fff; font-weight: 700; font-size: 15px; text-align: center; transition: background 0.2s; text-decoration: none; }
+    .to-btn-back:hover { background: var(--primary-dark); }
+    .to-btn-shop { display: block; padding: 14px; border-radius: 50px; background: #f4f6f8; color: var(--text-dark); font-weight: 600; font-size: 14px; text-align: center; text-decoration: none; transition: all 0.2s; }
+    .to-btn-shop:hover { background: #e5e7eb; }
+
+    /* ─── DARK MODE ─── */
+    [data-theme="dark"] body { background: #0f172a; }
+    [data-theme="dark"] .to-card { background: #1e293b; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+    [data-theme="dark"] .to-loading,
+    [data-theme="dark"] .to-error,
+    [data-theme="dark"] .to-empty { background: #1e293b; }
+    [data-theme="dark"] .to-search-input { background: #0f172a; color: #fff; }
+    [data-theme="dark"] .to-divider { background: rgba(255,255,255,0.05); }
+    [data-theme="dark"] .to-tl-label,
+    [data-theme="dark"] .to-item-name,
+    [data-theme="dark"] .to-info-row span:last-child,
+    [data-theme="dark"] .to-total-row span:first-child,
+    [data-theme="dark"] .to-order-num { color: #f1f5f9; }
+    [data-theme="dark"] .to-timeline::before { background: #334155; }
+    [data-theme="dark"] .to-tl-dot { background: #334155; border-color: #1e293b; }
+    [data-theme="dark"] .to-tl-item.tl-done .to-tl-dot { background: #10b981; border-color: #1e293b; }
+    [data-theme="dark"] .to-tl-item.tl-active .to-tl-dot { background: var(--primary); border-color: #1e293b; }
+    [data-theme="dark"] .to-item-img { background: rgba(0,0,0,0.2); border-color: rgba(255,255,255,0.05); }
+    [data-theme="dark"] .to-item { border-color: rgba(255,255,255,0.05); }
+    [data-theme="dark"] .to-total-row { border-color: rgba(255,255,255,0.08); }
+    [data-theme="dark"] .to-btn-shop { background: rgba(255,255,255,0.05); color: #e2e8f0; }
+    [data-theme="dark"] .to-btn-shop:hover { background: rgba(255,255,255,0.1); }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="sa-header" id="saHeader">
+  <div class="sa-wrap sa-header-inner">
+    <a href="index.html" class="sa-logo">
+      <img src="logo.png" alt="SatheAchi.com" class="sa-logo-img sa-logo-mobile" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+      <img src="sathe_achi_brand_logo.svg" alt="Sathe Achi" class="sa-logo-desktop">
+      <div class="sa-logo-icon" style="display:none;"><i class="fa-solid fa-handshake-simple"></i></div>
+    </a>
+
+    <div class="sa-hdr-actions">
+      <a href="index.html" class="sa-icon-btn sa-pc-home-btn" title="Home" aria-label="Home">
+        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+      </a>
+      <button class="sa-icon-btn theme-toggle" id="saTheme" title="Dark Mode" aria-label="Toggle theme">
+        <svg class="theme-icon-moon" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        <svg class="theme-icon-sun" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+      </button>
+      <a href="wishlist.html" class="sa-icon-btn" title="Wishlist" aria-label="Wishlist">
+        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+      </a>
+      <a href="cart.html" class="sa-icon-btn" title="Cart" aria-label="Cart">
+        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+        <span class="sa-badge cart-count">0</span>
+      </a>
+      <div style="position:relative;">
+        <button class="sa-icon-btn" id="saProfileBtn" title="Profile" aria-label="Profile menu">
+          <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        </button>
+        <div class="sa-profile-dropdown" id="saProfileDropdown">
+          <div class="sa-dropdown-logged-in" style="display:none;">
+            <div class="sa-dropdown-header"><div class="sa-dropdown-user-info"><span class="sa-user-name">Loading...</span><span class="sa-user-email"></span></div></div>
+            <div class="sa-dropdown-divider"></div>
+            <a href="account.html" class="sa-dropdown-item"><i class="fa-regular fa-user"></i> My Account</a>
+            <a href="orders.html" class="sa-dropdown-item"><i class="fa-solid fa-box"></i> My Orders</a>
+            <a href="wishlist.html" class="sa-dropdown-item"><i class="fa-regular fa-heart"></i> Wishlist</a>
+            <div class="sa-dropdown-divider"></div>
+            <a href="#" class="sa-dropdown-item" id="saHeaderLogout" style="color:#ef4444;"><i class="fa-solid fa-right-from-bracket" style="color:#ef4444;"></i> Logout</a>
+          </div>
+          <div class="sa-dropdown-guest">
+            <div class="sa-dropdown-header"><div class="sa-dropdown-user-info"><span class="sa-user-name">Welcome!</span><span class="sa-user-email">Sign in to your account</span></div></div>
+            <a href="login.html" class="sa-dropdown-login-btn">Sign In</a>
+            <a href="signup.html" class="sa-dropdown-item" style="justify-content:center; font-size:12px; color:var(--text-muted);">Create Account</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="to-hero">
+  <div class="to-hero-logo">
+    <img src="logo.png" alt="Sathe Achi" onerror="this.style.display='none'">
+  </div>
+  <h1><i class="fa-solid fa-location-dot" style="color:var(--primary);"></i> Track Your Order</h1>
+  <p>Enter your order number below to get live delivery status</p>
+  <div class="to-search-wrap">
+    <input type="text" class="to-search-input" id="orderInput" placeholder="e.g. SA-2026-311097" autocomplete="off" spellcheck="false">
+    <button class="to-search-btn" id="trackBtn" onclick="trackOrder()">
+      <i class="fa-solid fa-search"></i> Track
+    </button>
+  </div>
+</div>
+
+<!-- RESULT AREA -->
+<div class="to-content" id="resultArea">
+  <!-- Results injected here -->
+</div>
+
+<div class="sa-bottom-nav">
+  <a href="index.html" class="sa-bn-item">
+    <div class="sa-bn-icon-wrap">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+    </div>
+    <span class="sa-bn-label">Home</span>
+  </a>
+  <a href="categories.html" class="sa-bn-item">
+    <div class="sa-bn-icon-wrap">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"></rect><rect x="14" y="3" width="7" height="7" rx="2"></rect><rect x="14" y="14" width="7" height="7" rx="2"></rect><rect x="3" y="14" width="7" height="7" rx="2"></rect></svg>
+    </div>
+    <span class="sa-bn-label">Categories</span>
+  </a>
+  <a href="cart.html" class="sa-bn-item">
+    <div class="sa-bn-icon-wrap">
+      <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+      <span class="sa-cart-count sa-bn-badge" style="display:none;">0</span>
+    </div>
+    <span class="sa-bn-label">Cart</span>
+  </a>
+  <a href="wishlist.html" class="sa-bn-item">
+    <div class="sa-bn-icon-wrap">
+      <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+    </div>
+    <span class="sa-bn-label">Wishlist</span>
+  </a>
+  <a href="account.html" class="sa-bn-item">
+    <div class="sa-bn-icon-wrap">
+      <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+    </div>
+    <span class="sa-bn-label">Account</span>
+  </a>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = 'https://biteosolyhaoxwnzxdxx.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpdGVvc29seWhhb3h3bnp4ZHh4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4OTA3OTcsImV4cCI6MjA5NzQ2Njc5N30.jHjbpWxqqH83dLhGZ4MwYfk1pbnlov5jvP2x9Z0-S2g';
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  const pmtNames = {
+    'cod': 'Cash on Delivery',
+    'bkash': 'bKash Wallet',
+    'nagad': 'Nagad Wallet',
+    'rocket': 'Rocket Wallet'
+  };
+
+  // Auto-track from URL param on load
+  window.addEventListener('DOMContentLoaded', async () => {
+    const params = new URLSearchParams(window.location.search);
+    const orderNo = params.get('order') || params.get('id');
+    if (orderNo) {
+      document.getElementById('orderInput').value = orderNo;
+      await trackOrder();
+    }
+  });
+
+  // Enter key support
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('orderInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') trackOrder();
+    });
+  });
+
+  async function trackOrder() {
+    const input = document.getElementById('orderInput').value.trim();
+    if (!input) {
+      showError('Please enter an order number.');
+      return;
+    }
+
+    const btn = document.getElementById('trackBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+
+    showLoading();
+
+    try {
+      // Try to find by order_number (primary key for tracking)
+      const { data: order, error } = await supabase
+        .from('orders')
+        .select('*, order_items(*)')
+        .eq('order_number', input.toUpperCase())
+        .maybeSingle();
+
+      if (error) throw error;
+
+      if (!order) {
+        showNotFound(input);
+        return;
+      }
+
+      // Try to get payment method display name
+      try {
+        const { data: pmts } = await supabase.from('payment_settings').select('id, name');
+        if (pmts) pmts.forEach(p => { pmtNames[p.id] = p.name || p.id; });
+      } catch(e) {}
+
+      renderOrder(order);
+
+    } catch (err) {
+      console.error(err);
+      showError('Could not fetch order. Please try again.');
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa-solid fa-search"></i> Track';
+    }
+  }
+
+  function showLoading() {
+    document.getElementById('resultArea').innerHTML = `
+      <div class="to-loading">
+        <div class="spinner"></div>
+        <p>Looking up your order...</p>
+      </div>`;
+  }
+
+  function showError(msg) {
+    document.getElementById('resultArea').innerHTML = `
+      <div class="to-error">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        <h2>Something went wrong</h2>
+        <p>${msg}</p>
+      </div>`;
+  }
+
+  function showNotFound(q) {
+    document.getElementById('resultArea').innerHTML = `
+      <div class="to-empty">
+        <i class="fa-solid fa-box-open"></i>
+        <h2>Order Not Found</h2>
+        <p>We couldn't find an order with number <strong>${q}</strong>.<br>Please double-check and try again.</p>
+      </div>`;
+  }
+
+  function renderOrder(o) {
+    const statuses = ['pending', 'confirmed', 'processing', 'shipped', 'delivered'];
+    const currentIdx = statuses.indexOf(o.order_status);
+    const isCancelled = o.order_status === 'cancelled';
+
+    const statusLabels = [
+      { label: 'Order Placed', desc: 'We received your order.' },
+      { label: 'Confirmed', desc: 'Your order has been verified.' },
+      { label: 'Processing', desc: 'Preparing your package.' },
+      { label: 'Shipped', desc: 'Package handed to delivery partner.' },
+      { label: 'Delivered', desc: 'Package delivered successfully! 🎉' }
+    ];
+
+    const delDate = new Date(o.created_at);
+    delDate.setDate(delDate.getDate() + (o.delivery_method === 'express' ? 2 : 4));
+
+    const pmt = pmtNames[o.payment_method] || (o.payment_method || '').charAt(0).toUpperCase() + (o.payment_method || '').slice(1);
+
+    const timelineHtml = isCancelled ? `
+      <div class="to-cancelled-banner">
+        <i class="fa-solid fa-circle-xmark" style="font-size:20px;"></i>
+        This order has been cancelled.
+      </div>
+    ` : `
+      <div class="to-timeline-section">
+        <div class="to-tl-title"><i class="fa-solid fa-route" style="margin-right:6px;"></i>Delivery Timeline</div>
+        <div class="to-timeline">
+          ${statusLabels.map((s, i) => {
+            let cls = '';
+            if (i < currentIdx) cls = 'tl-done';
+            else if (i === currentIdx) cls = 'tl-active';
+            return `
+              <div class="to-tl-item ${cls}">
+                <div class="to-tl-dot"></div>
+                <div class="to-tl-label">${s.label}</div>
+                <div class="to-tl-desc">${s.desc}</div>
+              </div>`;
+          }).join('')}
+        </div>
+      </div>`;
+
+    const itemsHtml = (o.order_items || []).map(item => `
+      <div class="to-item">
+        <div class="to-item-img">
+          <img src="${item.image_url || 'https://placehold.co/100x100?text=?'}" alt="${item.name}" loading="lazy">
+        </div>
+        <div class="to-item-info">
+          <div class="to-item-name">${item.name}</div>
+          <div class="to-item-meta">Qty: ${item.quantity}${item.variant ? ' &bull; ' + item.variant : ''}</div>
+        </div>
+        <div class="to-item-price">৳${(Number(item.price) * item.quantity).toLocaleString()}</div>
+      </div>`).join('');
+
+    const statusBadgeClass = isCancelled ? 'cancelled'
+      : currentIdx === 4 ? 'delivered'
+      : currentIdx === 3 ? 'shipped'
+      : currentIdx === 2 ? 'processing'
+      : currentIdx === 1 ? 'confirmed'
+      : 'pending';
+
+    document.getElementById('resultArea').innerHTML = `
+      <div class="to-card">
+        <!-- Header -->
+        <div class="to-card-head">
+          <div>
+            <div class="to-order-num">${o.order_number}</div>
+            <div class="to-order-date">Placed on ${new Date(o.created_at).toLocaleDateString('en-US', {day:'numeric', month:'long', year:'numeric'})}</div>
+          </div>
+          <div class="to-status-badge ${statusBadgeClass}" style="text-transform:capitalize;">${o.order_status}</div>
+        </div>
+
+        <!-- Timeline -->
+        ${timelineHtml}
+
+        <div class="to-divider"></div>
+
+        <!-- Items -->
+        <div class="to-section">
+          <div class="to-section-title"><i class="fa-solid fa-box" style="margin-right:6px;"></i>Items Ordered</div>
+          ${itemsHtml}
+        </div>
+
+        <div class="to-divider"></div>
+
+        <!-- Payment Summary -->
+        <div class="to-section">
+          <div class="to-section-title"><i class="fa-solid fa-receipt" style="margin-right:6px;"></i>Payment Summary</div>
+          <div class="to-info-row"><span>Payment Method</span><span>${pmt}</span></div>
+          <div class="to-info-row"><span>Payment Status</span><span style="color:${o.payment_status === 'paid' ? '#10b981' : '#f59e0b'}; font-weight:800; text-transform:uppercase;">${o.payment_status || 'Pending'}</span></div>
+          ${o.sender_number ? `<div class="to-info-row"><span>Sender Number</span><span>${o.sender_number}</span></div>` : ''}
+          ${o.payment_trx_id ? `<div class="to-info-row"><span>Transaction ID</span><span>${o.payment_trx_id}</span></div>` : ''}
+          <div class="to-info-row"><span>Subtotal</span><span>৳${Number(o.subtotal || 0).toLocaleString()}</span></div>
+          <div class="to-info-row"><span>Shipping Fee</span><span>৳${Number(o.shipping_fee || 0).toLocaleString()}</span></div>
+          ${Number(o.discount) > 0 ? `<div class="to-info-row"><span>Discount</span><span style="color:#10b981;">-৳${Number(o.discount).toLocaleString()}</span></div>` : ''}
+          <div class="to-total-row"><span>Total</span><span>৳${Number(o.total).toLocaleString()}</span></div>
+        </div>
+
+        <div class="to-divider"></div>
+
+        <!-- Shipping -->
+        <div class="to-section">
+          <div class="to-section-title"><i class="fa-solid fa-truck" style="margin-right:6px;"></i>Shipping Details</div>
+          <div class="to-info-row"><span>Name</span><span>${o.shipping_name}</span></div>
+          <div class="to-info-row"><span>Phone</span><span>${o.shipping_phone}</span></div>
+          <div class="to-info-row"><span>Address</span><span>${o.shipping_address}, ${o.shipping_district}</span></div>
+          ${!isCancelled ? `<div class="to-info-row"><span>Est. Delivery</span><span style="color:var(--primary);font-weight:700;">${delDate.toLocaleDateString('en-US',{day:'numeric',month:'long',year:'numeric'})}</span></div>` : ''}
+        </div>
+
+        <!-- Actions -->
+        <div class="to-actions">
+          <a href="orders.html" class="to-btn-back"><i class="fa-solid fa-list-ul"></i> View All Orders</a>
+          <a href="index.html" class="to-btn-shop">Continue Shopping</a>
+        </div>
+      </div>`;
+  }
+</script>
+<script src="script.js?v=31"></script>
+<script src="sa-motion.js?v=4"></script>
+</body>
+</html>
