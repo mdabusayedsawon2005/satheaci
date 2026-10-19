@@ -297,8 +297,8 @@ async function syncUserSession(session) {
             try { window.history.replaceState(null, null, window.location.pathname + window.location.search); } catch(e){}
         }
 
-        // If currently on login.html or signup.html, redirect immediately to index.html
-        if (window.location.pathname.includes('login.html') || window.location.pathname.includes('signup.html')) {
+        // If currently on login or signup page, redirect smoothly to index.html
+        if (window.location.pathname.includes('login') || window.location.pathname.includes('signup')) {
             window.location.replace('index.html');
         }
 

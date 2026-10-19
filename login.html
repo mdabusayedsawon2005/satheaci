@@ -94,16 +94,52 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="script.js?v=38"></script>
+<script src="script.js?v=40"></script>
 <script>
-  // If already logged in, redirect to index.html
-  if (window.USER_STATE?.profile || (typeof hasLocalAuthToken === 'function' && hasLocalAuthToken())) {
-    window.location.replace('index.html');
-  }
+  async function signInWithGoogle() {
+    const btn = document.getElementById('btnGoogleLogin');
+    const origHtml = btn ? btn.innerHTML : '';
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Connecting to Google...';
+    }
 
-  function signInWithGoogle() {
-    if (typeof window.signInWithGoogle === 'function') {
-      window.signInWithGoogle();
+    try {
+      const client = (typeof getSupabase === 'function' ? getSupabase() : null) || window.supabaseClient || (window.supabase && typeof window.supabase.createClient === 'function' ? window.supabase.createClient('https://biteosolyhaoxwnzxdxx.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpdGVvc29seWhhb3h3bnp4ZHh4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4OTA3OTcsImV4cCI6MjA5NzQ2Njc5N30.jHjbpWxqqH83dLhGZ4MwYfk1pbnlov5jvP2x9Z0-S2g') : null);
+      if (!client) {
+        throw new Error('Supabase client could not be loaded. Please refresh the page.');
+      }
+
+      const origin = (window.location.origin && window.location.origin !== 'null') ? window.location.origin : 'https://satheaci.vercel.app';
+      const redirectUrl = `${origin}/index.html`;
+
+      const { data, error } = await client.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: redirectUrl,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent'
+          }
+        }
+      });
+
+      if (error) throw error;
+
+      if (data && data.url) {
+        window.location.href = data.url;
+      }
+    } catch (err) {
+      console.error('Google Sign-in Error:', err);
+      if (typeof showToast === 'function') {
+        showToast(err.message || 'Google sign-in failed. Please try again.', 'error');
+      } else {
+        alert(err.message || 'Google sign-in failed. Please try again.');
+      }
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = origHtml;
+      }
     }
   }
   document.getElementById('loginForm').addEventListener('submit', async (e) => {
