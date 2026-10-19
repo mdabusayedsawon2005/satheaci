@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sathe Achi | Admin Dashboard</title>
+  <link rel="icon" href="../logo.png" type="image/png">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Supabase & Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <link rel="stylesheet" href="admin-style.css?v=4">
+</head>
+<body>
+
+<div class="admin-layout">
+  <div class="sa-sidebar-overlay" id="sidebarOverlay"></div>
+  
+  <!-- SIDEBAR -->
+  <aside class="sa-sidebar" id="adminSidebar">
+    <div class="sa-sidebar-header">
+      <a href="index.html" class="sa-sidebar-logo">
+        <i class="fa-solid fa-bag-shopping"></i> SatheAchi Admin
+      </a>
+      <button class="sa-sidebar-close" id="sidebarCloseBtn"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <nav class="sa-sidebar-nav">
+      <div class="sa-nav-section-label">Main</div>
+      <a href="index.html" class="sa-nav-item active"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+      <a href="orders.html" class="sa-nav-item"><i class="fa-solid fa-cart-shopping"></i> Orders</a>
+      <a href="products.html" class="sa-nav-item"><i class="fa-solid fa-box"></i> Products</a>
+      <a href="categories.html" class="sa-nav-item"><i class="fa-solid fa-tags"></i> Categories</a>
+      <a href="customers.html" class="sa-nav-item"><i class="fa-solid fa-users"></i> Customers</a>
+      <div class="sa-nav-section-label">Marketing</div>
+      <a href="banners.html" class="sa-nav-item"><i class="fa-regular fa-image"></i> Banners</a>
+      <a href="coupons.html" class="sa-nav-item"><i class="fa-solid fa-ticket"></i> Coupons</a>
+      <a href="notifications.html" class="sa-nav-item"><i class="fa-regular fa-bell"></i> Notifications</a>
+      <a href="reviews.html" class="sa-nav-item"><i class="fa-regular fa-star"></i> Reviews</a>
+      <div class="sa-nav-section-label">System</div>
+      <a href="admins.html" class="sa-nav-item"><i class="fa-solid fa-user-shield"></i> Admins</a>
+      <a href="profile.html" class="sa-nav-item"><i class="fa-solid fa-user-gear"></i> Profile</a>
+      <a href="settings.html" class="sa-nav-item"><i class="fa-solid fa-gear"></i> Settings</a>
+      <div style="height: 20px;"></div>
+      <a href="#" class="sa-nav-item" onclick="adminLogout();return false;" style="margin-top: auto; border-top: 1px solid var(--border);"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+    </nav>
+  </aside>
+
+  <!-- MAIN WRAPPER -->
+  <main class="sa-main">
+    
+    <!-- TOPBAR -->
+    <header class="sa-topbar">
+      <div class="sa-tb-left">
+        <button class="sa-menu-btn" id="mobileMenuBtn"><i class="fa-solid fa-bars"></i></button>
+        <h1 class="sa-tb-title">Dashboard</h1>
+      </div>
+      <div class="sa-tb-right">
+        <button class="sa-icon-btn" id="adminThemeBtn"><i class="fa-regular fa-moon"></i></button>
+        <div class="sa-admin-profile">
+          <div class="sa-admin-avatar"><i class="fa-solid fa-user-tie"></i></div>
+          <div class="sa-admin-info">
+            <span class="sa-admin-name" id="topbarAdminName">Loading...</span>
+            <span class="sa-admin-role">Super Admin</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- CONTENT -->
+    <div class="sa-page-content">
+      
+      <!-- STATS GRID -->
+      <div class="sa-stats-grid">
+        <!-- Revenue -->
+        <div class="sa-stat-card">
+          <div class="sa-stat-icon" style="background:linear-gradient(135deg, #FF6B00, #FF9500);"><i class="fa-solid fa-sack-dollar"></i></div>
+          <div class="sa-stat-info">
+            <div class="sa-stat-val" id="statRevenue">৳0</div>
+            <div class="sa-stat-label">Total Revenue</div>
+          </div>
+        </div>
+        <!-- Orders -->
+        <div class="sa-stat-card">
+          <div class="sa-stat-icon" style="background:linear-gradient(135deg, #007AFF, #5856D6);"><i class="fa-solid fa-cart-shopping"></i></div>
+          <div class="sa-stat-info">
+            <div class="sa-stat-val" id="statOrders">0</div>
+            <div class="sa-stat-label">Total Orders</div>
+          </div>
+        </div>
+        <!-- Pending Orders -->
+        <div class="sa-stat-card">
+          <div class="sa-stat-icon" style="background:linear-gradient(135deg, #FF9500, #FFCC00);"><i class="fa-solid fa-clock"></i></div>
+          <div class="sa-stat-info">
+            <div class="sa-stat-val" id="statPendingOrders">0</div>
+            <div class="sa-stat-label">Pending Orders</div>
+          </div>
+        </div>
+        <!-- Delivered Orders -->
+        <div class="sa-stat-card">
+          <div class="sa-stat-icon" style="background:linear-gradient(135deg, #28CD41, #54E06A);"><i class="fa-solid fa-circle-check"></i></div>
+          <div class="sa-stat-info">
+            <div class="sa-stat-val" id="statDeliveredOrders">0</div>
+            <div class="sa-stat-label">Delivered Orders</div>
+          </div>
+        </div>
+        <!-- Customers -->
+        <div class="sa-stat-card">
+          <div class="sa-stat-icon" style="background:linear-gradient(135deg, #BF5AF2, #E396FF);"><i class="fa-solid fa-users"></i></div>
+          <div class="sa-stat-info">
+            <div class="sa-stat-val" id="statUsers">0</div>
+            <div class="sa-stat-label">Total Customers</div>
+          </div>
+        </div>
+        <!-- Products -->
+        <div class="sa-stat-card">
+          <div class="sa-stat-icon" style="background:linear-gradient(135deg, #30D158, #34C759);"><i class="fa-solid fa-box-open"></i></div>
+          <div class="sa-stat-info">
+            <div class="sa-stat-val" id="statProducts">0</div>
+            <div class="sa-stat-label">Active Products</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHARTS -->
+      <div class="sa-charts-grid">
+        <div class="sa-chart-card sa-card" style="padding: 20px;">
+          <div class="sa-card-header">
+            <h3 class="sa-card-title">Revenue Analytics</h3>
+          </div>
+          <div class="sa-chart-container" style="height: 250px; position: relative;">
+            <canvas id="revenueChart"></canvas>
+          </div>
+        </div>
+        <div class="sa-chart-card sa-card" style="padding: 20px;">
+          <div class="sa-card-header">
+            <h3 class="sa-card-title">Order Status</h3>
+          </div>
+          <div class="sa-chart-container" style="height: 250px; position: relative;">
+            <canvas id="orderChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- RECENT ORDERS TABLE / CARDS -->
+      <div class="sa-table-card">
+        <div class="sa-card-header">
+          <h3 class="sa-card-title">Recent Orders</h3>
+          <a href="orders.html" class="sa-btn sa-btn-primary">View All</a>
+        </div>
+        
+        <!-- Desktop Table -->
+        <div class="sa-table-resp-wrap">
+          <table class="sa-table">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Date</th>
+                <th>Amount</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="recentOrdersBody">
+              <tr><td colspan="5" style="text-align:center; padding:40px;">Loading orders...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Mobile Cards List -->
+        <div class="sa-mobile-cards" id="recentOrdersMobile">
+          <div style="text-align:center; padding:20px; color:var(--text-muted);">Loading orders...</div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script src="admin-app.js"></script>
+<script>
+  // Close drawer on mobile
+  document.getElementById('sidebarCloseBtn')?.addEventListener('click', () => {
+    document.getElementById('adminSidebar').classList.remove('show');
+    document.getElementById('sidebarOverlay').classList.remove('show');
+  });
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    // Wait slightly to ensure Auth check is done
+    setTimeout(loadDashboardData, 500);
+  });
+
+  async function loadDashboardData() {
+    try {
+      // 1. Fetch Stats
+      const [
+        { count: productCount }, 
+        { count: userCount }, 
+        { data: ordersData }
+      ] = await Promise.all([
+        window.db.from('products').select('*', { count: 'exact', head: true }).eq('status', 'active'),
+        window.db.from('profiles').select('*', { count: 'exact', head: true }),
+        window.db.from('orders').select('total, order_status, created_at, order_number, shipping_name').order('created_at', { ascending: false })
+      ]);
+
+      // Calculate customer count from profiles, fallback to unique order customers
+      let finalUserCount = userCount || 0;
+      if (!finalUserCount && ordersData && ordersData.length > 0) {
+        const uniqueCust = new Set();
+        ordersData.forEach(o => {
+          if (o.shipping_name || o.user_id) uniqueCust.add(o.shipping_name || o.user_id);
+        });
+        finalUserCount = uniqueCust.size;
+      }
+
+      document.getElementById('statProducts').textContent = productCount || 0;
+      document.getElementById('statUsers').textContent = finalUserCount;
+      document.getElementById('statOrders').textContent = ordersData ? ordersData.length : 0;
+
+      // Pending and Delivered Orders
+      const pendingCount = ordersData ? ordersData.filter(o => o.order_status === 'pending').length : 0;
+      const deliveredCount = ordersData ? ordersData.filter(o => o.order_status === 'delivered').length : 0;
+      document.getElementById('statPendingOrders').textContent = pendingCount;
+      document.getElementById('statDeliveredOrders').textContent = deliveredCount;
+
+      // Calculate Total Revenue (Only from non-cancelled orders)
+      const validOrders = ordersData ? ordersData.filter(o => o.order_status !== 'cancelled') : [];
+      const totalRev = validOrders.reduce((sum, o) => sum + Number(o.total), 0);
+      document.getElementById('statRevenue').textContent = '৳' + totalRev.toLocaleString();
+
+      // 2. Populate Recent Orders Table & Mobile Cards
+      const tbody = document.getElementById('recentOrdersBody');
+      const mobDiv = document.getElementById('recentOrdersMobile');
+      
+      if (ordersData && ordersData.length > 0) {
+        const recent = ordersData.slice(0, 5);
+        
+        // Table body
+        tbody.innerHTML = recent.map(o => `
+          <tr>
+            <td style="font-weight:700;">${o.order_number}</td>
+            <td>${o.shipping_name}</td>
+            <td>${new Date(o.created_at).toLocaleDateString()}</td>
+            <td style="color:var(--primary); font-weight:700;">৳${Number(o.total).toLocaleString()}</td>
+            <td><span class="sa-status-badge status-${o.order_status}">${o.order_status}</span></td>
+          </tr>
+        `).join('');
+
+        // Mobile Cards
+        mobDiv.innerHTML = recent.map(o => `
+          <div class="sa-mob-card">
+            <div class="sa-mob-card-header">
+              <div class="sa-mob-card-title">${o.order_number}</div>
+              <span class="sa-status-badge status-${o.order_status}">${o.order_status}</span>
+            </div>
+            <div class="sa-mob-card-body">
+              <div class="sa-mob-field">
+                <span class="sa-mob-field-label">Customer</span>
+                <span class="sa-mob-field-val">${o.shipping_name || '—'}</span>
+              </div>
+              <div class="sa-mob-field">
+                <span class="sa-mob-field-label">Date</span>
+                <span class="sa-mob-field-val">${new Date(o.created_at).toLocaleDateString()}</span>
+              </div>
+              <div class="sa-mob-field">
+                <span class="sa-mob-field-label">Amount</span>
+                <span class="sa-mob-field-val" style="color:var(--primary); font-weight:700;">৳${Number(o.total).toLocaleString()}</span>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      } else {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:40px; color:var(--text-muted);">No orders found.</td></tr>`;
+        mobDiv.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted);">No orders found.</div>`;
+      }
+
+      // 3. Initialize Charts
+      initCharts(ordersData || []);
+
+    } catch (err) {
+      console.error("Error loading dashboard data:", err);
+      showToast("Failed to load dashboard data.", "error");
+    }
+  }
+
+  function initCharts(ordersData) {
+    // Order Status Doughnut Chart
+    const statusCounts = { pending: 0, processing: 0, shipped: 0, delivered: 0, cancelled: 0 };
+    ordersData.forEach(o => { if (statusCounts[o.order_status] !== undefined) statusCounts[o.order_status]++; });
+
+    const ctxOrder = document.getElementById('orderChart').getContext('2d');
+    new Chart(ctxOrder, {
+      type: 'doughnut',
+      data: {
+        labels: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'],
+        datasets: [{
+          data: [statusCounts.pending, statusCounts.processing, statusCounts.shipped, statusCounts.delivered, statusCounts.cancelled],
+          backgroundColor: ['#FF9500', '#007AFF', '#5856D6', '#34C759', '#FF3B30'],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { family: 'Inter' } } } },
+        cutout: '75%'
+      }
+    });
+
+    // Dynamic Revenue Line Chart
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const currentMonthIdx = new Date().getMonth();
+    const last6Months = [];
+    const monthlyRev = [0, 0, 0, 0, 0, 0];
+    for (let i = 5; i >= 0; i--) {
+      const mIdx = (currentMonthIdx - i + 12) % 12;
+      last6Months.push(months[mIdx]);
+    }
+    (ordersData || []).forEach(o => {
+      if (o.order_status !== 'cancelled' && o.created_at) {
+        const oDate = new Date(o.created_at);
+        const m = months[oDate.getMonth()];
+        const idx = last6Months.indexOf(m);
+        if (idx !== -1) {
+          monthlyRev[idx] += Number(o.total || 0);
+        }
+      }
+    });
+
+    const ctxRev = document.getElementById('revenueChart').getContext('2d');
+    new Chart(ctxRev, {
+      type: 'line',
+      data: {
+        labels: last6Months,
+        datasets: [{
+          label: 'Revenue (৳)',
+          data: monthlyRev,
+          borderColor: '#FF6B00',
+          backgroundColor: 'rgba(255,107,0,0.1)',
+          borderWidth: 3, tension: 0.4, fill: true,
+          pointBackgroundColor: '#FF6B00', pointBorderColor: '#fff', pointBorderWidth: 2, pointRadius: 5
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { beginAtZero: true, grid: { borderDash: [5, 5], color: 'rgba(0,0,0,0.05)' } },
+          x: { grid: { display: false } }
+        }
+      }
+    });
+  }
+</script>
+</body>
+</html>

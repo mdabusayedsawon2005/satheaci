@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script>
+    (function(){try{if(localStorage.getItem('sathe_achi_theme')==='dark'){document.documentElement.setAttribute('data-theme','dark');}else{document.documentElement.removeAttribute('data-theme');}}catch(e){}})();
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shopping Cart | Sathe Achi</title>
+  <link rel="icon" href="logo.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="sa-style.css?v=31">
+  <style>
+    /* ══════════════════════════════════════════
+       PRODUCTION CART STYLESHEET
+    ══════════════════════════════════════════ */
+
+    /* ─── PAGE TITLE BAR (Royal Luxury Match) ─── */
+    .pg-title-bar { 
+      background: linear-gradient(135deg, #0a1c38 0%, #152a4e 100%); 
+      padding: 24px 0; 
+      border-bottom: 1.5px solid rgba(212, 175, 55, 0.3);
+    }
+    .pg-title-bar h1 { 
+      font-family: 'Playfair Display', Georgia, serif;
+      font-style: italic;
+      color: #fbf9f5; 
+      font-size: 24px; 
+      font-weight: 700; 
+      display: flex; 
+      align-items: center; 
+      gap: 12px; 
+    }
+    .pg-title-bar h1 i { color: #cca24a; font-size: 20px; }
+    .pg-title-bar span { 
+      font-family: var(--font-base);
+      font-style: normal;
+      font-size: 13px; 
+      color: #cca24a; 
+      font-weight: 600; 
+      margin-left: auto; 
+    }
+
+    /* ─── CART LAYOUT ─── */
+    .cart-layout { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-bottom: 40px; }
+    @media (max-width: 992px) { .cart-layout { grid-template-columns: 1fr; } }
+
+    /* ─── CART BOX COMPONENTS ─── */
+    .cart-box { background: var(--white); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); border: 1px solid var(--border); overflow: hidden; margin-bottom: 20px; }
+    .cart-box-head { padding: 15px 20px; border-bottom: 1px solid var(--border); font-size: 15px; font-weight: 800; color: var(--text-dark); display: flex; align-items: center; gap: 8px; }
+    .cart-box-head i { color: var(--primary); }
+
+    /* ─── CART ITEM CARD ─── */
+    .cart-item { display: flex; gap: 16px; padding: 20px; border-bottom: 1px solid var(--border); transition: var(--trans); }
+    .cart-item:last-child { border-bottom: none; }
+    .cart-item-img { width: 90px; height: 90px; flex-shrink: 0; border-radius: var(--radius-md); background: #f7f8fa; display: flex; align-items: center; justify-content: center; padding: 8px; border: 1px solid var(--border); cursor: pointer; }
+    .cart-item-img img { max-width: 100%; max-height: 100%; object-fit: contain; }
+    
+    .cart-item-body { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+    .cart-item-head { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; }
+    .cart-item-title { font-size: 15px; font-weight: 700; color: var(--text-dark); line-height: 1.3; margin-bottom: 6px; cursor: pointer; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .cart-item-price { font-size: 16px; font-weight: 800; color: var(--primary); text-align: right; }
+    .cart-item-was { font-size: 12px; color: var(--text-muted); text-decoration: line-through; display: block; }
+    
+    .cart-item-variants { font-size: 12px; color: var(--text-muted); margin-bottom: 12px; display: flex; gap: 12px; }
+    .cart-item-variants span { background: #f9f9fb; padding: 4px 8px; border-radius: 4px; border: 1px solid var(--border); }
+    
+    .cart-item-footer { display: flex; align-items: center; justify-content: space-between; margin-top: auto; }
+    
+    /* Quantity Selector */
+    .cart-qty { display: flex; align-items: center; border: 1px solid var(--border); border-radius: var(--radius-full); overflow: hidden; background: #f1f5f9; padding: 2px; }
+    [data-theme="dark"] .cart-qty { background: #1e293b; }
+    .cart-qty button { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: transparent; font-size: 14px; font-weight: 700; color: var(--text-dark); border: none; cursor: pointer; border-radius: 50%; transition: var(--trans); }
+    .cart-qty button:active { background: rgba(0, 0, 0, 0.05); transform: scale(0.9); }
+    [data-theme="dark"] .cart-qty button:active { background: rgba(255, 255, 255, 0.05); }
+    .cart-qty-num { width: 38px; text-align: center; font-size: 14px; font-weight: 700; color: var(--text-dark); }
+    
+    /* Item Actions */
+    .cart-item-actions { display: flex; gap: 15px; }
+    .cart-action-btn { background: none; border: none; font-size: 13px; font-weight: 600; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; gap: 5px; transition: var(--trans); }
+    .cart-action-btn:hover { color: var(--primary); }
+    .cart-action-btn.remove:hover { color: var(--danger); }
+
+    /* ─── COUPON COMPONENT ─── */
+    .coupon-wrap { display: flex; gap: 10px; padding: 16px 20px; }
+    .coupon-input { flex: 1; border: 1.5px solid var(--border); border-radius: var(--radius-full); padding: 12px 20px; font-size: 13px; outline: none; transition: var(--trans); background: #f8fafc; }
+    [data-theme="dark"] .coupon-input { background: rgba(0,0,0,0.1); }
+    .coupon-input:focus { border-color: var(--primary); background: #fff; }
+    .coupon-btn { background: var(--navy); color: #fff; font-weight: 700; font-size: 13px; padding: 12px 24px; border-radius: var(--radius-full); border: none; cursor: pointer; transition: var(--trans); }
+    .coupon-btn:hover { background: #2d1b5e; }
+    .coupon-msg { padding: 0 20px 16px; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+
+    /* ─── ORDER SUMMARY COMPONENT ─── */
+    .sum-row { display: flex; justify-content: space-between; padding: 10px 20px; font-size: 14px; }
+    .sum-row span:first-child { color: var(--text-muted); }
+    .sum-row span:last-child { font-weight: 600; color: var(--text-dark); }
+    .sum-row.total { border-top: 1px solid var(--border); padding-top: 16px; margin-top: 6px; }
+    .sum-row.total span:first-child { font-size: 16px; font-weight: 800; color: var(--text-dark); }
+    .sum-row.total span:last-child { font-size: 22px; font-weight: 900; color: var(--primary); }
+    
+    .delivery-est { margin: 0 20px 16px; padding: 12px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: var(--radius-md); display: flex; align-items: center; gap: 10px; font-size: 12px; color: #166534; font-weight: 600; }
+    .delivery-est i { font-size: 16px; color: #22c55e; }
+
+    /* ─── TRUST BADGES COMPONENT ─── */
+    .trust-badges { padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+    .trust-item { display: flex; align-items: center; gap: 12px; }
+    .trust-icon { width: 36px; height: 36px; background: #f9f9fb; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+    .trust-text strong { display: block; font-size: 13px; font-weight: 700; color: var(--text-dark); margin-bottom: 2px; }
+    .trust-text span { font-size: 11px; color: var(--text-muted); }
+
+    /* ─── EMPTY STATE COMPONENT ─── */
+    .cart-empty { text-align: center; padding: 60px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--white); border-radius: var(--radius-lg); border: 1px solid var(--border); box-shadow: var(--shadow-sm); margin-bottom: 30px; }
+    .cart-empty img { width: 200px; margin-bottom: 20px; opacity: 0.8; }
+    .cart-empty h2 { font-size: 22px; font-weight: 800; color: var(--text-dark); margin-bottom: 8px; }
+    .cart-empty p { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; max-width: 300px; }
+
+    /* ─── RECOMMENDED PRODUCTS COMPONENT ─── */
+    .rec-products { margin-bottom: 40px; }
+    .rec-slider { display: flex; gap: 16px; overflow-x: auto; scrollbar-width: none; padding-bottom: 10px; }
+    .rec-slider::-webkit-scrollbar { display: none; }
+    .rec-slider .sa-prod-card { min-width: 180px; flex-shrink: 0; }
+
+    /* ─── STICKY CHECKOUT BAR (Mobile) ─── */
+    .sticky-checkout {
+      display: none;
+      position: fixed;
+      bottom: calc(env(safe-area-inset-bottom, 0px) + 90px);
+      left: 12px;
+      right: 12px;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: var(--apple-blur);
+      -webkit-backdrop-filter: var(--apple-blur);
+      padding: 12px 16px;
+      align-items: center;
+      gap: 15px;
+      z-index: 998;
+      box-shadow: var(--apple-shadow);
+      border-radius: var(--radius-lg);
+    }
+    .sticky-total-col { display: flex; flex-direction: column; }
+    .sticky-total-col span:first-child { font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; }
+    .sticky-total-col span:last-child { font-size: 20px; font-weight: 900; color: var(--primary); line-height: 1; }
+    .sticky-btn { flex: 1; padding: 14px; font-size: 15px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; gap: 8px; }
+
+    @media (max-width: 768px) {
+      .cart-item { padding: 15px; gap: 12px; }
+      .cart-item-img { width: 75px; height: 75px; }
+      .cart-item-title { font-size: 13px; }
+      .cart-item-price { font-size: 15px; }
+      .cart-item-variants { flex-direction: column; gap: 4px; margin-bottom: 10px; }
+      .cart-item-variants span { display: inline-block; width: fit-content; }
+      .cart-item-actions { flex-direction: column; gap: 10px; align-items: flex-end; }
+      .sum-row.total span:last-child { font-size: 20px; }
+      .sticky-checkout { display: flex; }
+      .desktop-checkout-btn { display: none; }
+    }
+    @media (min-width: 769px) {
+      .sticky-checkout { display: none !important; }
+    }
+  </style>
+</head>
+<body class="sa-has-sticky-bar">
+<div class="sa-toasts" id="toastContainer"></div>
+
+<!-- HEADER -->
+<header class="sa-header" id="saHeader">
+  <div class="sa-wrap sa-header-inner">
+    <a href="index.html" class="sa-logo">
+      <img src="logo.png" alt="SatheAchi.com" class="sa-logo-img sa-logo-mobile" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+      <img src="sathe_achi_brand_logo.svg" alt="Sathe Achi" class="sa-logo-desktop">
+      <div class="sa-logo-icon" style="display:none;"><i class="fa-solid fa-handshake-simple"></i></div>
+    </a>
+    <div class="sa-search-wrap">
+      <div class="sa-search-box" id="saSearchBox">
+        <i class="fa-solid fa-magnifying-glass sa-search-icon"></i>
+        <input type="text" id="saSearch" placeholder="Search products, brands..." autocomplete="off">
+        <button type="button" class="sa-search-clear" id="saSearchClear" aria-label="Clear search"><i class="fa-solid fa-xmark"></i></button>
+        <button class="sa-search-btn" id="saSearchBtn" aria-label="Search"><i class="fa-solid fa-arrow-right"></i></button>
+      </div>
+      <div class="sa-search-suggestions" id="saSearchSuggestions"></div>
+    </div>
+    <div class="sa-hdr-actions">
+      <a href="index.html" class="sa-icon-btn sa-pc-home-btn" title="Home" aria-label="Home">
+        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+      </a>
+      <button class="sa-icon-btn theme-toggle" id="saTheme" title="Dark Mode" aria-label="Toggle theme">
+        <svg class="theme-icon-moon" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        <svg class="theme-icon-sun" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+      </button>
+      <a href="wishlist.html" class="sa-icon-btn" title="Wishlist" aria-label="Wishlist">
+        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+      </a>
+      <a href="cart.html" class="sa-icon-btn" title="Cart" aria-label="Cart">
+        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+        <span class="sa-badge cart-count">0</span>
+      </a>
+      <div style="position:relative;">
+        <button class="sa-icon-btn" id="saProfileBtn" title="Profile" aria-label="Profile menu">
+          <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        </button>
+        <div class="sa-profile-dropdown" id="saProfileDropdown">
+          <div class="sa-dropdown-logged-in" style="display:none;">
+            <div class="sa-dropdown-header"><div class="sa-dropdown-user-info"><span class="sa-user-name">Loading...</span><span class="sa-user-email"></span></div></div>
+            <div class="sa-dropdown-divider"></div>
+            <a href="account.html" class="sa-dropdown-item"><i class="fa-regular fa-user"></i> My Account</a>
+            <a href="orders.html" class="sa-dropdown-item"><i class="fa-solid fa-box"></i> My Orders</a>
+            <a href="wishlist.html" class="sa-dropdown-item"><i class="fa-regular fa-heart"></i> Wishlist</a>
+            <div class="sa-dropdown-divider"></div>
+            <a href="#" class="sa-dropdown-item" id="saHeaderLogout" style="color:#ef4444;"><i class="fa-solid fa-right-from-bracket" style="color:#ef4444;"></i> Logout</a>
+          </div>
+          <div class="sa-dropdown-guest">
+            <div class="sa-dropdown-header"><div class="sa-dropdown-user-info"><span class="sa-user-name">Welcome!</span><span class="sa-user-email">Sign in to your account</span></div></div>
+            <a href="login.html" class="sa-dropdown-login-btn">Sign In</a>
+            <a href="signup.html" class="sa-dropdown-item" style="justify-content:center; font-size:12px; color:var(--text-muted);">Create Account</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- PAGE TITLE -->
+<div class="pg-title-bar">
+  <div class="sa-wrap">
+    <h1><i class="fa-solid fa-cart-shopping"></i> Shopping Cart <span id="cartItemCount">0 Items</span></h1>
+  </div>
+</div>
+
+<!-- MAIN CONTENT WRAPPER -->
+<section class="sa-section" style="padding-top: 24px;">
+  <div class="sa-wrap" id="AppContainer">
+    <!-- Rendered by Next.js style JS components -->
+  </div>
+</section>
+
+<!-- MOBILE BOTTOM NAV -->
+<div class="sa-bottom-nav">
+  <a href="index.html" class="sa-bn-item">
+    <div class="sa-bn-icon-wrap">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+    </div>
+    <span class="sa-bn-label">Home</span>
+  </a>
+  <a href="categories.html" class="sa-bn-item">
+    <div class="sa-bn-icon-wrap">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"></rect><rect x="14" y="3" width="7" height="7" rx="2"></rect><rect x="14" y="14" width="7" height="7" rx="2"></rect><rect x="3" y="14" width="7" height="7" rx="2"></rect></svg>
+    </div>
+    <span class="sa-bn-label">Categories</span>
+  </a>
+  <a href="cart.html" class="sa-bn-item active">
+    <div class="sa-bn-icon-wrap">
+      <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+      <span class="sa-cart-count sa-bn-badge" style="display:none;">0</span>
+    </div>
+    <span class="sa-bn-label">Cart</span>
+  </a>
+  <a href="wishlist.html" class="sa-bn-item">
+    <div class="sa-bn-icon-wrap">
+      <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+    </div>
+    <span class="sa-bn-label">Wishlist</span>
+  </a>
+  <a href="account.html" class="sa-bn-item">
+    <div class="sa-bn-icon-wrap">
+      <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+    </div>
+    <span class="sa-bn-label">Account</span>
+  </a>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="script.js?v=38"></script>
+<script>
+/**
+ * ════════════════════════════════════════════════════════════════
+ *  NEXT.JS / SUPABASE STYLE COMPONENT ARCHITECTURE (Vanilla JS Mock)
+ * ════════════════════════════════════════════════════════════════
+ */
+
+// --- 1. Global State Management ---
+let cartState = [];
+let wishlistState = [];
+let couponState = { code: '', discountAmt: 0, msg: '', type: '', discountType: '', discountValue: 0, minOrderAmt: 0, maxDiscountAmt: null };
+
+// Initialize state from local storage
+function initState() {
+  cartState = JSON.parse(localStorage.getItem('sathe_achi_cart') || '[]');
+  wishlistState = JSON.parse(localStorage.getItem('sathe_achi_wishlist') || '[]');
+  
+  // Enrich cart items from PRODUCTS array if not yet enriched (DB items only have id+quantity)
+  cartState = cartState.map(item => {
+    if (!item.title && window.PRODUCTS && window.PRODUCTS.length > 0) {
+      const prod = window.PRODUCTS.find(p => p.id === item.id);
+      if (prod) {
+        item.title = prod.title;
+        item.price = prod.discountPrice;
+        item.image = prod.image;
+        item.category = prod.category;
+      }
+    }
+    if (!item.title) item.title = item.name || 'Product #' + (item.id || '');
+    if (item.price === undefined || item.price === null) item.price = 0;
+    if (!item.image) item.image = 'logo.png';
+    if (!item.variantColor) item.variantColor = ['Black','Silver','Blue'][Math.floor(Math.random()*3)];
+    if (!item.variantSize) item.variantSize = ['S','M','L','XL'][Math.floor(Math.random()*4)];
+    if (!item.quantity) item.quantity = 1;
+    return item;
+  });
+
+  // Load coupon from localStorage if active
+  const savedCode = localStorage.getItem('sathe_achi_coupon_code');
+  const savedDiscount = parseFloat(localStorage.getItem('sathe_achi_coupon_discount')) || 0;
+  const savedType = localStorage.getItem('sathe_achi_coupon_type') || '';
+  const savedValue = parseFloat(localStorage.getItem('sathe_achi_coupon_value')) || 0;
+  const savedMinOrder = parseFloat(localStorage.getItem('sathe_achi_coupon_min_order')) || 0;
+  const savedMaxDiscount = localStorage.getItem('sathe_achi_coupon_max_discount');
+  const parsedMaxDiscount = savedMaxDiscount ? parseFloat(savedMaxDiscount) : null;
+
+  if (savedCode && (savedType === 'free_shipping' || savedValue > 0)) {
+    couponState = {
+      code: savedCode,
+      discountAmt: savedDiscount,
+      discountType: savedType,
+      discountValue: savedValue,
+      minOrderAmt: savedMinOrder,
+      maxDiscountAmt: parsedMaxDiscount,
+      msg: savedType === 'free_shipping' ? `✓ Coupon "${savedCode}" applied! (Free Shipping)` : `✓ Coupon "${savedCode}" active!`,
+      type: 'success'
+    };
+  }
+}
+
+// Save state to local storage
+function syncState() {
+  localStorage.setItem('sathe_achi_cart', JSON.stringify(cartState));
+  localStorage.setItem('sathe_achi_wishlist', JSON.stringify(wishlistState));
+  renderApp();
+  updateBadges(); // global script.js function
+}
+
+// --- 2. Action Handlers ---
+function handleUpdateQty(id, delta) {
+  const item = cartState.find(c => c.id === id);
+  if(item) {
+    item.quantity = Math.max(1, item.quantity + delta);
+    syncState();
+    if (typeof syncCartItemToDB === 'function') {
+      syncCartItemToDB(id, item.quantity);
+    }
+  }
+}
+
+function handleRemoveItem(id) {
+  cartState = cartState.filter(c => c.id !== id);
+  showToast('Item removed from cart', 'info');
+  syncState();
+  if (typeof syncCartItemToDB === 'function') {
+    syncCartItemToDB(id, 0, true);
+  }
+}
+
+function handleSaveForLater(id) {
+  const item = cartState.find(c => c.id === id);
+  if(item) {
+    // Remove from cart
+    cartState = cartState.filter(c => c.id !== id);
+    // Add to wishlist if not already there
+    if(!wishlistState.find(w => w.id === id)) {
+      wishlistState.push(item);
+    }
+    showToast('Item saved for later', 'success');
+    syncState();
+
+    // Sync cart remove to DB
+    if (typeof syncCartItemToDB === 'function') {
+      syncCartItemToDB(id, 0, true);
+    }
+    // Sync wishlist add to DB
+    if (window.supabaseClient) {
+      window.supabaseClient.auth.getSession().then(res => {
+        const session = res.data.session;
+        if (session) {
+          window.supabaseClient.from('wishlist_items')
+            .insert([{ user_id: session.user.id, product_id: id }])
+            .then(insRes => {
+              if (insRes.error) console.error("Wishlist sync failed:", insRes.error);
+            });
+        }
+      });
+    }
+  }
+}
+
+function clearCouponStorage() {
+  ['sathe_achi_coupon_code','sathe_achi_coupon_discount','sathe_achi_coupon_type',
+   'sathe_achi_coupon_value','sathe_achi_coupon_min_order','sathe_achi_coupon_max_discount'].forEach(k => localStorage.removeItem(k));
+}
+
+async function handleApplyCoupon() {
+  const input = document.getElementById('couponInput');
+  if(!input) return;
+  const code = input.value.trim().toUpperCase();
+  if(!code) {
+    couponState = { code: '', discountAmt: 0, msg: 'Please enter a coupon code.', type: 'error', discountType: '', discountValue: 0, minOrderAmt: 0, maxDiscountAmt: null };
+    renderApp();
+    return;
+  }
+  
+  const subtotal = cartState.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const btn = document.querySelector('.coupon-btn');
+  if(btn) { btn.disabled = true; btn.textContent = 'Applying...'; }
+  
+  try {
+    const { data: coupon, error } = await supabaseClient
+      .from('coupons').select('*').eq('code', code).eq('is_active', true).maybeSingle();
+    if (error) throw error;
+    
+    const fail = (msg) => {
+      couponState = { code: '', discountAmt: 0, msg, type: 'error', discountType: '', discountValue: 0, minOrderAmt: 0, maxDiscountAmt: null };
+      clearCouponStorage();
+    };
+    
+    if (!coupon) { fail('✗ Invalid or inactive coupon code.'); renderApp(); return; }
+    
+    const now = new Date();
+    if (coupon.start_date && new Date(coupon.start_date) > now) { fail('✗ This coupon is not active yet.'); renderApp(); return; }
+    if (coupon.end_date && new Date(coupon.end_date) < now) { fail('✗ This coupon has expired.'); renderApp(); return; }
+    if (coupon.max_uses !== null && coupon.used_count >= coupon.max_uses) { fail('✗ Coupon usage limit reached.'); renderApp(); return; }
+    
+    const minOrder = parseFloat(coupon.min_order_amt) || 0;
+    if (minOrder > 0 && subtotal < minOrder) { fail(`✗ Minimum purchase of ৳${minOrder.toLocaleString()} required.`); renderApp(); return; }
+    
+    const maxDiscountAmt = coupon.max_discount_amt ? parseFloat(coupon.max_discount_amt) : null;
+    let discountVal = parseFloat(coupon.discount_value) || 0;
+    let discountAmt = 0;
+    let successMsg = '';
+    
+    if (coupon.discount_type === 'free_shipping') {
+      discountAmt = 0; // shipping is zeroed in renderApp
+      successMsg = `✓ Coupon "${coupon.code}" applied! (Free Shipping unlocked)`;
+    } else if (coupon.discount_type === 'percentage') {
+      discountAmt = Math.round(subtotal * (discountVal / 100));
+      if (maxDiscountAmt && discountAmt > maxDiscountAmt) discountAmt = maxDiscountAmt;
+      discountAmt = Math.min(discountAmt, subtotal);
+      successMsg = `✓ Coupon "${coupon.code}" applied! (Saved ৳${discountAmt.toLocaleString()})`;
+    } else {
+      discountAmt = Math.min(discountVal, subtotal);
+      successMsg = `✓ Coupon "${coupon.code}" applied! (Saved ৳${discountAmt.toLocaleString()})`;
+    }
+    
+    couponState = {
+      code: coupon.code, discountAmt, discountType: coupon.discount_type,
+      discountValue: discountVal, minOrderAmt: minOrder, maxDiscountAmt,
+      msg: successMsg, type: 'success'
+    };
+    
+    localStorage.setItem('sathe_achi_coupon_code', coupon.code);
+    localStorage.setItem('sathe_achi_coupon_discount', discountAmt);
+    localStorage.setItem('sathe_achi_coupon_type', coupon.discount_type);
+    localStorage.setItem('sathe_achi_coupon_value', discountVal);
+    localStorage.setItem('sathe_achi_coupon_min_order', minOrder);
+    if (maxDiscountAmt) localStorage.setItem('sathe_achi_coupon_max_discount', maxDiscountAmt);
+    
+  } catch (err) {
+    console.error("Coupon verification failed:", err);
+    couponState = { code: '', discountAmt: 0, msg: '✗ Server error verifying coupon.', type: 'error', discountType: '', discountValue: 0, minOrderAmt: 0, maxDiscountAmt: null };
+  } finally {
+    if(btn) { btn.disabled = false; btn.textContent = 'Apply'; }
+    renderApp();
+  }
+}
+
+// --- 3. UI Components ---
+
+// Component: CartItemCard
+const CartItemCard = (item) => `
+  <div class="cart-item">
+    <div class="cart-item-img" onclick="location.href='product.html?id=${item.id}'">
+      <img src="${item.image}" alt="${item.title}">
+    </div>
+    <div class="cart-item-body">
+      <div class="cart-item-head">
+        <div class="cart-item-title" onclick="location.href='product.html?id=${item.id}'">${item.title}</div>
+        <div style="text-align:right;">
+          <div class="cart-item-price">৳${(item.price * item.quantity).toLocaleString()}</div>
+          ${item.quantity > 1 ? `<span class="cart-item-was">৳${item.price.toLocaleString()} / item</span>` : ''}
+        </div>
+      </div>
+      
+      <div class="cart-item-variants">
+        ${item.category !== 'Electronics' && item.category !== 'Grocery' ? `<span>Size: <strong>${item.variantSize}</strong></span>` : ''}
+        <span>Color: <strong>${item.variantColor}</strong></span>
+      </div>
+      
+      <div class="cart-item-footer">
+        <div class="cart-qty">
+          <button onclick="handleUpdateQty('${item.id}', -1)"><i class="fa-solid fa-minus"></i></button>
+          <span class="cart-qty-num">${item.quantity}</span>
+          <button onclick="handleUpdateQty('${item.id}', 1)"><i class="fa-solid fa-plus"></i></button>
+        </div>
+        
+        <div class="cart-item-actions">
+          <button class="cart-action-btn" onclick="handleSaveForLater('${item.id}')"><i class="fa-regular fa-heart"></i> Save</button>
+          <button class="cart-action-btn remove" onclick="handleRemoveItem('${item.id}')"><i class="fa-regular fa-trash-can"></i> Remove</button>
+        </div>
+      </div>
+    </div>
+  </div>
+`;
+
+// Component: OrderSummary
+const OrderSummary = (subtotal, shipping, discount, total, hasFreeShipping = false) => {
+  // Mock delivery date: 3 days from now
+  const delDate = new Date();
+  delDate.setDate(delDate.getDate() + 3);
+  const options = { weekday: 'short', month: 'short', day: 'numeric' };
+  const delString = delDate.toLocaleDateString('en-US', options);
+  const freeCouponActive = hasFreeShipping || (typeof couponState !== 'undefined' && couponState && couponState.discountType === 'free_shipping');
+
+  return `
+    <div class="cart-box" style="margin-bottom: 18px;">
+      <div class="cart-box-head"><i class="fa-solid fa-receipt"></i> Order Summary</div>
+      <div class="sum-row"><span>Subtotal (${cartState.length} items)</span><span>৳${subtotal.toLocaleString()}</span></div>
+      <div class="sum-row"><span>Shipping Fee</span><span>${shipping === 0 ? '<strong style="color:#10b981;">FREE</strong>' : '৳'+shipping.toLocaleString()}</span></div>
+    ${subtotal > 0 && subtotal < (parseFloat(window.siteSettings?.['shipping_free_threshold']) || 15000) && !freeCouponActive ? `<div style="font-size:11px; color:var(--text-muted); padding: 0 20px 4px; line-height:1.5;">Add ৳${((parseFloat(window.siteSettings?.['shipping_free_threshold']) || 15000) - subtotal).toLocaleString()} more for free delivery</div>` : ''}
+      
+      ${discount > 0 ? `
+      <div class="sum-row" style="color:#10b981;">
+        <span>Coupon Discount</span><span>-৳${discount.toLocaleString()}</span>
+      </div>` : ''}
+      
+      <div class="sum-row total"><span>Grand Total</span><span>৳${total.toLocaleString()}</span></div>
+      
+      <div class="delivery-est">
+        <i class="fa-solid fa-truck"></i> Estimated Delivery by <strong>${delString}</strong>
+      </div>
+      
+      <div class="desktop-checkout-btn" style="padding: 0 20px 20px;">
+        <button onclick="if(window.authChecking || (window.USER_STATE&&window.USER_STATE.profile)){location.href='checkout.html';}else{window.showLoginRequiredModal();}" class="sa-btn-primary" style="width:100%; border-radius: var(--radius-md); padding: 16px; font-size: 16px;">
+          <i class="fa-solid fa-lock"></i> Proceed to Checkout
+        </button>
+      </div>
+    </div>
+  `;
+};
+
+// Component: TrustBadges
+const TrustBadges = () => `
+  <div class="cart-box trust-badges">
+    <div class="trust-item">
+      <div class="trust-icon" style="color:#3b82f6;"><i class="fa-solid fa-shield-halved"></i></div>
+      <div class="trust-text"><strong>Secure Payment</strong><span>256-bit SSL encrypted</span></div>
+    </div>
+    <div class="trust-item">
+      <div class="trust-icon" style="color:#f59e0b;"><i class="fa-solid fa-money-bill-wave"></i></div>
+      <div class="trust-text"><strong>Cash on Delivery</strong><span>Pay when you receive</span></div>
+    </div>
+    <div class="trust-item">
+      <div class="trust-icon" style="color:#10b981;"><i class="fa-solid fa-rotate-left"></i></div>
+      <div class="trust-text"><strong>Easy Returns</strong><span>7-day return policy</span></div>
+    </div>
+  </div>
+`;
+
+// Component: CouponBox
+const CouponBox = () => `
+  <div class="cart-box">
+    <div class="cart-box-head"><i class="fa-solid fa-tag"></i> Apply Promo Code</div>
+    <div class="coupon-wrap">
+      <input type="text" class="coupon-input" id="couponInput" placeholder="Enter code (e.g. SATHE20)" value="${couponState.code}">
+      <button class="coupon-btn" onclick="handleApplyCoupon()">Apply</button>
+    </div>
+    ${couponState.msg ? `
+      <div class="coupon-msg" style="color: ${couponState.type === 'success' ? '#10b981' : '#ef4444'};">
+        ${couponState.msg}
+      </div>
+    ` : ''}
+  </div>
+`;
+
+// Component: RecommendedProducts (Cross-sell)
+const RecommendedProducts = (title = "You might also like") => {
+  // Just grabbing some dummy products not in cart
+  const cartIds = cartState.map(c => c.id);
+  const recs = PRODUCTS.filter(p => !cartIds.includes(p.id)).slice(0, 8);
+  
+  if(!recs.length) return '';
+  
+  function pct(o,d){return Math.round((o-d)/o*100);}
+  function starsHtml(r){
+    var f=Math.floor(r),h=r%1>=.5?1:0,s='';
+    for(var i=0;i<f;i++) s+='<i class="fa-solid fa-star"></i>';
+    if(h) s+='<i class="fa-solid fa-star-half-stroke"></i>';
+    return s;
+  }
+
+  const cardsHtml = recs.map(p => {
+    const d = pct(p.originalPrice, p.discountPrice);
+    return `
+      <div class="sa-prod-card" onclick="location.href='product.html?id=${p.id}'">
+        <div class="sa-pc-top">
+          <span class="sa-disc-tag">-${d}%</span>
+          <button class="sa-wish-tag" onclick="event.stopPropagation(); window.saToggleWish(${p.id}, this)"><i class="fa-regular fa-heart"></i></button>
+          <div class="sa-pc-img"><img src="${p.image}" alt="${p.title}" loading="lazy"></div>
+        </div>
+        <div class="sa-pc-title">${p.title}</div>
+        <div class="sa-pc-stars">${starsHtml(p.rating)}<span>(${p.reviewsCount})</span></div>
+        <div class="sa-pc-price"><span class="sa-pc-now">৳${p.discountPrice.toLocaleString()}</span></div>
+      </div>
+    `;
+  }).join('');
+
+  return `
+    <div class="rec-products">
+      <div class="sa-sec-head">
+        <h2 class="sa-sec-title"><i class="fa-solid fa-sparkles" style="color:var(--primary)"></i> ${title}</h2>
+      </div>
+      <div class="rec-slider">${cardsHtml}</div>
+    </div>
+  `;
+};
+
+// Component: EmptyCartState
+const EmptyCartState = () => `
+  <div class="cart-empty">
+    <!-- Beautiful SVG Illustration from unDraw (embedded as img) -->
+    <img src="https://raw.githubusercontent.com/KaterinaLupacheva/svg-illustrations/main/undraw_empty_cart_co35.svg" alt="Empty Cart">
+    <h2>Your cart is empty!</h2>
+    <p>Browse our categories and discover our best deals. You'll surely find something you love.</p>
+    <button onclick="location.href='index.html'" class="sa-btn-primary" style="padding: 14px 30px; font-size: 16px;">
+      Start Shopping
+    </button>
+  </div>
+  ${RecommendedProducts("Recommended for you")}
+`;
+
+// Component: StickyCheckoutBar (Mobile)
+const StickyCheckoutBar = (total) => `
+  <div class="sticky-checkout" id="stickyCheckout">
+    <div class="sticky-total-col">
+      <span>Grand Total</span>
+      <span>৳${total.toLocaleString()}</span>
+    </div>
+    <button onclick="if(window.authChecking || (window.USER_STATE&&window.USER_STATE.profile)){location.href='checkout.html';}else{window.showLoginRequiredModal();}" class="sa-btn-primary sticky-btn">
+      Checkout <i class="fa-solid fa-arrow-right"></i>
+    </button>
+  </div>
+`;
+
+// --- 4. Main App Render ---
+function renderApp() {
+  const container = document.getElementById('AppContainer');
+  document.getElementById('cartItemCount').textContent = cartState.length + ' Items';
+
+  if(cartState.length === 0) {
+    container.innerHTML = EmptyCartState();
+    // Remove sticky bar if exists
+    const sticky = document.getElementById('stickyCheckout');
+    if(sticky) sticky.remove();
+    return;
+  }
+
+  // Calculate Totals
+  const subtotal = cartState.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  // Use DB settings for shipping — no hardcoding
+  const freeThreshold = parseFloat(window.siteSettings?.['shipping_free_threshold']) || 15000;
+  const baseShippingFee = parseFloat(window.siteSettings?.['shipping_inside_dhaka']) || 60;
+  const hasFreeShippingCoupon = couponState.discountType === 'free_shipping';
+  const shipping = hasFreeShippingCoupon ? 0 : (subtotal >= freeThreshold ? 0 : baseShippingFee);
+  
+  // Re-verify/recalculate coupon discount dynamically when subtotal changes
+  if (couponState.code) {
+    if (couponState.minOrderAmt && subtotal < couponState.minOrderAmt) {
+      couponState = { code: '', discountAmt: 0, msg: `✗ Coupon removed. Minimum ৳${couponState.minOrderAmt.toLocaleString()} required.`, type: 'error', discountType: '', discountValue: 0, minOrderAmt: 0, maxDiscountAmt: null };
+      clearCouponStorage();
+    } else if (couponState.discountType === 'free_shipping') {
+      couponState.discountAmt = 0; // shipping itself becomes 0
+    } else {
+      let discountAmt = 0;
+      if (couponState.discountType === 'percentage') {
+        discountAmt = Math.round(subtotal * (couponState.discountValue / 100));
+        if (couponState.maxDiscountAmt && discountAmt > couponState.maxDiscountAmt) discountAmt = couponState.maxDiscountAmt;
+      } else {
+        discountAmt = couponState.discountValue;
+      }
+      discountAmt = Math.min(discountAmt, subtotal);
+      couponState.discountAmt = discountAmt;
+      couponState.msg = `✓ Coupon "${couponState.code}" applied! (Saved ৳${discountAmt.toLocaleString()})`;
+      localStorage.setItem('sathe_achi_coupon_discount', discountAmt);
+    }
+  }
+  
+  const total = subtotal + shipping - couponState.discountAmt;
+
+  // Build View
+  const layout = `
+    <div class="cart-layout">
+      <!-- LEFT COLUMN: Cart Items & Coupon -->
+      <div class="cart-col-left">
+        <div class="cart-box" style="margin-bottom: 24px;">
+          <div class="cart-box-head">
+            <i class="fa-solid fa-box-open"></i> Order Items (${cartState.length})
+          </div>
+          <div class="cart-items-list">
+            ${cartState.map(item => CartItemCard(item)).join('')}
+          </div>
+        </div>
+        
+        ${CouponBox()}
+      </div>
+
+      <!-- RIGHT COLUMN: Summary & Trust -->
+      <div class="cart-col-right">
+        ${OrderSummary(subtotal, shipping, couponState.discountAmt, total, hasFreeShippingCoupon)}
+        ${TrustBadges()}
+      </div>
+    </div>
+    
+    ${RecommendedProducts("Customers who bought items in your cart also bought")}
+  `;
+
+  container.innerHTML = layout;
+  
+  // Manage Sticky Bar (outside the main container flow to avoid layout jumps)
+  let sticky = document.getElementById('stickyCheckout');
+  if(sticky) sticky.remove();
+  document.body.insertAdjacentHTML('beforeend', StickyCheckoutBar(total));
+}
+
+// --- 5. Bootstrapping ---
+
+// Update cart when DB cart loads/syncs (primary trigger)
+document.addEventListener('storeDataLoaded', () => {
+  initState();
+  renderApp();
+});
+
+document.addEventListener('DOMContentLoaded', async () => {
+  // If storeDataLoaded already fired (script.js loaded before inline script ran), render now
+  if (window.storeAlreadyLoaded) {
+    initState();
+    renderApp();
+    return;
+  }
+
+  // Check session: if guest, we can show demo or localStorage cart right away
+  let hasSession = false;
+  if (window.supabaseClient) {
+    try {
+      const { data: { session } } = await window.supabaseClient.auth.getSession();
+      if (session) hasSession = true;
+    } catch (e) {}
+  }
+
+  // Always render from local storage immediately (0ms instant render - zero waiting!)
+  initState();
+  renderApp();
+});
+</script>
+<script src="sa-motion.js?v=4"></script>
+</body>
+</html>
+

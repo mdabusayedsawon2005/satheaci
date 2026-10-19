@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sathe Achi | Banners Management</title>
+  <link rel="icon" href="../logo.png" type="image/png">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="admin-style.css?v=4">
+  <style>
+    .banner-img-cell { width: 120px; height: 60px; border-radius: var(--radius-sm); object-fit: cover; background: var(--bg-color); border: 1px solid var(--border); }
+
+    /* MODAL / BOTTOM-SHEET */
+    .sa-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.55); backdrop-filter: blur(4px); z-index: 1000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: var(--trans); }
+    .sa-modal.show { opacity: 1; pointer-events: auto; }
+    .sa-modal-content { background: var(--surface); width: 100%; max-width: 600px; padding: 30px; border-radius: var(--radius-lg); transform: translateY(20px); transition: var(--trans); box-shadow: var(--shadow-lg); border: 1px solid var(--glass-border); max-height: 90vh; overflow-y: auto; }
+    .sa-modal.show .sa-modal-content { transform: translateY(0); }
+    .sa-modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 16px; }
+    .sa-modal-title { font-size: 20px; font-weight: 800; }
+    .sa-modal-close { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-muted); width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
+
+    .form-group { margin-bottom: 20px; }
+    .form-group label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 8px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .form-input { width: 100%; padding: 12px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--bg-color); color: var(--text-dark); font-family: 'Inter'; outline: none; font-size: 14px; transition: var(--trans); min-height: var(--touch-min); }
+    .form-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
+
+    .img-preview { width: 100%; height: 150px; border-radius: var(--radius-sm); background: var(--bg-color); border: 2px dashed var(--border); display: flex; align-items: center; justify-content: center; overflow: hidden; margin-top: 10px; }
+    .img-preview img { width: 100%; height: 100%; object-fit: cover; }
+    
+    .action-btn { background: none; border: none; cursor: pointer; padding: 8px; border-radius: 6px; transition: var(--trans); min-width: 36px; min-height: 36px; display: inline-flex; align-items: center; justify-content: center; }
+    .btn-edit { color: var(--info); }
+    .btn-edit:hover { background: rgba(0,122,255,0.1); }
+    .btn-del { color: var(--danger); }
+    .btn-del:hover { background: rgba(255,59,48,0.1); }
+
+    /* Mobile banner cards */
+    .ban-card { background: var(--surface); border-radius: var(--radius-md); border: 1px solid var(--border); overflow: hidden; margin-bottom: 12px; box-shadow: var(--shadow-xs); }
+    .ban-card-img { width: 100%; height: 140px; object-fit: cover; background: var(--bg-color); display: block; }
+    .ban-card-img-placeholder { width: 100%; height: 140px; background: var(--bg-color); display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 32px; }
+    .ban-card-body { padding: 14px; }
+    .ban-card-title { font-weight: 800; font-size: 15px; margin-bottom: 4px; }
+    .ban-card-sub { font-size: 12px; color: var(--text-muted); margin-bottom: 10px; }
+    .ban-card-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+    .ban-card-badge { background: var(--bg-color); border: 1px solid var(--border); border-radius: 20px; padding: 4px 10px; font-size: 11px; font-weight: 600; color: var(--text-muted); }
+    .ban-card-footer { display: flex; gap: 8px; padding: 0 14px 14px; }
+    .ban-card-footer .sa-btn { flex: 1; justify-content: center; }
+
+    @media (max-width: 768px) {
+      .sa-modal { align-items: flex-end; padding: 0; }
+      .sa-modal-content { border-radius: var(--radius-xl) var(--radius-xl) 0 0; max-height: 92vh; transform: translateY(100%); padding: 24px 20px calc(env(safe-area-inset-bottom, 0px) + 24px); }
+      .sa-modal.show .sa-modal-content { transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="admin-layout">
+  <div class="sa-sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- SIDEBAR -->
+  <aside class="sa-sidebar" id="adminSidebar">
+    <div class="sa-sidebar-header">
+      <a href="index.html" class="sa-sidebar-logo"><i class="fa-solid fa-bag-shopping"></i> SatheAchi</a>
+      <button class="sa-sidebar-close" id="sidebarCloseBtn"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <nav class="sa-sidebar-nav">
+      <a href="index.html" class="sa-nav-item"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+      <a href="products.html" class="sa-nav-item"><i class="fa-solid fa-box"></i> Products</a>
+      <a href="categories.html" class="sa-nav-item"><i class="fa-solid fa-tags"></i> Categories</a>
+      <a href="orders.html" class="sa-nav-item"><i class="fa-solid fa-cart-shopping"></i> Orders</a>
+      <a href="customers.html" class="sa-nav-item"><i class="fa-solid fa-users"></i> Customers</a>
+      <a href="banners.html" class="sa-nav-item active"><i class="fa-regular fa-image"></i> Banners</a>
+      <a href="coupons.html" class="sa-nav-item"><i class="fa-solid fa-ticket"></i> Coupons</a>
+      <a href="reviews.html" class="sa-nav-item"><i class="fa-regular fa-star"></i> Reviews</a>
+      <div style="flex:1"></div>
+      <a href="settings.html" class="sa-nav-item"><i class="fa-solid fa-gear"></i> Settings</a>
+      <a href="#" class="sa-nav-item" onclick="event.preventDefault(); adminLogout();"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
+    </nav>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="sa-main">
+    <header class="sa-topbar">
+      <div class="sa-tb-left">
+        <button class="sa-menu-btn" id="mobileMenuBtn"><i class="fa-solid fa-bars"></i></button>
+        <h1 class="sa-tb-title">Banners</h1>
+      </div>
+      <div class="sa-tb-right">
+        <button class="sa-icon-btn" id="adminThemeBtn"><i class="fa-regular fa-moon"></i></button>
+        <div class="sa-admin-profile">
+          <div class="sa-admin-avatar"><i class="fa-solid fa-user-tie"></i></div>
+          <div class="sa-admin-info"><span class="sa-admin-name" id="topbarAdminName">Admin</span><span class="sa-admin-role">Super Admin</span></div>
+        </div>
+      </div>
+    </header>
+
+    <div class="sa-page-content">
+      <div class="sa-table-card">
+        <div class="sa-card-header">
+          <h3 class="sa-card-title">Manage Banners</h3>
+          <button class="sa-btn sa-btn-primary" onclick="openBannerModal()"><i class="fa-solid fa-plus"></i> Add Banner</button>
+        </div>
+        
+        <!-- Desktop Table -->
+        <div class="sa-table-resp-wrap">
+          <table class="sa-table">
+            <thead>
+              <tr>
+                <th>Image Preview</th>
+                <th>Title</th>
+                <th>Target Section</th>
+                <th>Sort Order</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="bannerTableBody">
+              <tr><td colspan="6"><div class="sa-skeleton" style="height:40px;"></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Mobile Cards -->
+        <div class="sa-mobile-cards" id="bannerMobileCards">
+          <div class="sa-skeleton" style="height:200px; border-radius:var(--radius-md);"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- BANNER MODAL -->
+<div class="sa-modal" id="bannerModal">
+  <div class="sa-modal-content">
+    <div class="sa-modal-header">
+      <h3 class="sa-modal-title" id="bannerModalTitle">Add Banner</h3>
+      <button class="sa-modal-close" onclick="closeBannerModal()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <form id="bannerForm">
+      <input type="hidden" id="banId">
+      
+      <div class="form-group">
+        <label>Banner Title</label>
+        <input type="text" id="banTitle" class="form-input" required placeholder="e.g. Eid Mega Sale">
+      </div>
+      <div class="form-group">
+        <label>Banner Subtitle</label>
+        <input type="text" id="banSubtitle" class="form-input" placeholder="e.g. Up to 50% off on all items">
+      </div>
+      <div class="form-group">
+        <label>Button Text</label>
+        <input type="text" id="banBtnText" class="form-input" placeholder="e.g. Shop Now">
+      </div>
+      <div class="form-group">
+        <label>Sort Order</label>
+        <input type="number" id="banSortOrder" class="form-input" placeholder="e.g. 10" value="0">
+      </div>
+      <div class="form-group">
+        <label>Target Section</label>
+        <select id="banTargetSection" class="form-input">
+          <option value="flash_sale">Flash Sale</option>
+          <option value="trending">Trending</option>
+          <option value="hot_deals">Hot Deals</option>
+          <option value="mobiles">Mobiles</option>
+          <option value="fashion">Fashion</option>
+          <option value="beauty">Beauty</option>
+          <option value="electronics">Electronics</option>
+          <option value="home">Home</option>
+          <option value="categories">Categories</option>
+          <option value="featured_products">Featured Products</option>
+          <option value="new_arrivals">New Arrivals</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label>Status</label>
+        <select id="banStatus" class="form-input">
+          <option value="true">Active</option>
+          <option value="false">Inactive</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Banner Image (16:9 recommended)</label>
+        <input type="file" id="banImageFile" accept="image/*" class="form-input">
+        <div class="img-preview" id="banImgPreview"><i class="fa-regular fa-image" style="color:var(--text-muted); font-size:32px;"></i></div>
+      </div>
+      
+      <button type="submit" id="banSubmitBtn" class="sa-btn sa-btn-primary" style="width:100%; justify-content:center; padding:16px; font-size:16px; margin-top:8px;">Save Banner</button>
+    </form>
+  </div>
+</div>
+
+<script src="admin-app.js"></script>
+<script>
+  let banners = [];
+
+  document.getElementById('mobileMenuBtn').addEventListener('click', () => {
+    document.getElementById('adminSidebar').classList.add('show');
+    document.getElementById('sidebarOverlay').classList.add('show');
+  });
+  document.getElementById('sidebarOverlay').addEventListener('click', () => {
+    document.getElementById('adminSidebar').classList.remove('show');
+    document.getElementById('sidebarOverlay').classList.remove('show');
+  });
+
+  // Image Preview
+  document.getElementById('banImageFile').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        document.getElementById('banImgPreview').innerHTML = `<img src="${e.target.result}">`;
+      }
+      reader.readAsDataURL(file);
+    }
+  });
+
+  document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(loadBanners, 500);
+  });
+
+  async function loadBanners() {
+    try {
+      const { data, error } = await window.db.from('banners').select('*').order('sort_order', { ascending: true });
+      if (error) throw error;
+      banners = data;
+      renderTable();
+      renderMobileCards();
+    } catch (err) {
+      showToast('Error loading banners', 'error');
+    }
+  }
+
+  function getTargetSectionLabel(val) {
+    const labels = {
+      flash_sale: 'Flash Sale', trending: 'Trending', hot_deals: 'Hot Deals',
+      mobiles: 'Mobiles', fashion: 'Fashion', beauty: 'Beauty',
+      electronics: 'Electronics', home: 'Home', categories: 'Categories',
+      featured_products: 'Featured Products', new_arrivals: 'New Arrivals'
+    };
+    return labels[val] || val || 'Featured Products';
+  }
+
+  function renderTable() {
+    const tbody = document.getElementById('bannerTableBody');
+    if (banners.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:40px;">No banners found.</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = banners.map(b => `
+      <tr>
+        <td><img src="${b.image_url || ''}" class="banner-img-cell" alt="Banner" onerror="this.style.display='none'"></td>
+        <td style="font-weight:700;">
+          ${b.title}
+          ${b.subtitle ? `<div style="font-size:11px; font-weight:400; color:var(--text-muted); margin-top:4px;">${b.subtitle}</div>` : ''}
+        </td>
+        <td>${getTargetSectionLabel(b.target_section)}</td>
+        <td style="font-weight:600;">${b.sort_order || 0}</td>
+        <td>
+          <button class="sa-btn" style="background:none; border:1px solid ${b.is_active ? 'var(--success)' : 'var(--danger)'}; color:${b.is_active ? 'var(--success)' : 'var(--danger)'}; padding:6px 12px; font-size:12px;" onclick="toggleStatus('${b.id}', ${!b.is_active})">
+            ${b.is_active ? 'Active' : 'Inactive'}
+          </button>
+        </td>
+        <td>
+          <button class="action-btn btn-edit" onclick="editBanner('${b.id}')" title="Edit"><i class="fa-solid fa-pen"></i></button>
+          <button class="action-btn btn-del" onclick="deleteBanner('${b.id}')" title="Delete"><i class="fa-solid fa-trash"></i></button>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  function renderMobileCards() {
+    const container = document.getElementById('bannerMobileCards');
+    if (banners.length === 0) {
+      container.innerHTML = `<div style="text-align:center; padding:48px 20px; color:var(--text-muted);"><i class="fa-regular fa-image" style="font-size:40px; margin-bottom:12px; display:block;"></i><p>No banners found.</p></div>`;
+      return;
+    }
+    container.innerHTML = banners.map(b => `
+      <div class="ban-card">
+        ${b.image_url 
+          ? `<img src="${b.image_url}" class="ban-card-img" alt="${b.title}" onerror="this.style.display='none'">` 
+          : `<div class="ban-card-img-placeholder"><i class="fa-regular fa-image"></i></div>`}
+        <div class="ban-card-body">
+          <div class="ban-card-title">${b.title}</div>
+          ${b.subtitle ? `<div class="ban-card-sub">${b.subtitle}</div>` : ''}
+          <div class="ban-card-meta">
+            <span class="ban-card-badge"><i class="fa-solid fa-crosshairs" style="margin-right:4px;"></i>${getTargetSectionLabel(b.target_section)}</span>
+            <span class="ban-card-badge">Order: ${b.sort_order || 0}</span>
+            <span class="sa-status-badge ${b.is_active ? 'status-delivered' : 'status-cancelled'}">${b.is_active ? 'Active' : 'Inactive'}</span>
+          </div>
+        </div>
+        <div class="ban-card-footer">
+          <button class="sa-btn" style="flex:1; justify-content:center; border:1px solid ${b.is_active ? 'var(--success)' : 'var(--danger)'}; color:${b.is_active ? 'var(--success)' : 'var(--danger)'}; background:none;" onclick="toggleStatus('${b.id}', ${!b.is_active})">
+            <i class="fa-solid fa-toggle-${b.is_active ? 'on' : 'off'}"></i> ${b.is_active ? 'Active' : 'Inactive'}
+          </button>
+          <button class="sa-btn" style="background:var(--primary-light); color:var(--primary);" onclick="editBanner('${b.id}')"><i class="fa-solid fa-pen"></i></button>
+          <button class="sa-btn" style="background:rgba(255,59,48,0.1); color:var(--danger);" onclick="deleteBanner('${b.id}')"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  async function toggleStatus(id, newStatus) {
+    try {
+      const { error } = await window.db.from('banners').update({ is_active: newStatus }).eq('id', id);
+      if (error) throw error;
+      showToast('Status updated', 'success');
+      loadBanners();
+    } catch (err) {
+      showToast(err.message, 'error');
+    }
+  }
+
+  function openBannerModal() {
+    document.getElementById('bannerForm').reset();
+    document.getElementById('banId').value = '';
+    document.getElementById('banSubtitle').value = '';
+    document.getElementById('banBtnText').value = '';
+    document.getElementById('banSortOrder').value = '0';
+    document.getElementById('banTargetSection').value = 'featured_products';
+    document.getElementById('bannerModalTitle').textContent = 'Add Banner';
+    document.getElementById('banImgPreview').innerHTML = '<i class="fa-regular fa-image" style="color:var(--text-muted); font-size:32px;"></i>';
+    document.getElementById('bannerModal').classList.add('show');
+  }
+
+  function closeBannerModal() {
+    document.getElementById('bannerModal').classList.remove('show');
+  }
+
+  function editBanner(id) {
+    const b = banners.find(x => x.id === id);
+    if (!b) return;
+    
+    document.getElementById('banId').value = b.id;
+    document.getElementById('banTitle').value = b.title;
+    document.getElementById('banSubtitle').value = b.subtitle || '';
+    document.getElementById('banBtnText').value = b.button_text || '';
+    document.getElementById('banSortOrder').value = b.sort_order || 0;
+    document.getElementById('banTargetSection').value = b.target_section || 'featured_products';
+    document.getElementById('banStatus').value = b.is_active ? "true" : "false";
+    document.getElementById('banImgPreview').innerHTML = b.image_url ? `<img src="${b.image_url}">` : '<i class="fa-regular fa-image" style="color:var(--text-muted); font-size:32px;"></i>';
+    
+    document.getElementById('bannerModalTitle').textContent = 'Edit Banner';
+    document.getElementById('bannerModal').classList.add('show');
+  }
+
+  document.getElementById('bannerForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('banSubmitBtn');
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+    btn.disabled = true;
+
+    try {
+      const id = document.getElementById('banId').value;
+      const title = document.getElementById('banTitle').value;
+      const subtitle = document.getElementById('banSubtitle').value;
+      const button_text = document.getElementById('banBtnText').value;
+      const sort_order = parseInt(document.getElementById('banSortOrder').value) || 0;
+      const target_section = document.getElementById('banTargetSection').value;
+      const position = 'hero';
+      const is_active = document.getElementById('banStatus').value === "true";
+      const fileInput = document.getElementById('banImageFile');
+      
+      let image_url = null;
+      if (id) {
+        const existing = banners.find(x => x.id === id);
+        image_url = existing.image_url;
+      } else if (fileInput.files.length === 0) {
+        throw new Error('Please select an image for new banner.');
+      }
+
+      if (fileInput.files.length > 0) {
+        const file = fileInput.files[0];
+        const fileExt = file.name.split('.').pop();
+        const fileName = `banner_${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
+        
+        const { error: uploadError } = await window.db.storage.from('banners').upload(fileName, file);
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = window.db.storage.from('banners').getPublicUrl(fileName);
+        image_url = publicUrl;
+      }
+
+      const payload = { title, subtitle, button_text, sort_order, target_section, position, is_active, image_url };
+
+      if (id) {
+        const { error } = await window.db.from('banners').update(payload).eq('id', id);
+        if (error) throw error;
+      } else {
+        const { error } = await window.db.from('banners').insert([payload]);
+        if (error) throw error;
+      }
+
+      showToast(id ? 'Banner updated' : 'Banner created', 'success');
+      closeBannerModal();
+      loadBanners();
+
+    } catch (err) {
+      showToast(err.message, 'error');
+    } finally {
+      btn.innerHTML = 'Save Banner';
+      btn.disabled = false;
+    }
+  });
+
+  function deleteBanner(id) {
+    saConfirm('Are you sure you want to delete this banner?', async () => {
+      try {
+        const { error } = await window.db.from('banners').delete().eq('id', id);
+        if (error) throw error;
+        showToast('Banner deleted', 'success');
+        loadBanners();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    });
+  }
+</script>
+</body>
+</html>

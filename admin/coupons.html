@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sathe Achi | Coupons Management</title>
+  <link rel="icon" href="../logo.png" type="image/png">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="admin-style.css?v=4">
+  <style>
+    /* MODAL / BOTTOM-SHEET */
+    .sa-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.55); backdrop-filter: blur(4px); z-index: 1000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: var(--trans); }
+    .sa-modal.show { opacity: 1; pointer-events: auto; }
+    .sa-modal-content { background: var(--surface); width: 100%; max-width: 600px; padding: 30px; border-radius: var(--radius-lg); transform: translateY(20px); transition: var(--trans); box-shadow: var(--shadow-lg); border: 1px solid var(--glass-border); max-height: 90vh; overflow-y: auto; }
+    .sa-modal.show .sa-modal-content { transform: translateY(0); }
+    .sa-modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 16px; }
+    .sa-modal-title { font-size: 20px; font-weight: 800; }
+    .sa-modal-close { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-muted); width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
+
+    .form-group { margin-bottom: 20px; }
+    .form-row { display: flex; gap: 16px; margin-bottom: 20px; }
+    .form-row .form-group { margin-bottom: 0; flex: 1; }
+    .form-group label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 8px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .form-input { width: 100%; padding: 12px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--bg-color); color: var(--text-dark); font-family: 'Inter'; outline: none; font-size: 14px; transition: var(--trans); min-height: var(--touch-min); }
+    .form-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
+
+    .action-btn { background: none; border: none; cursor: pointer; padding: 8px; border-radius: 6px; transition: var(--trans); min-width: 36px; min-height: 36px; display: inline-flex; align-items: center; justify-content: center; }
+    .btn-edit { color: var(--info); }
+    .btn-edit:hover { background: rgba(0,122,255,0.1); }
+    .btn-del { color: var(--danger); }
+    .btn-del:hover { background: rgba(255,59,48,0.1); }
+    
+    .coupon-code-badge { background: var(--primary-light); color: var(--primary); padding: 6px 12px; border-radius: var(--radius-sm); font-weight: 800; font-family: monospace; font-size: 14px; letter-spacing: 1px; display: inline-block; }
+
+    /* Mobile coupon cards */
+    .coup-card { background: var(--surface); border-radius: var(--radius-md); border: 1px solid var(--border); padding: 16px; margin-bottom: 12px; box-shadow: var(--shadow-xs); }
+    .coup-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; gap: 10px; }
+    .coup-card-code { font-size: 18px; font-weight: 900; font-family: monospace; letter-spacing: 2px; color: var(--primary); background: var(--primary-light); padding: 8px 14px; border-radius: var(--radius-sm); }
+    .coup-card-discount { font-size: 22px; font-weight: 900; color: var(--text-dark); }
+    .coup-card-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+    .coup-card-meta-item { background: var(--bg-color); border-radius: var(--radius-sm); padding: 10px 12px; }
+    .coup-card-meta-label { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }
+    .coup-card-meta-value { font-size: 13px; font-weight: 700; color: var(--text-dark); }
+    .coup-card-footer { display: flex; gap: 8px; align-items: center; }
+    .coup-card-footer .sa-btn { flex: 1; justify-content: center; }
+
+    @media (max-width: 768px) {
+      .form-row { flex-direction: column; gap: 14px; }
+      .sa-modal { align-items: flex-end; padding: 0; }
+      .sa-modal-content { border-radius: var(--radius-xl) var(--radius-xl) 0 0; max-height: 92vh; transform: translateY(100%); padding: 24px 20px calc(env(safe-area-inset-bottom, 0px) + 24px); }
+      .sa-modal.show .sa-modal-content { transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="admin-layout">
+  <div class="sa-sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- SIDEBAR -->
+  <aside class="sa-sidebar" id="adminSidebar">
+    <div class="sa-sidebar-header">
+      <a href="index.html" class="sa-sidebar-logo"><i class="fa-solid fa-bag-shopping"></i> SatheAchi</a>
+      <button class="sa-sidebar-close" id="sidebarCloseBtn"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <nav class="sa-sidebar-nav">
+      <a href="index.html" class="sa-nav-item"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+      <a href="products.html" class="sa-nav-item"><i class="fa-solid fa-box"></i> Products</a>
+      <a href="categories.html" class="sa-nav-item"><i class="fa-solid fa-tags"></i> Categories</a>
+      <a href="orders.html" class="sa-nav-item"><i class="fa-solid fa-cart-shopping"></i> Orders</a>
+      <a href="customers.html" class="sa-nav-item"><i class="fa-solid fa-users"></i> Customers</a>
+      <a href="banners.html" class="sa-nav-item"><i class="fa-regular fa-image"></i> Banners</a>
+      <a href="coupons.html" class="sa-nav-item active"><i class="fa-solid fa-ticket"></i> Coupons</a>
+      <a href="reviews.html" class="sa-nav-item"><i class="fa-regular fa-star"></i> Reviews</a>
+      <div style="flex:1"></div>
+      <a href="settings.html" class="sa-nav-item"><i class="fa-solid fa-gear"></i> Settings</a>
+      <a href="#" class="sa-nav-item" onclick="event.preventDefault(); adminLogout();"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
+    </nav>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="sa-main">
+    <header class="sa-topbar">
+      <div class="sa-tb-left">
+        <button class="sa-menu-btn" id="mobileMenuBtn"><i class="fa-solid fa-bars"></i></button>
+        <h1 class="sa-tb-title">Coupons</h1>
+      </div>
+      <div class="sa-tb-right">
+        <button class="sa-icon-btn" id="adminThemeBtn"><i class="fa-regular fa-moon"></i></button>
+        <div class="sa-admin-profile">
+          <div class="sa-admin-avatar"><i class="fa-solid fa-user-tie"></i></div>
+          <div class="sa-admin-info"><span class="sa-admin-name" id="topbarAdminName">Admin</span><span class="sa-admin-role">Super Admin</span></div>
+        </div>
+      </div>
+    </header>
+
+    <div class="sa-page-content">
+      <div class="sa-table-card">
+        <div class="sa-card-header">
+          <h3 class="sa-card-title">Manage Coupons</h3>
+          <button class="sa-btn sa-btn-primary" onclick="openCouponModal()"><i class="fa-solid fa-plus"></i> Add Coupon</button>
+        </div>
+        
+        <!-- Desktop Table -->
+        <div class="sa-table-resp-wrap">
+          <table class="sa-table">
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Discount</th>
+                <th>Usage</th>
+                <th>Min Order</th>
+                <th>Expiry</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="couponTableBody">
+              <tr><td colspan="7"><div class="sa-skeleton" style="height:40px;"></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Mobile Cards -->
+        <div class="sa-mobile-cards" id="couponMobileCards">
+          <div class="sa-skeleton" style="height:160px; border-radius:var(--radius-md);"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- COUPON MODAL -->
+<div class="sa-modal" id="couponModal">
+  <div class="sa-modal-content">
+    <div class="sa-modal-header">
+      <h3 class="sa-modal-title" id="couponModalTitle">Add Coupon</h3>
+      <button class="sa-modal-close" onclick="closeCouponModal()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <form id="couponForm">
+      <input type="hidden" id="coupId">
+      
+      <div class="form-group">
+        <label>Coupon Code</label>
+        <input type="text" id="coupCode" class="form-input" required placeholder="e.g. EID2026" style="text-transform: uppercase;">
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label>Discount Type</label>
+          <select id="coupType" class="form-input">
+            <option value="percentage">Percentage (%)</option>
+            <option value="fixed">Fixed Amount (৳)</option>
+            <option value="free_shipping">Free Shipping</option>
+          </select>
+        </div>
+        <div class="form-group" id="coupValGroup">
+          <label>Discount Value</label>
+          <input type="number" id="coupVal" class="form-input" required min="1">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Min Order Amount (৳)</label>
+          <input type="number" id="coupMin" class="form-input" value="0" min="0">
+        </div>
+        <div class="form-group" id="coupMaxDiscountGroup">
+          <label>Max Discount (৳)</label>
+          <input type="number" id="coupMaxDiscount" class="form-input" value="" min="0" placeholder="No limit">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Start Date</label>
+          <input type="datetime-local" id="coupStart" class="form-input">
+        </div>
+        <div class="form-group">
+          <label>End Date (Expiry)</label>
+          <input type="datetime-local" id="coupExpiry" class="form-input">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Max Uses</label>
+          <input type="number" id="coupMax" class="form-input" value="100" min="1">
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select id="coupStatus" class="form-input">
+            <option value="true">Active</option>
+            <option value="false">Inactive</option>
+          </select>
+        </div>
+      </div>
+      
+      <button type="submit" id="coupSubmitBtn" class="sa-btn sa-btn-primary" style="width:100%; justify-content:center; padding:16px; font-size:16px; margin-top:8px;">Save Coupon</button>
+    </form>
+  </div>
+</div>
+
+<script src="admin-app.js"></script>
+<script>
+  let coupons = [];
+
+  document.getElementById('mobileMenuBtn').addEventListener('click', () => {
+    document.getElementById('adminSidebar').classList.add('show');
+    document.getElementById('sidebarOverlay').classList.add('show');
+  });
+  document.getElementById('sidebarOverlay').addEventListener('click', () => {
+    document.getElementById('adminSidebar').classList.remove('show');
+    document.getElementById('sidebarOverlay').classList.remove('show');
+  });
+
+  document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(loadCoupons, 500);
+    document.getElementById('coupType').addEventListener('change', (e) => {
+      toggleFormFields(e.target.value);
+    });
+  });
+
+  function toggleFormFields(type) {
+    const valGroup = document.getElementById('coupValGroup');
+    const valInput = document.getElementById('coupVal');
+    const maxDiscountGroup = document.getElementById('coupMaxDiscountGroup');
+    const maxDiscountInput = document.getElementById('coupMaxDiscount');
+
+    if (type === 'free_shipping') {
+      valGroup.style.opacity = '0.5';
+      valInput.disabled = true;
+      valInput.required = false;
+      valInput.value = '0';
+      maxDiscountGroup.style.opacity = '0.5';
+      maxDiscountInput.disabled = true;
+      maxDiscountInput.value = '';
+    } else if (type === 'fixed') {
+      valGroup.style.opacity = '1';
+      valInput.disabled = false;
+      valInput.required = true;
+      if (valInput.value === '0') valInput.value = '';
+      maxDiscountGroup.style.opacity = '0.5';
+      maxDiscountInput.disabled = true;
+      maxDiscountInput.value = '';
+    } else {
+      valGroup.style.opacity = '1';
+      valInput.disabled = false;
+      valInput.required = true;
+      if (valInput.value === '0') valInput.value = '';
+      maxDiscountGroup.style.opacity = '1';
+      maxDiscountInput.disabled = false;
+    }
+  }
+
+  async function loadCoupons() {
+    try {
+      const { data, error } = await window.db.from('coupons').select('*').order('created_at', { ascending: false });
+      if (error) throw error;
+      coupons = data;
+      renderTable();
+      renderMobileCards();
+    } catch (err) {
+      showToast('Error loading coupons', 'error');
+    }
+  }
+
+  function getCouponStatus(c) {
+    const now = new Date();
+    const started = !c.start_date || new Date(c.start_date) <= now;
+    const notExpired = !c.end_date || new Date(c.end_date) > now;
+    const usageAvailable = !c.max_uses || c.used_count < c.max_uses;
+    
+    if (c.is_active && started && notExpired && usageAvailable) return { label: 'Active', cls: 'status-delivered' };
+    if (!started) return { label: 'Scheduled', cls: 'status-pending' };
+    if (!notExpired) return { label: 'Expired', cls: 'status-cancelled' };
+    if (!usageAvailable) return { label: 'Limit Reached', cls: 'status-cancelled' };
+    return { label: 'Inactive', cls: 'status-cancelled' };
+  }
+
+  function renderTable() {
+    const tbody = document.getElementById('couponTableBody');
+    if (coupons.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:40px;">No coupons found.</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = coupons.map(c => {
+      let discount = '';
+      if (c.discount_type === 'percentage') {
+        discount = `${c.discount_value}%`;
+        if (c.max_discount_amt) discount += ` (Max ৳${c.max_discount_amt})`;
+      } else if (c.discount_type === 'fixed') {
+        discount = `৳${c.discount_value}`;
+      } else {
+        discount = 'Free Shipping';
+      }
+      const expiry = c.end_date ? new Date(c.end_date).toLocaleDateString() : 'Never';
+      const status = getCouponStatus(c);
+      return `
+        <tr>
+          <td><span class="coupon-code-badge">${c.code}</span></td>
+          <td style="font-weight:700;">${discount}</td>
+          <td>${c.used_count} / ${c.max_uses || '∞'}</td>
+          <td>৳${c.min_order_amt}</td>
+          <td>${expiry}</td>
+          <td><span class="sa-status-badge ${status.cls}">${status.label}</span></td>
+          <td>
+            <button class="action-btn btn-edit" onclick="editCoupon('${c.id}')" title="Edit"><i class="fa-solid fa-pen"></i></button>
+            <button class="action-btn btn-del" onclick="deleteCoupon('${c.id}')" title="Delete"><i class="fa-solid fa-trash"></i></button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  function renderMobileCards() {
+    const container = document.getElementById('couponMobileCards');
+    if (coupons.length === 0) {
+      container.innerHTML = `<div style="text-align:center; padding:48px 20px; color:var(--text-muted);"><i class="fa-solid fa-ticket" style="font-size:40px; margin-bottom:12px; display:block;"></i><p>No coupons found.</p></div>`;
+      return;
+    }
+    container.innerHTML = coupons.map(c => {
+      let discount = '';
+      if (c.discount_type === 'percentage') {
+        discount = `${c.discount_value}% OFF`;
+        if (c.max_discount_amt) discount += ` (Max ৳${c.max_discount_amt})`;
+      } else if (c.discount_type === 'fixed') {
+        discount = `৳${c.discount_value} OFF`;
+      } else {
+        discount = 'Free Shipping';
+      }
+      const expiry = c.end_date ? new Date(c.end_date).toLocaleDateString() : 'Never';
+      const status = getCouponStatus(c);
+      return `
+        <div class="coup-card">
+          <div class="coup-card-top">
+            <span class="coup-card-code">${c.code}</span>
+            <span class="coup-card-discount">${discount}</span>
+          </div>
+          <div class="coup-card-meta">
+            <div class="coup-card-meta-item">
+              <div class="coup-card-meta-label">Usage</div>
+              <div class="coup-card-meta-value">${c.used_count} / ${c.max_uses || '∞'}</div>
+            </div>
+            <div class="coup-card-meta-item">
+              <div class="coup-card-meta-label">Min Order</div>
+              <div class="coup-card-meta-value">৳${c.min_order_amt}</div>
+            </div>
+            <div class="coup-card-meta-item">
+              <div class="coup-card-meta-label">Expiry</div>
+              <div class="coup-card-meta-value">${expiry}</div>
+            </div>
+            <div class="coup-card-meta-item">
+              <div class="coup-card-meta-label">Status</div>
+              <div class="coup-card-meta-value"><span class="sa-status-badge ${status.cls}">${status.label}</span></div>
+            </div>
+          </div>
+          <div class="coup-card-footer">
+            <button class="sa-btn" style="flex:1; justify-content:center; background:var(--primary-light); color:var(--primary);" onclick="editCoupon('${c.id}')"><i class="fa-solid fa-pen"></i> Edit</button>
+            <button class="sa-btn" style="background:rgba(255,59,48,0.1); color:var(--danger);" onclick="deleteCoupon('${c.id}')"><i class="fa-solid fa-trash"></i></button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function openCouponModal() {
+    document.getElementById('couponForm').reset();
+    document.getElementById('coupId').value = '';
+    document.getElementById('couponModalTitle').textContent = 'Add Coupon';
+    toggleFormFields('percentage');
+    document.getElementById('couponModal').classList.add('show');
+  }
+
+  function closeCouponModal() {
+    document.getElementById('couponModal').classList.remove('show');
+  }
+
+  function editCoupon(id) {
+    const c = coupons.find(x => x.id === id);
+    if (!c) return;
+    
+    document.getElementById('coupId').value = c.id;
+    document.getElementById('coupCode').value = c.code;
+    document.getElementById('coupType').value = c.discount_type;
+    document.getElementById('coupVal').value = c.discount_value;
+    document.getElementById('coupMin').value = c.min_order_amt || 0;
+    document.getElementById('coupMax').value = c.max_uses || '';
+    document.getElementById('coupMaxDiscount').value = c.max_discount_amt || '';
+    
+    if (c.start_date) {
+      const d = new Date(c.start_date);
+      d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+      document.getElementById('coupStart').value = d.toISOString().slice(0, 16);
+    } else {
+      document.getElementById('coupStart').value = '';
+    }
+
+    if (c.end_date) {
+      const d = new Date(c.end_date);
+      d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+      document.getElementById('coupExpiry').value = d.toISOString().slice(0, 16);
+    } else {
+      document.getElementById('coupExpiry').value = '';
+    }
+    
+    document.getElementById('coupStatus').value = c.is_active ? "true" : "false";
+    toggleFormFields(c.discount_type);
+    document.getElementById('couponModalTitle').textContent = 'Edit Coupon';
+    document.getElementById('couponModal').classList.add('show');
+  }
+
+  document.getElementById('couponForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('coupSubmitBtn');
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+    btn.disabled = true;
+
+    try {
+      const id = document.getElementById('coupId').value;
+      const startVal = document.getElementById('coupStart').value;
+      const expiryVal = document.getElementById('coupExpiry').value;
+      const maxDiscountVal = document.getElementById('coupMaxDiscount').value;
+      
+      const payload = {
+        code: document.getElementById('coupCode').value.toUpperCase().trim(),
+        discount_type: document.getElementById('coupType').value,
+        discount_value: parseFloat(document.getElementById('coupVal').value) || 0,
+        min_order_amt: parseFloat(document.getElementById('coupMin').value) || 0,
+        max_uses: parseInt(document.getElementById('coupMax').value) || null,
+        max_discount_amt: maxDiscountVal ? parseFloat(maxDiscountVal) : null,
+        start_date: startVal ? new Date(startVal).toISOString() : null,
+        end_date: expiryVal ? new Date(expiryVal).toISOString() : null,
+        is_active: document.getElementById('coupStatus').value === "true"
+      };
+
+      if (id) {
+        const { error } = await window.db.from('coupons').update(payload).eq('id', id);
+        if (error) throw error;
+      } else {
+        const { error } = await window.db.from('coupons').insert([payload]);
+        if (error) throw error;
+      }
+
+      showToast(id ? 'Coupon updated' : 'Coupon created', 'success');
+      closeCouponModal();
+      loadCoupons();
+
+    } catch (err) {
+      showToast(err.message, 'error');
+    } finally {
+      btn.innerHTML = 'Save Coupon';
+      btn.disabled = false;
+    }
+  });
+
+  function deleteCoupon(id) {
+    saConfirm('Are you sure you want to delete this coupon?', async () => {
+      try {
+        const { error } = await window.db.from('coupons').delete().eq('id', id);
+        if (error) throw error;
+        showToast('Coupon deleted', 'success');
+        loadCoupons();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    });
+  }
+</script>
+</body>
+</html>

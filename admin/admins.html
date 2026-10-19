@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sathe Achi | Admin Management</title>
+  <link rel="icon" href="../logo.png" type="image/png">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="admin-style.css?v=4">
+  <style>
+    /* MODAL / BOTTOM-SHEET */
+    .sa-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.55); backdrop-filter: blur(4px); z-index: 1000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: var(--trans); }
+    .sa-modal.show { opacity: 1; pointer-events: auto; }
+    .sa-modal-content { background: var(--surface); width: 100%; max-width: 560px; padding: 30px; border-radius: var(--radius-lg); transform: translateY(20px); transition: var(--trans); box-shadow: var(--shadow-lg); border: 1px solid var(--glass-border); max-height: 90vh; overflow-y: auto; }
+    .sa-modal.show .sa-modal-content { transform: translateY(0); }
+    .sa-modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 16px; }
+    .sa-modal-title { font-size: 18px; font-weight: 800; }
+    .sa-modal-close { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-muted); width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
+
+    .form-group { margin-bottom: 18px; }
+    .form-group label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 8px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .form-input { width: 100%; padding: 12px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--bg-color); color: var(--text-dark); font-family: 'Inter'; outline: none; font-size: 14px; transition: var(--trans); min-height: 48px; }
+    .form-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
+    
+    .action-btn { background: none; border: none; cursor: pointer; padding: 8px; border-radius: 6px; transition: var(--trans); min-width: 36px; min-height: 36px; display: inline-flex; align-items: center; justify-content: center; }
+    .btn-del { color: var(--danger); }
+    .btn-del:hover { background: rgba(255,59,48,0.1); }
+
+    /* Admin cards */
+    .admin-card { background: var(--surface); border-radius: var(--radius-md); border: 1px solid var(--border); padding: 16px; margin-bottom: 12px; box-shadow: var(--shadow-xs); display: flex; align-items: center; gap: 14px; }
+    .admin-card-avatar { width: 52px; height: 52px; border-radius: 50%; background: var(--primary-light); display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 900; color: var(--primary); flex-shrink: 0; overflow: hidden; }
+    .admin-card-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .admin-card-info { flex: 1; min-width: 0; }
+    .admin-card-name { font-weight: 800; font-size: 15px; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .admin-card-email { font-size: 12px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; }
+    .admin-card-role { display: inline-block; }
+    .admin-card-actions { display: flex; gap: 6px; flex-shrink: 0; }
+    
+    .role-badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+    .role-super { background: rgba(255,107,0,0.12); color: var(--primary); }
+    .role-admin { background: rgba(10,132,255,0.12); color: var(--info); }
+    .role-manager { background: rgba(48,209,88,0.12); color: var(--success); }
+
+    .invite-tip { background: var(--primary-light); border: 1px solid rgba(255,107,0,0.2); border-radius: var(--radius-sm); padding: 14px 16px; margin-bottom: 20px; font-size: 13px; color: var(--primary); display: flex; gap: 10px; align-items: flex-start; }
+    .invite-tip i { margin-top: 2px; flex-shrink: 0; }
+
+    @media (max-width: 768px) {
+      .sa-modal { align-items: flex-end; padding: 0; }
+      .sa-modal-content { border-radius: var(--radius-xl) var(--radius-xl) 0 0; max-height: 92vh; transform: translateY(100%); padding: 24px 20px calc(env(safe-area-inset-bottom, 0px) + 24px); }
+      .sa-modal.show .sa-modal-content { transform: translateY(0); }
+      .admin-card { flex-wrap: wrap; }
+      .admin-card-actions { width: 100%; justify-content: flex-end; border-top: 1px solid var(--border); padding-top: 10px; margin-top: 4px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="admin-layout">
+  <div class="sa-sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- SIDEBAR -->
+  <aside class="sa-sidebar" id="adminSidebar">
+    <div class="sa-sidebar-header">
+      <a href="index.html" class="sa-sidebar-logo"><i class="fa-solid fa-bag-shopping"></i> SatheAchi</a>
+      <button class="sa-sidebar-close" id="sidebarCloseBtn"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <nav class="sa-sidebar-nav">
+      <a href="index.html" class="sa-nav-item"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+      <a href="products.html" class="sa-nav-item"><i class="fa-solid fa-box"></i> Products</a>
+      <a href="categories.html" class="sa-nav-item"><i class="fa-solid fa-tags"></i> Categories</a>
+      <a href="orders.html" class="sa-nav-item"><i class="fa-solid fa-cart-shopping"></i> Orders</a>
+      <a href="customers.html" class="sa-nav-item"><i class="fa-solid fa-users"></i> Customers</a>
+      <a href="banners.html" class="sa-nav-item"><i class="fa-regular fa-image"></i> Banners</a>
+      <a href="coupons.html" class="sa-nav-item"><i class="fa-solid fa-ticket"></i> Coupons</a>
+      <a href="reviews.html" class="sa-nav-item"><i class="fa-regular fa-star"></i> Reviews</a>
+      <div style="flex:1"></div>
+      <a href="admins.html" class="sa-nav-item active"><i class="fa-solid fa-user-shield"></i> Admins</a>
+      <a href="settings.html" class="sa-nav-item"><i class="fa-solid fa-gear"></i> Settings</a>
+      <a href="#" class="sa-nav-item" onclick="event.preventDefault(); adminLogout();"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
+    </nav>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="sa-main">
+    <header class="sa-topbar">
+      <div class="sa-tb-left">
+        <button class="sa-menu-btn" id="mobileMenuBtn"><i class="fa-solid fa-bars"></i></button>
+        <h1 class="sa-tb-title">Admins</h1>
+      </div>
+      <div class="sa-tb-right">
+        <button class="sa-icon-btn" id="adminThemeBtn"><i class="fa-regular fa-moon"></i></button>
+        <div class="sa-admin-profile">
+          <div class="sa-admin-avatar"><i class="fa-solid fa-user-tie"></i></div>
+          <div class="sa-admin-info"><span class="sa-admin-name" id="topbarAdminName">Admin</span><span class="sa-admin-role">Super Admin</span></div>
+        </div>
+      </div>
+    </header>
+
+    <div class="sa-page-content">
+      <div class="sa-table-card">
+        <div class="sa-card-header">
+          <h3 class="sa-card-title">Admin Users</h3>
+          <button class="sa-btn sa-btn-primary" onclick="openInviteModal()">
+            <i class="fa-solid fa-user-plus"></i> Invite Admin
+          </button>
+        </div>
+
+        <!-- Desktop Table -->
+        <div class="sa-table-resp-wrap" style="margin-top:16px;">
+          <table class="sa-table">
+            <thead>
+              <tr>
+                <th>Admin</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="adminTableBody">
+              <tr><td colspan="5"><div class="sa-skeleton" style="height:40px;"></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Mobile Cards -->
+        <div class="sa-mobile-cards" id="adminMobileCards" style="margin-top:16px;">
+          <div class="sa-skeleton" style="height:100px; border-radius:var(--radius-md);"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- INVITE MODAL -->
+<div class="sa-modal" id="inviteModal">
+  <div class="sa-modal-content">
+    <div class="sa-modal-header">
+      <h3 class="sa-modal-title">Invite Admin</h3>
+      <button class="sa-modal-close" onclick="closeInviteModal()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <div class="invite-tip">
+      <i class="fa-solid fa-circle-info"></i>
+      <span>An invitation email will be sent to the address below. The user must confirm the invite to gain access.</span>
+    </div>
+
+    <form id="inviteForm">
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="inviteEmail" class="form-input" required placeholder="admin@example.com">
+      </div>
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="inviteName" class="form-input" placeholder="e.g. John Doe">
+      </div>
+      <div class="form-group">
+        <label>Role</label>
+        <select id="inviteRole" class="form-input">
+          <option value="admin">Admin</option>
+          <option value="manager">Manager</option>
+          <option value="super_admin">Super Admin</option>
+        </select>
+      </div>
+      <button type="submit" id="inviteBtn" class="sa-btn sa-btn-primary" style="width:100%; justify-content:center; padding:16px; margin-top:8px;">
+        <i class="fa-solid fa-paper-plane"></i> Send Invitation
+      </button>
+    </form>
+  </div>
+</div>
+
+<script src="admin-app.js"></script>
+<script>
+  let admins = [];
+
+  document.getElementById('mobileMenuBtn').addEventListener('click', () => {
+    document.getElementById('adminSidebar').classList.add('show');
+    document.getElementById('sidebarOverlay').classList.add('show');
+  });
+  document.getElementById('sidebarOverlay').addEventListener('click', () => {
+    document.getElementById('adminSidebar').classList.remove('show');
+    document.getElementById('sidebarOverlay').classList.remove('show');
+  });
+
+  document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(loadAdmins, 600);
+  });
+
+  async function loadAdmins() {
+    try {
+      // Try admin_users table first
+      const { data, error } = await window.db
+        .from('admin_users')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      admins = data || [];
+      if (admins.length === 0) {
+        const currentEmail = localStorage.getItem('sa_admin_email') || 'mdabusayedsawon2005@gmail.com';
+        admins = [{
+          id: 'admin-super',
+          user_id: 'admin-super',
+          full_name: 'Abu Sayed',
+          email: currentEmail,
+          role: 'super_admin',
+          is_active: true,
+          created_at: new Date().toISOString()
+        }];
+      }
+      renderTable();
+      renderMobileCards();
+    } catch (err) {
+      const currentEmail = localStorage.getItem('sa_admin_email') || 'mdabusayedsawon2005@gmail.com';
+      admins = [{
+        id: 'admin-super',
+        user_id: 'admin-super',
+        full_name: 'Abu Sayed',
+        email: currentEmail,
+        role: 'super_admin',
+        is_active: true,
+        created_at: new Date().toISOString()
+      }];
+      renderTable();
+      renderMobileCards();
+    }
+  }
+
+  function getRoleBadge(role) {
+    const map = {
+      super_admin: ['Super Admin', 'role-super'],
+      admin: ['Admin', 'role-admin'],
+      manager: ['Manager', 'role-manager']
+    };
+    const [label, cls] = map[role] || ['Unknown', 'role-admin'];
+    return `<span class="role-badge ${cls}">${label}</span>`;
+  }
+
+  function getInitial(name, email) {
+    return (name || email || 'A').charAt(0).toUpperCase();
+  }
+
+  function renderTable() {
+    const tbody = document.getElementById('adminTableBody');
+    if (admins.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text-muted);">No admin users found.</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = admins.map(a => `
+      <tr>
+        <td>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="width:36px;height:36px;border-radius:50%;background:var(--primary-light);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--primary);">${getInitial(a.full_name, a.email)}</div>
+            <span style="font-weight:700;">${a.full_name || '—'}</span>
+          </div>
+        </td>
+        <td style="color:var(--text-muted);">${a.email || '—'}</td>
+        <td>${getRoleBadge(a.role)}</td>
+        <td><span class="sa-status-badge ${a.is_active !== false ? 'status-delivered' : 'status-cancelled'}">${a.is_active !== false ? 'Active' : 'Suspended'}</span></td>
+        <td>
+          <button class="action-btn btn-del" onclick="removeAdmin('${a.id || a.user_id}')" title="Remove"><i class="fa-solid fa-user-minus"></i></button>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  function renderMobileCards() {
+    const container = document.getElementById('adminMobileCards');
+    if (admins.length === 0) {
+      container.innerHTML = `<div style="text-align:center;padding:48px 20px;color:var(--text-muted);"><i class="fa-solid fa-users-slash" style="font-size:40px;margin-bottom:12px;display:block;"></i><p>No admin users found.</p></div>`;
+      return;
+    }
+    container.innerHTML = admins.map(a => `
+      <div class="admin-card">
+        <div class="admin-card-avatar">${getInitial(a.full_name, a.email)}</div>
+        <div class="admin-card-info">
+          <div class="admin-card-name">${a.full_name || 'Admin User'}</div>
+          <div class="admin-card-email">${a.email || '—'}</div>
+          <div class="admin-card-role">${getRoleBadge(a.role)}</div>
+        </div>
+        <div class="admin-card-actions">
+          <span class="sa-status-badge ${a.is_active !== false ? 'status-delivered' : 'status-cancelled'}">${a.is_active !== false ? 'Active' : 'Suspended'}</span>
+          <button class="action-btn btn-del" onclick="removeAdmin('${a.id || a.user_id}')" title="Remove Admin">
+            <i class="fa-solid fa-user-minus"></i>
+          </button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function openInviteModal() {
+    document.getElementById('inviteForm').reset();
+    document.getElementById('inviteModal').classList.add('show');
+  }
+
+  function closeInviteModal() {
+    document.getElementById('inviteModal').classList.remove('show');
+  }
+
+  document.getElementById('inviteForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('inviteBtn');
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending...';
+    btn.disabled = true;
+
+    try {
+      const email = document.getElementById('inviteEmail').value.trim();
+      const name = document.getElementById('inviteName').value.trim();
+      const role = document.getElementById('inviteRole').value;
+
+      // Use Supabase admin invite (if using service role on backend this would call edge function)
+      // For now, use auth.signUp as invite simulation
+      const { data, error } = await window.db.auth.signUp({
+        email,
+        password: `TempAdmin${Math.random().toString(36).slice(2, 10)}!`,
+        options: {
+          data: { full_name: name, role: role },
+          emailRedirectTo: `${window.location.origin}/admin/login.html`
+        }
+      });
+
+      if (error) throw error;
+
+      // Try to add to admin_users table
+      try {
+        await window.db.from('admin_users').insert([{
+          user_id: data.user?.id,
+          full_name: name,
+          email: email,
+          role: role,
+          is_active: true
+        }]);
+      } catch (e) { /* table may not exist */ }
+
+      showToast(`Invitation sent to ${email}`, 'success');
+      closeInviteModal();
+      loadAdmins();
+    } catch (err) {
+      showToast(err.message, 'error');
+    } finally {
+      btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Send Invitation';
+      btn.disabled = false;
+    }
+  });
+
+  async function removeAdmin(id) {
+    const a = admins.find(x => x.id === id || x.user_id === id);
+    if (a && (a.email === '11@gmail.com' || a.email === 'mdabusayedsawon2005@gmail.com')) {
+      showToast('Cannot remove primary Super Admin account.', 'error');
+      return;
+    }
+    saConfirm('Are you sure you want to remove this admin? They will lose access to the panel.', async () => {
+      try {
+        const { error } = await window.db.from('admins').delete().or(`id.eq.${id},user_id.eq.${id}`);
+        if (error) throw error;
+        showToast('Admin removed', 'success');
+        loadAdmins();
+      } catch (err) {
+        showToast('Could not remove admin: ' + err.message, 'error');
+      }
+    });
+  }
+</script>
+</body>
+</html>

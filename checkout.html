@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script>
+    (function(){try{if(localStorage.getItem('sathe_achi_theme')==='dark'){document.documentElement.setAttribute('data-theme','dark');}else{document.documentElement.removeAttribute('data-theme');}}catch(e){}})();
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout | Sathe Achi</title>
+  <link rel="icon" href="logo.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="sa-style.css?v=31">
+  <style>
+    /* ══════════════════════════════════════════
+       PREMIUM CHECKOUT STYLESHEET
+    ══════════════════════════════════════════ */
+    body { background: #f0f3f7; font-family: 'Inter', sans-serif; } 
+    
+    .ck-header { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(0,0,0,0.05); padding: 18px 0; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 20px rgba(0,0,0,0.02); }
+    .ck-header-inner { display: flex; align-items: center; justify-content: space-between; }
+    .ck-secure-badge { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; color: #10b981; background: #ecfdf5; padding: 6px 12px; border-radius: 30px; }
+    
+    .ck-layout { display: grid; grid-template-columns: 1.8fr 1.2fr; gap: 32px; margin: 40px 0 100px; align-items: start; }
+    @media (max-width: 992px) { .ck-layout { grid-template-columns: 1fr; gap: 24px; margin: 20px 0 100px; } }
+
+    /* ─── CHECKOUT CARDS ─── */
+    .ck-card { background: var(--white); border-radius: 20px; padding: 32px; box-shadow: 0 8px 30px rgba(0,0,0,0.06); border: 1px solid rgba(0,0,0,0.05); margin-bottom: 24px; transition: transform 0.3s ease; }
+    .ck-card:hover { box-shadow: 0 8px 30px rgba(0,0,0,0.06); }
+    .ck-card-title { font-size: 20px; font-weight: 800; color: #1e293b; margin-bottom: 28px; display: flex; align-items: center; gap: 12px; letter-spacing: -0.02em; }
+    .ck-card-title i { color: var(--primary); font-size: 22px; background: var(--primary-light); padding: 10px; border-radius: 12px; }
+    
+    @media (max-width: 600px) { .ck-card { padding: 20px; border-radius: 16px; } }
+
+    /* ─── FORMS ─── */
+    .sa-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 16px; }
+    .sa-form-group.full { grid-column: span 2; }
+    @media (max-width: 600px) { .sa-form-grid { grid-template-columns: 1fr; gap: 16px; } .sa-form-group.full { grid-column: span 1; } }
+    
+    .sa-label { display: block; font-size: 13px; font-weight: 700; color: #475569; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .sa-label span { color: var(--danger); }
+    .sa-input, .sa-select { width: 100%; padding: 16px; border: 1.5px solid #e2e8f0; border-radius: var(--radius-md); font-size: 16px; background: #f8fafc; outline: none; transition: all 0.2s ease; font-family: var(--font-base); color: #0f172a; font-weight: 500; }
+    .sa-input:focus, .sa-select:focus { border-color: var(--primary); background: #fff; box-shadow: 0 0 0 4px rgba(255,107,0,0.1); }
+    .sa-input.error { border-color: var(--danger); background: #fef2f2; }
+    .sa-input::placeholder { color: #94a3b8; font-weight: 400; }
+
+    .sa-step-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--primary-light);
+      color: var(--primary);
+      font-size: 14px;
+      font-weight: 800;
+      margin-right: 6px;
+    }
+    [data-theme="dark"] .sa-step-badge {
+      background: rgba(255, 107, 0, 0.15);
+    }
+
+    /* ─── CHECKOUT PROGRESS STEPPER ─── */
+    .ck-stepper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 18px auto 26px auto;
+      max-width: 580px;
+      padding: 0 10px;
+    }
+    .ck-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      position: relative;
+      z-index: 2;
+      text-decoration: none;
+    }
+    .ck-step-circle {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #f1f5f9;
+      color: #94a3b8;
+      font-weight: 800;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #e2e8f0;
+      transition: all 0.3s ease;
+    }
+    .ck-step-text {
+      font-size: 12px;
+      font-weight: 700;
+      color: #94a3b8;
+      white-space: nowrap;
+      transition: color 0.3s ease;
+    }
+    .ck-step.completed .ck-step-circle {
+      background: #10b981;
+      border-color: #10b981;
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+    .ck-step.completed .ck-step-text {
+      color: #10b981;
+    }
+    .ck-step.active .ck-step-circle {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(255, 107, 0, 0.35);
+      transform: scale(1.08);
+    }
+    .ck-step.active .ck-step-text {
+      color: var(--primary);
+      font-weight: 800;
+    }
+    .ck-step-line {
+      flex: 1;
+      height: 3px;
+      background: #e2e8f0;
+      margin: -18px 8px 0 8px;
+      border-radius: 4px;
+      transition: background 0.3s ease;
+      min-width: 25px;
+    }
+    .ck-step-line.completed {
+      background: linear-gradient(90deg, #10b981, var(--primary));
+    }
+    [data-theme="dark"] .ck-step-circle {
+      background: #1e293b;
+      border-color: #334155;
+      color: #64748b;
+    }
+    [data-theme="dark"] .ck-step-line {
+      background: #334155;
+    }
+
+    /* ─── OPTIONS (DELIVERY & PAYMENT) ─── */
+    .ck-opt-grid { display: flex; flex-direction: column; gap: 16px; }
+    .ck-opt-label { display: flex; align-items: flex-start; gap: 16px; padding: 20px; border: 1px solid rgba(0,0,0,0.06); border-radius: 20px; cursor: pointer; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); background: rgba(255, 255, 255, 0.45); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); position: relative; overflow: hidden; box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.04); }
+    .ck-opt-label:hover { border-color: rgba(255, 107, 0, 0.3); background: rgba(255, 255, 255, 0.6); transform: translateY(-3px); box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.08); }
+    .ck-opt-label.active { border-color: var(--primary); background: rgba(255, 255, 255, 0.85); box-shadow: 0 12px 40px rgba(255,107,0,0.12); }
+    .ck-opt-label.active::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--primary); }
+    
+    .ck-opt-radio { margin-top: 4px; accent-color: var(--primary); width: 22px; height: 22px; cursor: pointer; }
+    .ck-opt-content { flex: 1; }
+    .ck-opt-title { font-size: 16px; font-weight: 800; color: #1e293b; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; }
+    .ck-opt-desc { font-size: 14px; color: #64748b; line-height: 1.5; font-weight: 500; }
+    
+    /* Payment specific */
+    .pmt-details { margin-top: 16px; padding-top: 16px; border-top: 1px dashed rgba(0,0,0,0.08); display: none; animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+    @keyframes fadeIn { from{opacity:0; transform:translateY(-8px);} to{opacity:1; transform:translateY(0);} }
+    .ck-opt-label.active .pmt-details { display: block; }
+    .pmt-inst { background: rgba(255, 107, 0, 0.03); padding: 16px; border-radius: 14px; font-size: 14px; color: #475569; border: 1px solid rgba(255,107,0,0.15); margin-bottom: 16px; line-height: 1.6; }
+    .pmt-inst strong { color: #0f172a; }
+
+    /* ─── SUMMARY CARD ─── */
+    .sum-items { max-height: 320px; overflow-y: auto; margin-bottom: 24px; padding-right: 10px; scrollbar-width: thin; }
+    .sum-items::-webkit-scrollbar { width: 6px; }
+    .sum-items::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    
+    .sum-item { display: flex; gap: 16px; margin-bottom: 20px; align-items: center; }
+    .sum-item:last-child { margin-bottom: 0; }
+    .sum-item-img { width: 64px; height: 64px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; padding: 6px; display: flex; align-items: center; justify-content: center; }
+    .sum-item-img img { width: 100%; height: 100%; object-fit: contain; }
+    .sum-item-info { flex: 1; }
+    .sum-item-title { font-size: 14px; font-weight: 700; color: #1e293b; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 4px; line-height: 1.4; }
+    .sum-item-qty { font-size: 13px; color: #64748b; font-weight: 600; }
+    .sum-item-price { font-size: 15px; font-weight: 800; color: #0f172a; }
+    
+    .sum-row { display: flex; justify-content: space-between; padding: 12px 0; font-size: 15px; }
+    .sum-row span:first-child { color: #64748b; font-weight: 600; }
+    .sum-row span:last-child { font-weight: 800; color: #1e293b; }
+    .sum-row.total { border-top: 2px dashed #e2e8f0; padding-top: 20px; margin-top: 10px; }
+    .sum-row.total span:first-child { font-size: 18px; font-weight: 900; color: #0f172a; text-transform: uppercase; }
+    .sum-row.total span:last-child { font-size: 28px; font-weight: 900; color: var(--primary); }
+
+    /* ─── DESKTOP SUBMIT BUTTON ─── */
+    .ck-submit-btn { width: 100%; padding: 20px; border-radius: 14px; background: var(--primary); color: #fff; font-size: 18px; font-weight: 800; border: none; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 12px; position: relative; overflow: hidden; }
+    .ck-submit-btn::after { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); transform: skewX(-20deg); transition: 0.5s; }
+    .ck-submit-btn:hover { background: #e65c00; transform: translateY(-3px); box-shadow: 0 12px 24px rgba(255,107,0,0.3); }
+    .ck-submit-btn:hover::after { left: 150%; }
+    .ck-submit-btn:disabled { background: #cbd5e1; cursor: not-allowed; transform: none; box-shadow: none; color: #f8fafc; }
+
+    /* ─── STICKY SUBMIT BAR (MOBILE) ─── */
+    .ck-sticky-bar {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--glass-bg);
+      backdrop-filter: var(--apple-blur);
+      -webkit-backdrop-filter: var(--apple-blur);
+      padding: 16px 16px calc(16px + env(safe-area-inset-bottom, 0px));
+      border-top: 1px solid var(--glass-border);
+      box-shadow: var(--apple-shadow);
+      z-index: 1000;
+    }
+    
+    @media (max-width: 992px) {
+      .ck-sticky-bar { display: block; }
+      .desktop-submit { display: none; }
+    }
+
+    /* ─── DARK MODE OVERRIDES ─── */
+    [data-theme="dark"] body { background: #0f172a; }
+    [data-theme="dark"] .ck-header { background: rgba(15, 23, 42, 0.95); border-color: rgba(255,255,255,0.05); }
+    [data-theme="dark"] .ck-header a.sa-btn-primary { color: #fff !important; }
+    [data-theme="dark"] .ck-card { background: rgba(30, 41, 59, 0.45); border-color: rgba(255, 255, 255, 0.05); }
+    [data-theme="dark"] .ck-card-title { color: #fff; }
+    [data-theme="dark"] .sa-label { color: #94a3b8; }
+    [data-theme="dark"] .sa-input, [data-theme="dark"] .sa-select { background: rgba(0, 0, 0, 0.15); border-color: rgba(255,255,255,0.08); color: #fff; }
+    [data-theme="dark"] .sa-input:focus, [data-theme="dark"] .sa-select:focus { background: rgba(0, 0, 0, 0.25); border-color: var(--primary); }
+    [data-theme="dark"] .ck-opt-label { background: rgba(0,0,0,0.1); border-color: rgba(255,255,255,0.05); }
+    [data-theme="dark"] .ck-opt-label:hover { background: rgba(0,0,0,0.15); border-color: rgba(255,255,255,0.08); }
+    [data-theme="dark"] .ck-opt-label.active { background: rgba(255, 107, 0, 0.05); border-color: var(--primary); }
+    [data-theme="dark"] .ck-opt-title { color: #fff; }
+    [data-theme="dark"] .ck-opt-desc { color: #94a3b8; }
+    [data-theme="dark"] .pmt-inst { background: rgba(0,0,0,0.2); border-color: rgba(255,107,0,0.2); color: #cbd5e1; }
+    [data-theme="dark"] .pmt-inst strong { color: #fff; }
+    [data-theme="dark"] .sum-item-img { background: rgba(0,0,0,0.15); border-color: rgba(255,255,255,0.05); }
+    [data-theme="dark"] .sum-item-title { color: #fff; }
+    [data-theme="dark"] .sum-item-qty { color: #94a3b8; }
+    [data-theme="dark"] .sum-item-price { color: #fff; }
+    [data-theme="dark"] .sum-row span:last-child { color: #fff; }
+    [data-theme="dark"] .sum-row.total span:first-child { color: #fff; }
+    [data-theme="dark"] .sum-row.total { border-color: rgba(255,255,255,0.08); }
+  </style>
+</head>
+<body class="sa-has-back-btn">
+
+<button class="sa-back-btn" onclick="navigateBack()" aria-label="Go back">
+  <i class="fa-solid fa-chevron-left"></i>
+</button>
+
+<div class="sa-toasts" id="toastContainer"></div>
+
+<!-- HEADER -->
+<header class="ck-header">
+  <div class="sa-wrap ck-header-inner">
+    <a href="cart.html" class="sa-btn-primary" style="background:transparent; color:var(--text-dark); border:1px solid var(--border); padding:8px 16px; font-size:13px; font-weight:600;"><i class="fa-solid fa-arrow-left"></i> Back</a>
+    <a href="index.html" class="sa-logo">
+      <div class="sa-logo-icon"><i class="fa-solid fa-bag-shopping"></i></div>
+      <span>Sathe<span style="color:var(--primary)">Achi</span></span>
+    </a>
+    <div class="ck-secure-badge"><i class="fa-solid fa-lock"></i> <span style="display:none;@media(min-width:600px){display:inline;}">Secure Checkout</span></div>
+  </div>
+</header>
+
+<section class="sa-section" style="padding-top:10px;">
+  <div class="sa-wrap">
+
+    <!-- CHECKOUT STEPPER -->
+    <div class="ck-stepper">
+      <a href="cart.html" class="ck-step completed" title="Return to cart">
+        <div class="ck-step-circle"><i class="fa-solid fa-check"></i></div>
+        <span class="ck-step-text">Cart</span>
+      </a>
+      <div class="ck-step-line completed"></div>
+      <div class="ck-step active">
+        <div class="ck-step-circle">2</div>
+        <span class="ck-step-text">Address</span>
+      </div>
+      <div class="ck-step-line"></div>
+      <div class="ck-step">
+        <div class="ck-step-circle">3</div>
+        <span class="ck-step-text">Payment</span>
+      </div>
+      <div class="ck-step-line"></div>
+      <div class="ck-step">
+        <div class="ck-step-circle"><i class="fa-solid fa-flag-checkered"></i></div>
+        <span class="ck-step-text">Confirmed</span>
+      </div>
+    </div>
+    
+    <!-- MAIN FORM -->
+    <form id="checkoutForm" class="ck-layout">
+      
+      <!-- LEFT COL: Forms -->
+      <div class="ck-col-main">
+        
+        <!-- ADDRESS -->
+        <div class="ck-card" id="addressCard">
+          <h2 class="ck-card-title"><span class="sa-step-badge">1</span> Shipping Address</h2>
+          <div class="sa-form-grid">
+            <div class="sa-form-group">
+              <label class="sa-label">Full Name <span>*</span></label>
+              <input type="text" class="sa-input" id="f_name" name="f_name" required placeholder="John Doe">
+            </div>
+            <div class="sa-form-group">
+              <label class="sa-label">Phone Number <span>*</span></label>
+              <input type="tel" class="sa-input" id="f_phone" name="f_phone" required placeholder="01XXXXXXXXX">
+            </div>
+            <div class="sa-form-group">
+              <label class="sa-label">Division <span>*</span></label>
+              <select class="sa-select" id="f_div" name="f_div" required>
+                <option value="">Select Division</option>
+                <option value="Dhaka">Dhaka</option>
+                <option value="Chattogram">Chattogram</option>
+                <option value="Rajshahi">Rajshahi</option>
+                <option value="Khulna">Khulna</option>
+                <option value="Barishal">Barishal</option>
+                <option value="Sylhet">Sylhet</option>
+                <option value="Rangpur">Rangpur</option>
+                <option value="Mymensingh">Mymensingh</option>
+              </select>
+            </div>
+            <div class="sa-form-group">
+              <label class="sa-label">District <span>*</span></label>
+              <select class="sa-select" id="f_district" name="f_district" required>
+                <option value="">Select District</option>
+              </select>
+            </div>
+            <div class="sa-form-group">
+              <label class="sa-label">Thana / Upazila <span>*</span></label>
+              <select class="sa-select" id="f_thana" name="f_thana" required>
+                <option value="">Select Thana</option>
+              </select>
+              <input type="text" class="sa-input" id="f_thana_manual" name="f_thana_manual" placeholder="Type Thana manually" style="display:none; margin-top:8px;">
+            </div>
+            <div class="sa-form-group">
+              <label class="sa-label">House / Flat <span>*</span></label>
+              <input type="text" class="sa-input" id="f_house" name="f_house" required placeholder="e.g. House 12, Flat 3A">
+            </div>
+            <div class="sa-form-group">
+              <label class="sa-label">Road / Street <span>*</span></label>
+              <input type="text" class="sa-input" id="f_road" name="f_road" required placeholder="e.g. Road 5, Block B">
+            </div>
+            <div class="sa-form-group">
+              <label class="sa-label">Village / Sector / Area <span>*</span></label>
+              <input type="text" class="sa-input" id="f_village" name="f_village" required placeholder="e.g. Sector 3, Uttara">
+            </div>
+            <div class="sa-form-group full">
+              <label class="sa-label">Landmark (Optional)</label>
+              <input type="text" class="sa-input" id="f_landmark" name="f_landmark" placeholder="e.g. Near Mosque">
+            </div>
+          </div>
+        </div>
+
+        <!-- DELIVERY OPTIONS -->
+        <div class="ck-card">
+          <h2 class="ck-card-title"><span class="sa-step-badge">2</span> Delivery Method</h2>
+          <div class="ck-opt-grid" id="deliveryOptions">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+        <!-- PAYMENT METHODS -->
+        <div class="ck-card">
+          <h2 class="ck-card-title"><span class="sa-step-badge">3</span> Payment Method</h2>
+          <div class="ck-opt-grid" id="paymentOptions">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+        
+      </div>
+
+      <!-- RIGHT COL: Summary -->
+      <div class="ck-col-side">
+        <div class="ck-card" style="position: sticky; top: 90px;">
+          <h2 class="ck-card-title"><span class="sa-step-badge">4</span> Order Summary</h2>
+          
+          <div class="sum-items" id="sumItemsList"></div>
+          
+          <div style="border-top:1px solid var(--border); padding-top:12px;">
+            <div class="sum-row"><span>Subtotal (<span id="sumItemCount">0</span> items)</span><span id="sumSubtotal">৳0</span></div>
+            <div class="sum-row"><span>Shipping Fee</span><span id="sumShipping">৳0</span></div>
+            <div class="sum-row" id="discountRow" style="display:none; color:#10b981;"><span>Coupon Discount</span><span id="sumDiscount">-৳0</span></div>
+            <div class="sum-row total"><span>Total Payable</span><span id="sumTotal">৳0</span></div>
+          </div>
+          
+          <div class="desktop-submit" style="margin-top: 24px;">
+            <button type="submit" class="ck-submit-btn" id="btnDesktopSubmit">
+              Place Order ৳<span id="btnTotalD">0</span>
+            </button>
+            <p style="font-size:11px; color:var(--text-muted); text-align:center; margin-top:12px;">By placing this order, you agree to our Terms & Conditions.</p>
+          </div>
+        </div>
+      </div>
+      
+    </form>
+  </div>
+</section>
+
+<!-- MOBILE STICKY SUBMIT -->
+<div class="ck-sticky-bar">
+  <button type="button" class="ck-submit-btn" id="btnMobileSubmit" onclick="submitCheckout()">
+    Place Order ৳<span id="btnTotalM">0</span>
+  </button>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="script.js?v=38"></script>
+<script>
+/**
+ * ════════════════════════════════════════════════════════════════
+ *  CHECKOUT ENGINE v2 — PRODUCTION READY
+ *  All 10 issues fixed:
+ *  1. No more name='' errors — form has name attrs + no required on hidden inputs
+ *  2. Full 64-district BD location system
+ *  3. Profile address auto-fill with division column
+ *  4. Payment logos use FontAwesome — zero external image URLs
+ *  5. Merchant number clearly displayed with copy button
+ *  6. Delivery methods from DB (delivery_methods table)
+ *  7. Order summary from DB cart + localStorage fallback
+ *  8. Pre-submit validation with per-field errors
+ *  9. DB audit: addresses.division, payment_settings.requires_trx
+ *  10. Cart loads from DB (cart_items → products join) then localStorage
+ * ════════════════════════════════════════════════════════════════
+ */
+
+let ckCart = [];
+let paymentSettings = [];
+let deliveryMethods = [];
+let deliverySettings = { insideDhaka: 60, outsideDhaka: 120, expressCharge: 150, freeThreshold: 10000 };
+
+let checkoutState = {
+  subtotal: 0,
+  shipping: 60,
+  discount: 0,
+  total: 0,
+  deliveryMethod: null,
+  paymentMethod: null,
+  paymentSenderNum: '',
+  paymentTrxId: ''
+};
+
+// ── PAYMENT METHOD ICONS (all inline, zero external URLs) ──
+const PMT_ICONS = {
+  cod:      '<div style="width:44px;height:44px;border-radius:12px;background:rgba(16,185,129,0.12);display:flex;align-items:center;justify-content:center;"><i class="fa-solid fa-money-bill-wave" style="color:#10b981;font-size:22px;"></i></div>',
+  bkash:    '<div style="width:44px;height:44px;border-radius:12px;background:#fce4ee;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;color:#e2125f;letter-spacing:-0.5px;">bKash</div>',
+  nagad:    '<div style="width:44px;height:44px;border-radius:12px;background:#fff3ed;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:12px;color:#f55c23;">Nagad</div>',
+  rocket:   '<div style="width:44px;height:44px;border-radius:12px;background:#f3e8ff;display:flex;align-items:center;justify-content:center;"><i class="fa-solid fa-rocket" style="color:#8c3494;font-size:20px;"></i></div>',
+  upay:     '<div style="width:44px;height:44px;border-radius:12px;background:#e0f2fe;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;color:#0284c7;">Upay</div>',
+  cellfin:  '<div style="width:44px;height:44px;border-radius:12px;background:#ecfdf5;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:11px;color:#059669;">Cell\nFin</div>',
+  bank:     '<div style="width:44px;height:44px;border-radius:12px;background:rgba(59,130,246,0.1);display:flex;align-items:center;justify-content:center;"><i class="fa-solid fa-building-columns" style="color:#3b82f6;font-size:20px;"></i></div>'
+};
+
+const PMT_COLORS = {
+  cod:'#10b981', bkash:'#e2125f', nagad:'#f55c23', rocket:'#8c3494', upay:'#0284c7', cellfin:'#059669', bank:'#3b82f6'
+};
+
+// ── GEOGRAPHY POPULATORS ──
+function populateCheckoutDistricts(division) {
+  const distSel = document.getElementById('f_district');
+  const thanaSel = document.getElementById('f_thana');
+  const thanaMan = document.getElementById('f_thana_manual');
+  if (!distSel) return;
+  distSel.innerHTML = '<option value="">Select District</option>';
+  if (thanaSel) thanaSel.innerHTML = '<option value="">Select Thana</option>';
+  if (thanaMan) { thanaMan.style.display = 'none'; thanaMan.value = ''; thanaMan.required = false; }
+  if (!division || !window.BD_GEOGRAPHY || !window.BD_GEOGRAPHY[division]) return;
+  Object.keys(window.BD_GEOGRAPHY[division]).forEach(d => {
+    const o = document.createElement('option'); o.value = d; o.textContent = d; distSel.appendChild(o);
+  });
+}
+
+function populateCheckoutThanas(division, district) {
+  const thanaSel = document.getElementById('f_thana');
+  const thanaMan = document.getElementById('f_thana_manual');
+  if (!thanaSel) return;
+  thanaSel.innerHTML = '<option value="">Select Thana</option>';
+  if (thanaMan) { thanaMan.style.display = 'none'; thanaMan.value = ''; thanaMan.required = false; }
+  if (!division || !district || !window.BD_GEOGRAPHY?.[division]?.[district]) return;
+  window.BD_GEOGRAPHY[division][district].forEach(t => {
+    const o = document.createElement('option'); o.value = t; o.textContent = t; thanaSel.appendChild(o);
+  });
+  const other = document.createElement('option');
+  other.value = 'Other'; other.textContent = 'Other — Type manually'; thanaSel.appendChild(other);
+}
+
+function getDeliveryCost() {
+  if (checkoutState.deliveryMethod) {
+    const dm = deliveryMethods.find(m => m.id === checkoutState.deliveryMethod);
+    if (dm) return parseFloat(dm.fee);
+  }
+  const div = document.getElementById('f_div')?.value;
+  return div === 'Dhaka' ? deliverySettings.insideDhaka : deliverySettings.outsideDhaka;
+}
+
+// ── INIT ──
+async function initCheckout() {
+  if (window.authChecking) {
+    await new Promise(resolve => document.addEventListener('authChecked', resolve, { once: true }));
+  }
+
+  if (!USER_STATE?.profile) {
+    try {
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      if (!session) { window.showLoginRequiredModal(() => window.location.href = 'index.html'); return; }
+      if (!window.USER_STATE) window.USER_STATE = {};
+      const { data: profile } = await supabaseClient.from('profiles').select('*').eq('id', session.user.id).single();
+      USER_STATE.profile = {
+        id: session.user.id,
+        name: profile?.full_name || session.user.email.split('@')[0] || 'User',
+        email: session.user.email,
+        phone: profile?.phone || ''
+      };
+    } catch (err) {
+      if (!USER_STATE?.profile) { window.showLoginRequiredModal(() => window.location.href = 'index.html'); return; }
+    }
+  }
+
+  // ISSUE 10: Load cart from DB first, then localStorage fallback
+  await loadCartFromDB();
+  if (ckCart.length === 0) { window.location.href = 'cart.html'; return; }
+
+  checkoutState.subtotal = ckCart.reduce((s, i) => s + ((i.price || 0) * (i.quantity || 1)), 0);
+  checkoutState.discount = parseFloat(localStorage.getItem('sathe_achi_coupon_discount')) || 0;
+
+  await Promise.all([fetchDeliveryMethods(), fetchPaymentSettings(), fetchSiteSettings()]);
+  renderSummaryItems();
+  renderDeliveryOptions();
+  renderPaymentOptions();
+  recalcTotals();
+  await prefillDefaultAddress();
+  bindAddressEvents();
+}
+
+// ISSUE 10: Load cart from DB with product join
+async function loadCartFromDB() {
+  try {
+    const userId = USER_STATE?.profile?.id;
+    if (!userId || !supabaseClient) throw new Error('no user');
+
+    const { data: dbItems, error } = await supabaseClient
+      .from('cart_items')
+      .select('product_id, quantity, products(id, name, sale_price, price, product_images(image_url, sort_order))')
+      .eq('user_id', userId);
+    if (error) throw error;
+
+    if (dbItems && dbItems.length > 0) {
+      ckCart = dbItems.map(item => {
+        const p = item.products;
+        if (!p) return null;
+        const imgs = (p.product_images || []).sort((a, b) => (a.sort_order||0) - (b.sort_order||0));
+        return {
+          id: item.product_id,
+          title: p.name,
+          price: parseFloat(p.sale_price || p.price || 0),
+          quantity: item.quantity || 1,
+          image: imgs[0]?.image_url || 'logo.png'
+        };
+      }).filter(Boolean).filter(i => i.price > 0);
+
+      // Sync to localStorage
+      localStorage.setItem('sathe_achi_cart', JSON.stringify(ckCart));
+      return;
+    }
+  } catch (e) {
+    console.warn('DB cart load failed, using localStorage:', e);
+  }
+
+  // Fallback: localStorage
+  ckCart = JSON.parse(localStorage.getItem('sathe_achi_cart') || '[]');
+  // Repair missing prices
+  const missing = ckCart.filter(i => !i.price || !i.title);
+  if (missing.length > 0 && supabaseClient) {
+    try {
+      const ids = missing.map(i => i.id);
+      const { data: prods } = await supabaseClient.from('products').select('id,name,sale_price,price').in('id', ids);
+      if (prods) {
+        ckCart = ckCart.map(item => {
+          const p = prods.find(x => x.id === item.id);
+          if (p && (!item.price || !item.title)) {
+            item.title = item.title || p.name;
+            item.price = item.price || parseFloat(p.sale_price || p.price);
+          }
+          return item;
+        }).filter(i => i.price > 0);
+        localStorage.setItem('sathe_achi_cart', JSON.stringify(ckCart));
+      }
+    } catch (e) { console.warn('Cart repair failed:', e); }
+  }
+}
+
+// ISSUE 6: Load delivery methods from DB
+async function fetchDeliveryMethods() {
+  try {
+    const { data, error } = await supabaseClient.from('delivery_methods').select('*').eq('is_active', true).order('sort_order');
+    if (error) throw error;
+    if (data && data.length > 0) {
+      deliveryMethods = data;
+      checkoutState.deliveryMethod = data[0].id;
+      checkoutState.shipping = parseFloat(data[0].fee);
+    }
+  } catch (err) {
+    console.warn('Using default delivery methods:', err);
+    deliveryMethods = [
+      { id: 'standard', name: 'Standard Delivery', description: '3–5 business days', fee: deliverySettings.insideDhaka, estimated_days: '3–5 days', sort_order: 1 },
+      { id: 'express', name: 'Express Delivery', description: 'Priority handling', fee: deliverySettings.expressCharge, estimated_days: '1–2 days', sort_order: 2 }
+    ];
+    checkoutState.deliveryMethod = 'standard';
+    checkoutState.shipping = deliverySettings.insideDhaka;
+  }
+}
+
+async function fetchSiteSettings() {
+  try {
+    const { data } = await supabaseClient.from('site_settings').select('key, value');
+    if (data) {
+      data.forEach(r => {
+        if (r.key === 'shipping_inside_dhaka')  deliverySettings.insideDhaka   = parseFloat(r.value);
+        if (r.key === 'shipping_outside_dhaka') deliverySettings.outsideDhaka  = parseFloat(r.value);
+        if (r.key === 'shipping_express')       deliverySettings.expressCharge = parseFloat(r.value);
+        if (r.key === 'shipping_free_threshold')deliverySettings.freeThreshold = parseFloat(r.value);
+      });
+    }
+  } catch (err) { console.warn('Site settings fetch failed:', err); }
+}
+
+async function fetchPaymentSettings() {
+  try {
+    const { data, error } = await supabaseClient.from('payment_settings').select('*').eq('is_enabled', true).order('sort_order', { ascending: true, nullsFirst: false });
+    if (error) throw error;
+    paymentSettings = data || [];
+    if (paymentSettings.length > 0 && !checkoutState.paymentMethod) {
+      checkoutState.paymentMethod = paymentSettings[0].id;
+    }
+  } catch (err) {
+    console.error('Payment settings failed:', err);
+    paymentSettings = [{ id: 'cod', name: 'Cash on Delivery', is_enabled: true, merchant_number: null, requires_trx: false }];
+    checkoutState.paymentMethod = 'cod';
+  }
+}
+
+// ISSUE 3: Address prefill using division column
+async function prefillDefaultAddress() {
+  if (!USER_STATE?.profile) return;
+  const fName = document.getElementById('f_name');
+  const fPhone = document.getElementById('f_phone');
+  if (fName && !fName.value) fName.value = USER_STATE.profile.name || '';
+  if (fPhone && !fPhone.value) fPhone.value = USER_STATE.profile.phone || '';
+
+  try {
+    const { data: addr } = await supabaseClient
+      .from('addresses').select('*').eq('user_id', USER_STATE.profile.id).eq('is_default', true).maybeSingle();
+    if (!addr) return;
+
+    if (fName && addr.full_name) fName.value = addr.full_name;
+    if (fPhone && addr.phone)    fPhone.value = addr.phone;
+
+    // Use division column (new) or fall back to district column (old data)
+    const division = addr.division || addr.district || '';
+    const divSel = document.getElementById('f_div');
+    if (divSel && division) {
+      divSel.value = division;
+      populateCheckoutDistricts(division);
+      updateDeliveryCost();
+
+      // area field stores "district, thana"
+      if (addr.area) {
+        const parts = addr.area.split(',').map(s => s.trim());
+        const distVal = parts[0] || '';
+        const thanaVal = parts[1] || '';
+        const distSel = document.getElementById('f_district');
+        if (distSel && distVal) {
+          distSel.value = distVal;
+          populateCheckoutThanas(division, distVal);
+          const thanaSel = document.getElementById('f_thana');
+          if (thanaSel && thanaVal) {
+            // Try to set the thana option
+            const exists = Array.from(thanaSel.options).some(o => o.value === thanaVal);
+            if (exists) {
+              thanaSel.value = thanaVal;
+            } else {
+              thanaSel.value = 'Other';
+              const thanaMan = document.getElementById('f_thana_manual');
+              if (thanaMan) { thanaMan.style.display = 'block'; thanaMan.required = true; thanaMan.value = thanaVal; }
+            }
+          }
+        }
+      }
+    }
+
+    if (addr.address) {
+      const parsed = parseAddressString(addr.address);
+      const fH = document.getElementById('f_house');
+      const fR = document.getElementById('f_road');
+      const fV = document.getElementById('f_village');
+      const fL = document.getElementById('f_landmark');
+      if (fH) fH.value = parsed.house;
+      if (fR) fR.value = parsed.road;
+      if (fV) fV.value = parsed.village;
+      if (fL) fL.value = parsed.landmark;
+    }
+    recalcTotals();
+  } catch (err) { console.warn('Address prefill failed:', err); }
+}
+
+function parseAddressString(s) {
+  const r = { house: '', road: '', village: '', landmark: '' };
+  if (!s) return r;
+  s.split(',').map(p => p.trim()).forEach(part => {
+    const lp = part.toLowerCase();
+    if (lp.startsWith('house:'))            r.house    = part.slice(6).trim();
+    else if (lp.startsWith('road:'))        r.road     = part.slice(5).trim();
+    else if (lp.startsWith('village/sector:')) r.village = part.slice(15).trim();
+    else if (lp.startsWith('village:'))     r.village  = part.slice(8).trim();
+    else if (lp.startsWith('landmark:'))    r.landmark = part.slice(9).trim();
+  });
+  if (!r.house && !r.road && !r.village) r.village = s;
+  return r;
+}
+
+function bindAddressEvents() {
+  const divSel   = document.getElementById('f_div');
+  const distSel  = document.getElementById('f_district');
+  const thanaSel = document.getElementById('f_thana');
+  const thanaMan = document.getElementById('f_thana_manual');
+
+  divSel?.addEventListener('change', e => {
+    populateCheckoutDistricts(e.target.value);
+    updateDeliveryCost();
+  });
+  distSel?.addEventListener('change', e => {
+    populateCheckoutThanas(divSel?.value || '', e.target.value);
+  });
+  thanaSel?.addEventListener('change', e => {
+    if (e.target.value === 'Other') {
+      if (thanaMan) { thanaMan.style.display = 'block'; thanaMan.required = true; thanaMan.focus(); }
+    } else {
+      if (thanaMan) { thanaMan.style.display = 'none'; thanaMan.required = false; thanaMan.value = ''; }
+    }
+  });
+}
+
+function updateDeliveryCost() {
+  if (checkoutState.deliveryMethod) {
+    const dm = deliveryMethods.find(m => m.id === checkoutState.deliveryMethod);
+    if (dm) {
+      const division = document.getElementById('f_div')?.value;
+      if (dm.id === 'standard') {
+        const baseCost = division === 'Dhaka' ? deliverySettings.insideDhaka : deliverySettings.outsideDhaka;
+        checkoutState.shipping = checkoutState.subtotal >= deliverySettings.freeThreshold ? 0 : baseCost;
+      } else {
+        checkoutState.shipping = parseFloat(dm.fee);
+      }
+    }
+  }
+  renderDeliveryOptions();
+  recalcTotals();
+}
+
+// ISSUE 6: Render from DB delivery_methods
+function renderDeliveryOptions() {
+  const container = document.getElementById('deliveryOptions');
+  if (!container) return;
+  if (deliveryMethods.length === 0) {
+    container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);"><i class="fa-solid fa-spinner fa-spin"></i><p>Loading delivery options...</p></div>';
+    return;
+  }
+
+  const division = document.getElementById('f_div')?.value || '';
+  container.innerHTML = deliveryMethods.map(dm => {
+    const isStd = dm.id === 'standard';
+    let cost = parseFloat(dm.fee);
+    if (isStd && division === 'Dhaka') cost = deliverySettings.insideDhaka;
+    else if (isStd) cost = deliverySettings.outsideDhaka;
+    const isFree = isStd && checkoutState.subtotal >= deliverySettings.freeThreshold;
+    if (isFree) cost = 0;
+    const isActive = checkoutState.deliveryMethod === dm.id;
+    const costLabel = isFree
+      ? '<span style="color:#10b981;font-weight:800;">FREE</span>'
+      : `৳${cost.toLocaleString()}`;
+    const icon = isStd ? 'fa-truck' : 'fa-bolt';
+
+    return `
+      <label class="ck-opt-label ${isActive ? 'active' : ''}">
+        <input type="radio" name="delivery" class="ck-opt-radio" value="${dm.id}"
+          ${isActive ? 'checked' : ''}
+          onchange="handleDeliveryChange('${dm.id}', ${cost})">
+        <div class="ck-opt-content">
+          <div class="ck-opt-title">
+            <span><i class="fa-solid ${icon}" style="margin-right:8px;color:var(--primary);"></i>${dm.name}</span>
+            <span style="font-size:16px;">${costLabel}</span>
+          </div>
+          <div class="ck-opt-desc"><i class="fa-regular fa-clock" style="margin-right:4px;"></i>${dm.description || dm.estimated_days || ''}</div>
+        </div>
+      </label>`;
+  }).join('');
+}
+
+window.handleDeliveryChange = function(id, cost) {
+  checkoutState.deliveryMethod = id;
+  checkoutState.shipping = cost;
+  renderDeliveryOptions();
+  recalcTotals();
+};
+
+// ISSUE 4 & 5: Payment options with inline icons and clear UX
+function renderPaymentOptions() {
+  const container = document.getElementById('paymentOptions');
+  if (!container) return;
+  if (paymentSettings.length === 0) {
+    container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);"><i class="fa-solid fa-spinner fa-spin"></i><p>Loading payment methods...</p></div>';
+    return;
+  }
+
+  container.innerHTML = paymentSettings.map(setting => {
+    const isSelected = checkoutState.paymentMethod === setting.id;
+    const iconHtml   = PMT_ICONS[setting.id] || PMT_ICONS.bank;
+    const color      = PMT_COLORS[setting.id] || 'var(--primary)';
+    const reqTrx     = setting.requires_trx !== false && setting.id !== 'cod';
+    const selStyle   = isSelected ? `border-color:${color};background:${color}11;box-shadow:0 8px 25px ${color}22;` : '';
+    const title      = setting.name || setting.id.charAt(0).toUpperCase() + setting.id.slice(1);
+
+    let detailsHtml = '';
+    if (reqTrx) {
+      detailsHtml = `
+        <div class="pmt-details" style="${isSelected ? 'display:block;margin-top:20px;' : 'display:none;'}">
+          <div class="pmt-inst">
+            <div style="margin-bottom:14px;">
+              <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;">Send Money To:</div>
+              <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                <span style="font-weight:900;color:${color};font-size:22px;letter-spacing:1px;">${setting.merchant_number || 'Not configured'}</span>
+                ${setting.merchant_number ? `<button type="button" onclick="event.stopPropagation();copyMerchantNumber('${setting.merchant_number}',this)" style="background:${color};border:none;color:#fff;padding:6px 14px;border-radius:8px;display:flex;align-items:center;gap:6px;cursor:pointer;font-weight:700;font-size:13px;"><i class="fa-solid fa-copy"></i> Copy</button>` : ''}
+              </div>
+            </div>
+            <div style="font-size:13.5px;line-height:1.8;color:var(--text-dark);border-top:1px dashed var(--border);padding-top:12px;">
+              ${setting.instructions || `<strong>Step 1:</strong> Open ${title} app.<br><strong>Step 2:</strong> Send Money to the number above.<br><strong>Step 3:</strong> Enter amount: <strong style="color:${color};">৳<span class="pmt-amount">${checkoutState.total.toLocaleString()}</span></strong><br><strong>Step 4:</strong> Copy Transaction ID and paste below.`}
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:12px;">
+            <div>
+              <label class="sa-label" style="font-size:11px;margin-bottom:6px;">Your Sender Number <span>*</span></label>
+              <input type="tel" class="sa-input" id="sender_${setting.id}"
+                placeholder="01XXXXXXXXX"
+                oninput="checkoutState.paymentSenderNum=this.value"
+                value="${isSelected ? (checkoutState.paymentSenderNum||'') : ''}"
+                style="padding:12px 14px;font-size:14px;border-radius:10px;">
+            </div>
+            <div>
+              <label class="sa-label" style="font-size:11px;margin-bottom:6px;">Transaction ID <span>*</span></label>
+              <input type="text" class="sa-input" id="trx_${setting.id}"
+                placeholder="e.g. 9XZ8K2L"
+                oninput="checkoutState.paymentTrxId=this.value"
+                value="${isSelected ? (checkoutState.paymentTrxId||'') : ''}"
+                style="padding:12px 14px;font-size:14px;border-radius:10px;">
+            </div>
+          </div>
+        </div>`;
+    }
+
+    return `
+      <div class="ck-opt-label ${isSelected ? 'active' : ''}" style="flex-direction:column;align-items:stretch;gap:0;${selStyle}">
+        <div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;" onclick="handlePaymentChange('${setting.id}')">
+          <div style="display:flex;align-items:center;gap:14px;flex:1;">
+            <input type="radio" name="payment" class="ck-opt-radio" value="${setting.id}" ${isSelected?'checked':''} style="margin:0;">
+            <div>
+              <div class="ck-opt-title" style="margin:0;font-size:15px;">${title}</div>
+              <div class="ck-opt-desc" style="margin-top:3px;font-size:13px;">${setting.id === 'cod' ? 'Pay cash when your order arrives.' : 'Send Money via ' + title}</div>
+            </div>
+          </div>
+          ${iconHtml}
+        </div>
+        ${detailsHtml}
+      </div>`;
+  }).join('');
+}
+
+window.copyMerchantNumber = function(number, btn) {
+  if (!number) return;
+  navigator.clipboard.writeText(number).then(() => {
+    showToast('Number copied!', 'success');
+    const icon = btn.querySelector('i');
+    if (icon) { icon.className = 'fa-solid fa-check'; setTimeout(() => icon.className = 'fa-solid fa-copy', 2000); }
+  });
+};
+
+window.handlePaymentChange = function(id) {
+  checkoutState.paymentMethod = id;
+  checkoutState.paymentTrxId = '';
+  checkoutState.paymentSenderNum = '';
+  renderPaymentOptions();
+};
+
+// ── SUMMARY & TOTALS ──
+function renderSummaryItems() {
+  const html = ckCart.map(item => `
+    <div class="sum-item">
+      <div class="sum-item-img"><img src="${item.image || 'logo.png'}" alt="${item.title || 'Product'}" onerror="this.src='logo.png'"></div>
+      <div class="sum-item-info">
+        <div class="sum-item-title">${item.title || 'Product'}</div>
+        <div class="sum-item-qty">Qty: ${item.quantity}</div>
+      </div>
+      <div class="sum-item-price">৳${((item.price||0)*item.quantity).toLocaleString()}</div>
+    </div>`).join('');
+  document.getElementById('sumItemsList').innerHTML = html || '<div style="text-align:center;padding:20px;color:var(--text-muted);">No items</div>';
+  document.getElementById('sumItemCount').textContent = ckCart.length;
+}
+
+function recalcTotals() {
+  checkoutState.total = Math.max(0, checkoutState.subtotal + checkoutState.shipping - checkoutState.discount);
+  const el = id => document.getElementById(id);
+  el('sumSubtotal').textContent = '৳' + checkoutState.subtotal.toLocaleString();
+  el('sumShipping').innerHTML = checkoutState.shipping === 0
+    ? '<span style="color:#10b981;font-weight:800;">FREE</span>'
+    : '৳' + checkoutState.shipping.toLocaleString();
+  const discRow = el('discountRow');
+  if (checkoutState.discount > 0 && discRow) {
+    discRow.style.display = 'flex';
+    el('sumDiscount').textContent = '-৳' + checkoutState.discount.toLocaleString();
+  } else if (discRow) {
+    discRow.style.display = 'none';
+  }
+  el('sumTotal').textContent  = '৳' + checkoutState.total.toLocaleString();
+  el('btnTotalD').textContent = checkoutState.total.toLocaleString();
+  el('btnTotalM').textContent = checkoutState.total.toLocaleString();
+  document.querySelectorAll('.pmt-amount').forEach(e => e.textContent = checkoutState.total.toLocaleString());
+}
+
+// ISSUE 1 & 8: Unified submit handler — called by both desktop form submit AND mobile button
+window.submitCheckout = async function() {
+  if (!USER_STATE?.profile) {
+    showToast('Session expired. Please log in again.', 'error');
+    setTimeout(() => window.location.href = 'login.html', 1500);
+    return;
+  }
+
+  // Per-field validation
+  const g = id => document.getElementById(id)?.value?.trim() || '';
+  const name     = g('f_name');
+  const phone    = g('f_phone');
+  const division = g('f_div');
+  const district = g('f_district');
+  const thanaRaw = g('f_thana');
+  const thanaMan = g('f_thana_manual');
+  const thana    = thanaRaw === 'Other' ? thanaMan : thanaRaw;
+  const house    = g('f_house');
+  const road     = g('f_road');
+  const village  = g('f_village');
+  const landmark = g('f_landmark');
+
+  const phoneRx = /^01[3-9]\d{8}$/;
+
+  if (!name)         { showToast('Please enter the recipient full name.', 'error'); document.getElementById('f_name')?.focus(); return; }
+  if (!phone)        { showToast('Please enter a phone number.', 'error'); document.getElementById('f_phone')?.focus(); return; }
+  if (!phoneRx.test(phone)) { showToast('Please enter a valid Bangladeshi phone number (e.g. 01712345678).', 'error'); document.getElementById('f_phone')?.focus(); return; }
+  if (!division)     { showToast('Please select your Division.', 'error'); document.getElementById('f_div')?.focus(); return; }
+  if (!district)     { showToast('Please select your District.', 'error'); document.getElementById('f_district')?.focus(); return; }
+  if (!thana)        { showToast('Please select or enter your Thana/Upazila.', 'error'); document.getElementById('f_thana')?.focus(); return; }
+  if (!house)        { showToast('Please enter your House/Flat number.', 'error'); document.getElementById('f_house')?.focus(); return; }
+  if (!road)         { showToast('Please enter your Road/Street.', 'error'); document.getElementById('f_road')?.focus(); return; }
+  if (!village)      { showToast('Please enter your Village/Sector/Area.', 'error'); document.getElementById('f_village')?.focus(); return; }
+  if (!checkoutState.deliveryMethod) { showToast('Please select a delivery method.', 'error'); return; }
+  if (!checkoutState.paymentMethod)  { showToast('Please select a payment method.', 'error'); return; }
+
+  // Payment-specific validation
+  const selectedPmt = paymentSettings.find(s => s.id === checkoutState.paymentMethod);
+  const reqTrx = selectedPmt?.requires_trx !== false && checkoutState.paymentMethod !== 'cod';
+  if (reqTrx) {
+    const sender = checkoutState.paymentSenderNum || document.getElementById(`sender_${checkoutState.paymentMethod}`)?.value?.trim() || '';
+    const trx    = checkoutState.paymentTrxId    || document.getElementById(`trx_${checkoutState.paymentMethod}`)?.value?.trim() || '';
+    if (!sender || !phoneRx.test(sender)) {
+      showToast('Please enter a valid sender phone number.', 'error');
+      document.getElementById(`sender_${checkoutState.paymentMethod}`)?.focus();
+      return;
+    }
+    if (!trx || trx.length < 5) {
+      showToast('Please enter a valid Transaction ID (minimum 5 characters).', 'error');
+      document.getElementById(`trx_${checkoutState.paymentMethod}`)?.focus();
+      return;
+    }
+    checkoutState.paymentSenderNum = sender;
+    checkoutState.paymentTrxId = trx;
+  }
+
+  if (ckCart.length === 0) { showToast('Your cart is empty.', 'error'); return; }
+  if (checkoutState.total <= 0) { showToast('Order total is invalid. Please refresh and try again.', 'error'); return; }
+
+  // Lock buttons
+  const btns = ['btnDesktopSubmit','btnMobileSubmit'].map(id => document.getElementById(id)).filter(Boolean);
+  btns.forEach(btn => { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Placing Order...'; });
+
+  try {
+    const orderNumber = 'SA-' + new Date().getFullYear() + '-' + Math.floor(100000 + Math.random() * 900000);
+    const userId      = USER_STATE.profile.id;
+    const couponCode  = localStorage.getItem('sathe_achi_coupon_code') || null;
+    const shippingAddress  = `House: ${house}, Road: ${road}, Village/Sector: ${village}${landmark ? ', Landmark: ' + landmark : ''}`;
+    const shippingDistrict = `${division}, ${district}, ${thana}`;
+
+    const { data: ord, error: ordErr } = await supabaseClient.from('orders').insert([{
+      user_id:          userId,
+      order_number:     orderNumber,
+      subtotal:         checkoutState.subtotal,
+      shipping_fee:     checkoutState.shipping,
+      discount:         checkoutState.discount,
+      total:            checkoutState.total,
+      payment_method:   checkoutState.paymentMethod,
+      payment_status:   'unpaid',
+      payment_trx_id:   reqTrx ? checkoutState.paymentTrxId : null,
+      sender_number:    reqTrx ? checkoutState.paymentSenderNum : null,
+      order_status:     'pending',
+      shipping_name:    name,
+      shipping_phone:   phone,
+      shipping_district: shippingDistrict,
+      shipping_address: shippingAddress,
+      delivery_method:  checkoutState.deliveryMethod,
+      coupon_code:      couponCode
+    }]).select().single();
+
+    if (ordErr) throw ordErr;
+
+    const orderItems = ckCart.map(item => ({
+      order_id:   ord.id,
+      product_id: item.id,
+      name:       item.title || 'Product',
+      image_url:  item.image || null,
+      quantity:   item.quantity,
+      price:      item.price
+    }));
+    const { error: itemsErr } = await supabaseClient.from('order_items').insert(orderItems);
+    if (itemsErr) throw itemsErr;
+
+    if (couponCode) {
+      try { await supabaseClient.rpc('increment_coupon_used_count', { coupon_code: couponCode }); }
+      catch (cpErr) { console.warn('Coupon increment failed:', cpErr); }
+    }
+
+    // Clear cart from both DB and localStorage
+    try { await supabaseClient.from('cart_items').delete().eq('user_id', userId); }
+    catch (e) { console.warn('DB cart clear failed:', e); }
+    ['sathe_achi_cart','sathe_achi_coupon_code','sathe_achi_coupon_discount',
+     'sathe_achi_coupon_type','sathe_achi_coupon_value','sathe_achi_coupon_min_order'
+    ].forEach(k => localStorage.removeItem(k));
+
+    window.location.href = `order-success.html?id=${orderNumber}`;
+
+  } catch (err) {
+    console.error('Order placement error:', err);
+    showToast('Order failed: ' + (err.message || 'Unknown error. Please try again.'), 'error');
+    btns.forEach(btn => {
+      btn.disabled = false;
+      btn.innerHTML = btn.id === 'btnDesktopSubmit'
+        ? 'Place Order <i class="fa-solid fa-arrow-right"></i>'
+        : 'Place Order ৳<span id="btnTotalM">' + checkoutState.total.toLocaleString() + '</span>';
+    });
+  }
+};
+
+// Desktop form submit also calls submitCheckout
+document.getElementById('checkoutForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  submitCheckout();
+});
+
+// Boot
+document.addEventListener('storeDataLoaded', initCheckout);
+
+// Fallback: self-initialize if storeDataLoaded already fired or takes too long
+(function tryInitFallback() {
+  if (window.supabaseClient && window.USER_STATE !== undefined) {
+    // storeDataLoaded listener handles it
+  }
+  let tries = 0;
+  const iv = setInterval(() => {
+    tries++;
+    if (window.supabaseClient && (window.USER_STATE !== undefined || tries > 30)) {
+      clearInterval(iv);
+      if (!document._ckInitDone) { document._ckInitDone = true; initCheckout(); }
+    }
+  }, 200);
+  document.addEventListener('storeDataLoaded', () => {
+    clearInterval(iv);
+    if (!document._ckInitDone) { document._ckInitDone = true; initCheckout(); }
+  });
+})();
+</script>
+<script src="sa-motion.js?v=4"></script>
+</body>
+</html>
+

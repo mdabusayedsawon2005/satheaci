@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script>
+    (function(){try{if(localStorage.getItem('sathe_achi_theme')==='dark'){document.documentElement.setAttribute('data-theme','dark');}else{document.documentElement.removeAttribute('data-theme');}}catch(e){}})();
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Help Center | Sathe Achi</title>
+  <meta name="description" content="Get help, find answers to frequently asked questions, and contact our support team.">
+  <link rel="icon" href="logo.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="sa-style.css?v=31">
+  <style>
+    /* ── HERO ── */
+    .hc-hero {
+      background: linear-gradient(135deg, #1c1c2e 0%, #2d1b5e 60%, #4c1b8a 100%);
+      padding: 60px 20px 80px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hc-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 70% 40%, rgba(255,107,0,0.15) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .hc-hero h1 {
+      font-size: clamp(28px, 5vw, 44px);
+      font-weight: 900;
+      color: #fff;
+      margin-bottom: 14px;
+      line-height: 1.2;
+    }
+    .hc-hero h1 span { color: var(--primary, #FF6B00); }
+    .hc-hero p {
+      font-size: 16px;
+      color: rgba(255,255,255,0.72);
+      max-width: 480px;
+      margin: 0 auto 32px;
+      line-height: 1.6;
+    }
+    .hc-search-wrap {
+      max-width: 520px;
+      margin: 0 auto;
+      position: relative;
+    }
+    .hc-search-wrap input {
+      width: 100%;
+      padding: 16px 54px 16px 20px;
+      border-radius: 50px;
+      border: none;
+      font-size: 15px;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      background: rgba(255,255,255,0.95);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    }
+    .hc-search-wrap i {
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #999;
+      font-size: 16px;
+    }
+
+    /* ── CONTACT CARDS ── */
+    .hc-contact-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 48px;
+    }
+    .hc-contact-card {
+      background: var(--white, #fff);
+      border-radius: 18px;
+      border: 1px solid var(--border, #eee);
+      padding: 24px 20px;
+      text-align: center;
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+    .hc-contact-card:hover { transform: translateY(-4px); box-shadow: 0 8px 32px rgba(0,0,0,0.12); }
+    .hc-contact-icon {
+      width: 56px; height: 56px;
+      border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px;
+      margin: 0 auto 14px;
+    }
+    .hc-contact-card h3 { font-size: 15px; font-weight: 800; margin-bottom: 6px; }
+    .hc-contact-card p { font-size: 13px; color: var(--text-muted, #888); line-height: 1.5; margin: 0; }
+    .hc-cc-wa .hc-contact-icon { background: rgba(37,211,102,0.12); color: #25D366; }
+    .hc-cc-phone .hc-contact-icon { background: rgba(0,122,255,0.1); color: #007AFF; }
+    .hc-cc-fb .hc-contact-icon { background: rgba(24,119,242,0.1); color: #1877F2; }
+    .hc-cc-email .hc-contact-icon { background: rgba(255,107,0,0.1); color: #FF6B00; }
+
+    /* ── SECTION HEADER ── */
+    .hc-sec-title {
+      font-size: 22px; font-weight: 900;
+      color: var(--text-dark, #1c1c2e);
+      margin-bottom: 6px;
+    }
+    .hc-sec-subtitle { font-size: 14px; color: var(--text-muted, #888); margin-bottom: 24px; }
+
+    /* ── FAQ ── */
+    .faq-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 48px; }
+    .faq-item {
+      background: var(--white, #fff);
+      border: 1px solid var(--border, #eee);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+      transition: box-shadow 0.2s;
+    }
+    .faq-item.open { box-shadow: 0 4px 18px rgba(0,0,0,0.1); }
+    .faq-q {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 18px 20px;
+      cursor: pointer;
+      font-weight: 700; font-size: 15px;
+      color: var(--text-dark, #1c1c2e);
+      gap: 12px;
+    }
+    .faq-q i { flex-shrink: 0; color: var(--primary, #FF6B00); transition: transform 0.3s; font-size: 14px; }
+    .faq-item.open .faq-q i { transform: rotate(180deg); }
+    .faq-a {
+      max-height: 0; overflow: hidden;
+      transition: max-height 0.35s ease, padding 0.25s;
+      font-size: 14px; color: var(--text-muted, #666); line-height: 1.75;
+    }
+    .faq-item.open .faq-a { max-height: 500px; }
+    .faq-a-inner { padding: 0 20px 18px; }
+
+    /* Search filter */
+    .faq-item.hidden { display: none; }
+
+    /* ── SUPPORT INFO ── */
+    .hc-info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px;
+      margin-bottom: 48px;
+    }
+    .hc-info-item {
+      background: var(--white, #fff);
+      border: 1px solid var(--border, #eee);
+      border-radius: 14px;
+      padding: 18px;
+      display: flex; align-items: flex-start; gap: 14px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+    }
+    .hc-info-icon {
+      width: 40px; height: 40px; flex-shrink: 0;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 17px;
+      background: var(--primary-light, rgba(255,107,0,0.1));
+      color: var(--primary, #FF6B00);
+    }
+    .hc-info-label { font-size: 12px; color: var(--text-muted, #888); font-weight: 600; margin-bottom: 4px; }
+    .hc-info-val { font-size: 14px; font-weight: 700; color: var(--text-dark, #1c1c2e); line-height: 1.4; }
+    .hc-info-val a { color: var(--primary, #FF6B00); text-decoration: none; }
+
+    /* ── TOPICS ── */
+    .hc-topics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 14px;
+      margin-bottom: 48px;
+    }
+    .hc-topic {
+      background: var(--white, #fff);
+      border: 1px solid var(--border, #eee);
+      border-radius: 14px;
+      padding: 20px 16px;
+      text-align: center;
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+      transition: all 0.2s;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+    }
+    .hc-topic:hover { transform: translateY(-3px); box-shadow: 0 6px 24px rgba(0,0,0,0.1); border-color: var(--primary, #FF6B00); }
+    .hc-topic i { font-size: 26px; color: var(--primary, #FF6B00); margin-bottom: 10px; }
+    .hc-topic span { display: block; font-size: 13px; font-weight: 700; color: var(--text-dark, #1c1c2e); }
+
+    @media (max-width: 600px) {
+      .hc-hero { padding: 40px 16px 60px; }
+      .hc-contact-grid { grid-template-columns: 1fr 1fr; }
+      .hc-topics-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+  </style>
+</head>
+<body class="sa-has-sticky-bar">
+<div class="sa-toasts" id="toastContainer"></div>
+
+<!-- HEADER -->
+<header class="sa-header" id="saHeader">
+  <div class="sa-wrap sa-header-inner">
+    <a href="index.html" class="sa-logo">
+      <img src="logo.png" alt="SatheAchi.com" class="sa-logo-img sa-logo-mobile" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+      <img src="sathe_achi_brand_logo.svg" alt="Sathe Achi" class="sa-logo-desktop">
+      <div class="sa-logo-icon" style="display:none;"><i class="fa-solid fa-handshake-simple"></i></div>
+    </a>
+
+    <div class="sa-hdr-actions">
+      <a href="index.html" class="sa-icon-btn sa-pc-home-btn" title="Home" aria-label="Home">
+        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+      </a>
+      <button class="sa-icon-btn theme-toggle" id="saTheme" title="Dark Mode" aria-label="Toggle theme">
+        <svg class="theme-icon-moon" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        <svg class="theme-icon-sun" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+      </button>
+      <a href="wishlist.html" class="sa-icon-btn" title="Wishlist" aria-label="Wishlist">
+        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+      </a>
+      <a href="cart.html" class="sa-icon-btn" title="Cart" aria-label="Cart">
+        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+        <span class="sa-badge cart-count">0</span>
+      </a>
+      <div style="position:relative;">
+        <button class="sa-icon-btn" id="saProfileBtn" title="Profile" aria-label="Profile menu">
+          <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        </button>
+        <div class="sa-profile-dropdown" id="saProfileDropdown">
+          <div class="sa-dropdown-logged-in" style="display:none;">
+            <div class="sa-dropdown-header"><div class="sa-dropdown-user-info"><span class="sa-user-name">Loading...</span><span class="sa-user-email"></span></div></div>
+            <div class="sa-dropdown-divider"></div>
+            <a href="account.html" class="sa-dropdown-item"><i class="fa-regular fa-user"></i> My Account</a>
+            <a href="orders.html" class="sa-dropdown-item"><i class="fa-solid fa-box"></i> My Orders</a>
+            <a href="wishlist.html" class="sa-dropdown-item"><i class="fa-regular fa-heart"></i> Wishlist</a>
+            <div class="sa-dropdown-divider"></div>
+            <a href="#" class="sa-dropdown-item" id="saHeaderLogout" style="color:#ef4444;"><i class="fa-solid fa-right-from-bracket" style="color:#ef4444;"></i> Logout</a>
+          </div>
+          <div class="sa-dropdown-guest">
+            <div class="sa-dropdown-header"><div class="sa-dropdown-user-info"><span class="sa-user-name">Welcome!</span><span class="sa-user-email">Sign in to your account</span></div></div>
+            <a href="login.html" class="sa-dropdown-login-btn">Sign In</a>
+            <a href="signup.html" class="sa-dropdown-item" style="justify-content:center;font-size:12px;color:var(--text-muted);">Create Account</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="hc-hero">
+  <h1>How can we <span>help you?</span></h1>
+  <p>Search our Help Center or choose a topic below. We're here for you.</p>
+  <div class="hc-search-wrap">
+    <input type="text" id="faqSearch" placeholder="Search FAQs (e.g. return, payment, delivery)...">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<section class="sa-section">
+  <div class="sa-wrap">
+
+    <!-- CONTACT CARDS -->
+    <div style="margin-top: -32px; margin-bottom: 48px;">
+      <div class="hc-contact-grid" id="contactCardsGrid">
+        <!-- Loaded from DB -->
+        <div class="sa-skeleton" style="height:130px; border-radius:18px;"></div>
+        <div class="sa-skeleton" style="height:130px; border-radius:18px;"></div>
+        <div class="sa-skeleton" style="height:130px; border-radius:18px;"></div>
+        <div class="sa-skeleton" style="height:130px; border-radius:18px;"></div>
+      </div>
+    </div>
+
+    <!-- TOPICS -->
+    <h2 class="hc-sec-title">Browse by Topic</h2>
+    <p class="hc-sec-subtitle">Find answers quickly by selecting a category</p>
+    <div class="hc-topics-grid">
+      <a href="#faq-orders" class="hc-topic" onclick="filterFaq('orders')">
+        <i class="fa-solid fa-box-open"></i><span>Orders</span>
+      </a>
+      <a href="#faq-section" class="hc-topic" onclick="filterFaq('payment')">
+        <i class="fa-solid fa-credit-card"></i><span>Payment</span>
+      </a>
+      <a href="#faq-section" class="hc-topic" onclick="filterFaq('delivery')">
+        <i class="fa-solid fa-truck"></i><span>Delivery</span>
+      </a>
+      <a href="#faq-section" class="hc-topic" onclick="filterFaq('returns')">
+        <i class="fa-solid fa-rotate-left"></i><span>Returns</span>
+      </a>
+      <a href="#faq-section" class="hc-topic" onclick="filterFaq('account')">
+        <i class="fa-solid fa-user-circle"></i><span>Account</span>
+      </a>
+      <a href="#faq-section" class="hc-topic" onclick="filterFaq('coupon')">
+        <i class="fa-solid fa-ticket"></i><span>Coupons</span>
+      </a>
+    </div>
+
+    <!-- FAQ -->
+    <div id="faq-section">
+      <h2 class="hc-sec-title">Frequently Asked Questions</h2>
+      <p class="hc-sec-subtitle">Quick answers to common questions</p>
+      <div class="faq-list" id="faqList">
+
+        <div class="faq-item" data-tags="orders delivery">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            How do I track my order?
+            <i class="fa-solid fa-chevron-down"></i>
+          </div>
+          <div class="faq-a"><div class="faq-a-inner">After placing your order, you will receive an SMS or email confirmation. You can also track your order status by visiting <a href="orders.html" style="color:var(--primary);">My Orders</a> in your account. Our team processes orders within 24 hours.</div></div>
+        </div>
+
+        <div class="faq-item" data-tags="delivery orders">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            How long does delivery take?
+            <i class="fa-solid fa-chevron-down"></i>
+          </div>
+          <div class="faq-a"><div class="faq-a-inner">Standard delivery within Dhaka takes 1–2 business days. Outside Dhaka takes 3–5 business days. Express delivery (same-day or next-day) is available for select areas. Delivery times may vary during peak seasons.</div></div>
+        </div>
+
+        <div class="faq-item" data-tags="delivery orders">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            What are the delivery charges?
+            <i class="fa-solid fa-chevron-down"></i>
+          </div>
+          <div class="faq-a"><div class="faq-a-inner" id="faqDeliveryCharges">Delivery charges depend on your location and order size. Standard delivery inside Dhaka starts from a small fee. Orders above a certain amount qualify for free delivery. You can see the exact charge at checkout before placing your order.</div></div>
+        </div>
+
+        <div class="faq-item" data-tags="payment">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            What payment methods are accepted?
+            <i class="fa-solid fa-chevron-down"></i>
+          </div>
+          <div class="faq-a"><div class="faq-a-inner">We accept Cash on Delivery (COD), bKash, Nagad, and Rocket. Simply select your preferred payment method at checkout. For mobile banking payments, you'll receive our merchant number to send the payment.</div></div>
+        </div>
+
+        <div class="faq-item" data-tags="payment">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            Is it safe to pay online?
+            <i class="fa-solid fa-chevron-down"></i>
+          </div>
+          <div class="faq-a"><div class="faq-a-inner">Yes, absolutely. All online transactions on SatheAchi are processed securely. We use industry-standard encryption to protect your payment information. You can also choose Cash on Delivery if you prefer to pay after receiving your items.</div></div>
+        </div>
+
+        <div class="faq-item" data-tags="returns">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            What is your return policy?
+            <i class="fa-solid fa-chevron-down"></i>
+          </div>
+          <div class="faq-a"><div class="faq-a-inner">We offer a 7-day return policy for most products. Items must be unused, in original packaging, and with all tags attached. To initiate a return, contact our support team with your order number and reason for return. Refunds are processed within 3–5 business days.</div></div>
+        </div>
+
+        <div class="faq-item" data-tags="returns">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            What if I receive a damaged or wrong item?
+            <i class="fa-solid fa-chevron-down"></i>
+          </div>
+          <div class="faq-a"><div class="faq-a-inner">We sincerely apologize for the inconvenience! Please contact us immediately with your order number and clear photos of the item. We will arrange a free replacement or full refund as quickly as possible.</div></div>
+        </div>
+
+        <div class="faq-item" data-tags="account">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            How do I create an account?
+            <i class="fa-solid fa-chevron-down"></i>
+          </div>
+          <div class="faq-a"><div class="faq-a-inner">Click "Sign Up" on the top right of any page. Enter your name, email address, and a secure password. You'll receive a verification email — click the link to activate your account. Creating an account lets you track orders, save wishlists, and checkout faster.</div></div>
+        </div>
+
+        <div class="faq-item" data-tags="account">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            I forgot my password. How do I reset it?
+            <i class="fa-solid fa-chevron-down"></i>
+          </div>
+          <div class="faq-a"><div class="faq-a-inner">Click <a href="forgot-password.html" style="color:var(--primary);">Forgot Password</a> on the login page and enter your registered email address. You'll receive a password reset link in your inbox within a few minutes. Check your spam folder if you don't see it.</div></div>
+        </div>
+
+        <div class="faq-item" data-tags="coupon">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            How do I apply a coupon code?
+            <i class="fa-solid fa-chevron-down"></i>
+          </div>
+          <div class="faq-a"><div class="faq-a-inner">Add items to your cart and go to the <a href="cart.html" style="color:var(--primary);">Cart page</a>. You'll see a "Apply Promo Code" section — enter your coupon code and click Apply. If the code is valid and your order meets the minimum requirements, the discount will be applied immediately.</div></div>
+        </div>
+
+        <div class="faq-item" data-tags="coupon">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            Why is my coupon code not working?
+            <i class="fa-solid fa-chevron-down"></i>
+          </div>
+          <div class="faq-a"><div class="faq-a-inner">Coupon codes may not work if: the code has expired, the minimum order requirement has not been met, the usage limit has been reached, or the code was already used. Check the coupon's terms and conditions, or contact us for assistance.</div></div>
+        </div>
+
+        <div class="faq-item" data-tags="orders">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            Can I cancel or change my order?
+            <i class="fa-solid fa-chevron-down"></i>
+          </div>
+          <div class="faq-a"><div class="faq-a-inner">Orders can be cancelled or modified within 1 hour of placement. After that, the order may have already been dispatched and changes may not be possible. Please contact our support team as soon as possible if you need to make changes.</div></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- SUPPORT INFO -->
+    <h2 class="hc-sec-title">Support Information</h2>
+    <p class="hc-sec-subtitle">All contact details are loaded directly from our system</p>
+    <div class="hc-info-grid" id="supportInfoGrid">
+      <div class="sa-skeleton" style="height:80px; border-radius:14px;"></div>
+      <div class="sa-skeleton" style="height:80px; border-radius:14px;"></div>
+      <div class="sa-skeleton" style="height:80px; border-radius:14px;"></div>
+      <div class="sa-skeleton" style="height:80px; border-radius:14px;"></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- MOBILE BOTTOM NAV -->
+<div class="sa-bottom-nav">
+  <a href="index.html" class="sa-bn-item">
+    <div class="sa-bn-icon-wrap">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+    </div>
+    <span class="sa-bn-label">Home</span>
+  </a>
+  <a href="categories.html" class="sa-bn-item">
+    <div class="sa-bn-icon-wrap">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"></rect><rect x="14" y="3" width="7" height="7" rx="2"></rect><rect x="14" y="14" width="7" height="7" rx="2"></rect><rect x="3" y="14" width="7" height="7" rx="2"></rect></svg>
+    </div>
+    <span class="sa-bn-label">Categories</span>
+  </a>
+  <a href="cart.html" class="sa-bn-item">
+    <div class="sa-bn-icon-wrap">
+      <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+      <span class="sa-cart-count sa-bn-badge" style="display:none;">0</span>
+    </div>
+    <span class="sa-bn-label">Cart</span>
+  </a>
+  <a href="wishlist.html" class="sa-bn-item">
+    <div class="sa-bn-icon-wrap">
+      <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+    </div>
+    <span class="sa-bn-label">Wishlist</span>
+  </a>
+  <a href="account.html" class="sa-bn-item">
+    <div class="sa-bn-icon-wrap">
+      <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+    </div>
+    <span class="sa-bn-label">Account</span>
+  </a>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="script.js?v=31"></script>
+<script>
+// ── FAQ Accordion ──
+function toggleFaq(btn) {
+  const item = btn.closest('.faq-item');
+  const isOpen = item.classList.contains('open');
+  // Close all
+  document.querySelectorAll('.faq-item.open').forEach(el => el.classList.remove('open'));
+  // Open clicked if was closed
+  if (!isOpen) item.classList.add('open');
+}
+
+// ── FAQ Search ──
+document.getElementById('faqSearch').addEventListener('input', function() {
+  const q = this.value.trim().toLowerCase();
+  document.querySelectorAll('.faq-item').forEach(item => {
+    const text = item.textContent.toLowerCase();
+    item.classList.toggle('hidden', q.length > 1 && !text.includes(q));
+  });
+  document.querySelector('#faq-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
+
+// ── Topic Filter ──
+window.filterFaq = function(tag) {
+  document.querySelectorAll('.faq-item').forEach(item => {
+    const tags = (item.dataset.tags || '').split(' ');
+    item.classList.toggle('hidden', !tags.includes(tag));
+    item.classList.remove('open');
+  });
+  document.getElementById('faqSearch').value = '';
+  setTimeout(() => {
+    document.getElementById('faq-section').scrollIntoView({ behavior: 'smooth' });
+  }, 100);
+};
+
+// ── Load Support Info from DB ──
+function renderSupportInfo() {
+  const s = window.siteSettings || {};
+  const phone   = s['contact_phone'] || s['support_phone']  || '';
+  const email   = s['contact_email'] || s['support_email']  || '';
+  const wa      = s['whatsapp']        || '';
+  const fb      = s['social_fb']       || '';
+  const hours   = s['business_hours'] || '';
+  const address = s['contact_address']|| '';
+  const inDhaka = s['shipping_inside_dhaka']    || '';
+  const outDhaka= s['shipping_outside_dhaka']   || '';
+  const freeT   = s['shipping_free_threshold']  || '';
+
+  const grid = document.getElementById('supportInfoGrid');
+  if (!grid) return;
+
+  let items = '';
+
+  if (phone) items += `
+    <a href="tel:${phone}" class="hc-info-item" style="text-decoration:none;color:inherit;">
+      <div class="hc-info-icon"><i class="fa-solid fa-phone"></i></div>
+      <div><div class="hc-info-label">Support Phone</div><div class="hc-info-val">${phone}</div></div>
+    </a>`;
+
+  if (email) items += `
+    <a href="mailto:${email}" class="hc-info-item" style="text-decoration:none;color:inherit;">
+      <div class="hc-info-icon"><i class="fa-solid fa-envelope"></i></div>
+      <div><div class="hc-info-label">Support Email</div><div class="hc-info-val">${email}</div></div>
+    </a>`;
+
+  if (wa) {
+    let waUrl = wa;
+    if (!wa.startsWith('http')) { const c = wa.replace(/[^\d+]/g,''); waUrl = `https://wa.me/${c}`; }
+    items += `
+    <a href="${waUrl}" target="_blank" class="hc-info-item" style="text-decoration:none;color:inherit;">
+      <div class="hc-info-icon" style="background:rgba(37,211,102,0.12);color:#25D366;"><i class="fa-brands fa-whatsapp"></i></div>
+      <div><div class="hc-info-label">WhatsApp</div><div class="hc-info-val">${wa}</div></div>
+    </a>`;
+  }
+
+  if (fb) items += `
+    <a href="${fb}" target="_blank" class="hc-info-item" style="text-decoration:none;color:inherit;">
+      <div class="hc-info-icon" style="background:rgba(24,119,242,0.1);color:#1877F2;"><i class="fa-brands fa-facebook"></i></div>
+      <div><div class="hc-info-label">Facebook Page</div><div class="hc-info-val">Visit Page</div></div>
+    </a>`;
+
+  if (hours) items += `
+    <div class="hc-info-item">
+      <div class="hc-info-icon" style="background:rgba(52,199,89,0.1);color:#34C759;"><i class="fa-regular fa-clock"></i></div>
+      <div><div class="hc-info-label">Business Hours</div><div class="hc-info-val">${hours}</div></div>
+    </div>`;
+
+  if (address) items += `
+    <div class="hc-info-item">
+      <div class="hc-info-icon" style="background:rgba(255,59,48,0.08);color:#FF3B30;"><i class="fa-solid fa-location-dot"></i></div>
+      <div><div class="hc-info-label">Address</div><div class="hc-info-val">${address}</div></div>
+    </div>`;
+
+  if (inDhaka || outDhaka) items += `
+    <div class="hc-info-item">
+      <div class="hc-info-icon" style="background:rgba(255,107,0,0.1);color:#FF6B00;"><i class="fa-solid fa-truck"></i></div>
+      <div>
+        <div class="hc-info-label">Delivery Charges</div>
+        <div class="hc-info-val">${inDhaka ? `Inside Dhaka: ৳${inDhaka}` : ''}${inDhaka && outDhaka ? '<br>' : ''}${outDhaka ? `Outside Dhaka: ৳${outDhaka}` : ''}</div>
+      </div>
+    </div>`;
+
+  if (freeT && parseFloat(freeT) > 0) items += `
+    <div class="hc-info-item">
+      <div class="hc-info-icon" style="background:rgba(52,199,89,0.1);color:#34C759;"><i class="fa-solid fa-star"></i></div>
+      <div><div class="hc-info-label">Free Delivery</div><div class="hc-info-val">On orders above ৳${parseFloat(freeT).toLocaleString()}</div></div>
+    </div>`;
+
+  grid.innerHTML = items || '<p style="color:var(--text-muted);font-size:14px;grid-column:1/-1;">Support information not available.</p>';
+
+  // Also update FAQ delivery charges text
+  const faqDel = document.getElementById('faqDeliveryCharges');
+  if (faqDel && (inDhaka || outDhaka || freeT)) {
+    let txt = '';
+    if (inDhaka) txt += `Standard delivery inside Dhaka: ৳${inDhaka}. `;
+    if (outDhaka) txt += `Outside Dhaka: ৳${outDhaka}. `;
+    if (freeT && parseFloat(freeT) > 0) txt += `Orders above ৳${parseFloat(freeT).toLocaleString()} qualify for FREE delivery. `;
+    txt += `Express delivery is also available at checkout.`;
+    faqDel.textContent = txt;
+  }
+}
+
+// ── Load Contact Cards from DB ──
+function renderContactCards() {
+  const s = window.siteSettings || {};
+  const wa     = s['whatsapp']       || '';
+  const phone  = s['contact_phone']  || s['support_phone'] || '';
+  const fb     = s['social_fb']      || s['social_messenger'] || '';
+  const email  = s['contact_email']  || s['support_email'] || '';
+  const yt     = s['social_yt']      || '';
+  const tiktok = s['social_tiktok']  || '';
+
+  const grid = document.getElementById('contactCardsGrid');
+  if (!grid) return;
+
+  let cards = '';
+
+  if (wa) {
+    let waUrl = wa;
+    if (!wa.startsWith('http')) { const c = wa.replace(/[^\d+]/g,''); waUrl = `https://wa.me/${c}`; }
+    cards += `<a href="${waUrl}" target="_blank" class="hc-contact-card hc-cc-wa">
+      <div class="hc-contact-icon"><i class="fa-brands fa-whatsapp"></i></div>
+      <h3>WhatsApp</h3>
+      <p>Chat with us instantly. Fast replies guaranteed.</p>
+    </a>`;
+  }
+
+  if (phone) {
+    cards += `<a href="tel:${phone}" class="hc-contact-card hc-cc-phone">
+      <div class="hc-contact-icon"><i class="fa-solid fa-phone"></i></div>
+      <h3>Call Support</h3>
+      <p>${phone}</p>
+    </a>`;
+  }
+
+  if (fb) {
+    cards += `<a href="${fb}" target="_blank" class="hc-contact-card hc-cc-fb">
+      <div class="hc-contact-icon"><i class="fa-brands fa-facebook"></i></div>
+      <h3>Facebook</h3>
+      <p>Message us on our Facebook page.</p>
+    </a>`;
+  }
+
+  if (email) {
+    cards += `<a href="mailto:${email}" class="hc-contact-card hc-cc-email">
+      <div class="hc-contact-icon"><i class="fa-solid fa-envelope"></i></div>
+      <h3>Email Support</h3>
+      <p>${email}</p>
+    </a>`;
+  }
+
+  if (yt) {
+    cards += `<a href="${yt}" target="_blank" class="hc-contact-card" style="border-top:3px solid #ff0000;">
+      <div class="hc-contact-icon" style="color:#ff0000;background:rgba(255,0,0,0.1);"><i class="fa-brands fa-youtube"></i></div>
+      <h3>YouTube</h3>
+      <p>Watch guides, tutorials and announcements.</p>
+    </a>`;
+  }
+
+  if (tiktok) {
+    cards += `<a href="${tiktok}" target="_blank" class="hc-contact-card" style="border-top:3px solid #000000;">
+      <div class="hc-contact-icon" style="color:#000000;background:rgba(0,0,0,0.1);"><i class="fa-brands fa-tiktok"></i></div>
+      <h3>TikTok</h3>
+      <p>Follow our TikTok channel for latest deals.</p>
+    </a>`;
+  }
+
+  if (!cards) {
+    cards = `<div style="grid-column:1/-1;text-align:center;padding:30px;color:var(--text-muted);font-size:14px;">
+      Contact information is being set up. Please check back soon.
+    </div>`;
+  }
+
+  grid.innerHTML = cards;
+}
+
+// Apply when settings load
+function applyHelpCenterData() {
+  renderContactCards();
+  renderSupportInfo();
+}
+
+document.addEventListener('storeDataLoaded', applyHelpCenterData);
+// Also try immediately in case already loaded
+if (window.siteSettings && Object.keys(window.siteSettings).length > 0) {
+  applyHelpCenterData();
+}
+</script>
+<script src="sa-motion.js?v=4"></script>
+</body>
+</html>
